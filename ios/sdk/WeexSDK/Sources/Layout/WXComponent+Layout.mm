@@ -135,14 +135,7 @@ bool flexIsUndefined(float value) {
                 strongSelf.layer.transform = CATransform3DIdentity;
             }
             
-            WXBoxShadow* usingBoxShadow = nil;
-            if (strongSelf->_darkThemeBoxShadow && [strongSelf.weexInstance isDarkTheme]) {
-                usingBoxShadow = strongSelf->_darkThemeBoxShadow;
-            }
-            else {
-                usingBoxShadow = strongSelf->_boxShadow;
-            }
-            
+            WXBoxShadow* usingBoxShadow = [strongSelf _chooseBoxShadow];            
             if (!CGRectEqualToRect(strongSelf.view.frame,strongSelf.calculatedFrame)) {
                 strongSelf.view.frame = strongSelf.calculatedFrame;
                 strongSelf->_absolutePosition = CGPointMake(NAN, NAN);

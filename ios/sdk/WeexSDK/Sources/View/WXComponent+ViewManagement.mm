@@ -75,6 +75,14 @@ do {\
     }\
 } while(0);
 
+#define WX_BOARD_RADIUS_LIGHT_THEME_COLOR_RESET_ALL(key)\
+do {\
+    if (styles && [styles containsObject:@#key]) {\
+        _lightThemeBorderTopColor = _lightThemeBorderLeftColor = _lightThemeBorderRightColor = _lightThemeBorderBottomColor = [UIColor blackColor];\
+        [self setNeedsDisplay];\
+    }\
+} while(0);
+
 #define WX_BOARD_COLOR_RESET(key)\
 do {\
     if (styles && [styles containsObject:@#key]) {\
@@ -186,8 +194,12 @@ do {\
     if (styles[@"darkThemeBackgroundColor"]) {
         self.darkThemeBackgroundColor = [WXConvert UIColor:styles[@"darkThemeBackgroundColor"]];
     }
+    if (styles[@"lightThemeBackgroundColor"]) {
+        self.lightThemeBackgroundColor = [WXConvert UIColor:styles[@"lightThemeBackgroundColor"]];
+    }
     _backgroundImage = styles[@"backgroundImage"] ? [WXConvert NSString:styles[@"backgroundImage"]]: nil;
     _darkThemeBackgroundImage = styles[@"darkThemeBackgroundImage"] ? [WXConvert NSString:styles[@"darkThemeBackgroundImage"]] : nil;
+    _lightThemeBackgroundImage = styles[@"lightThemeBackgroundImage"] ? [WXConvert NSString:styles[@"lightThemeBackgroundImage"]] : nil;
     _opacity = styles[@"opacity"] ? [WXConvert CGFloat:styles[@"opacity"]] : 1.0;
     _clipToBounds = styles[@"overflow"] ? [WXConvert WXClipType:styles[@"overflow"]] : NO;
     _visibility = styles[@"visibility"] ? [WXConvert WXVisibility:styles[@"visibility"]] : WXVisibilityShow;
@@ -199,6 +211,9 @@ do {\
     if (styles[@"darkThemeBoxShadow"]) {
         _darkThemeBoxShadow = [WXConvert WXBoxShadow:styles[@"darkThemeBoxShadow"] scaleFactor:self.weexInstance.pixelScaleFactor];
     }
+    if (styles[@"lightThemeBoxShadow"]) {
+        _lightThemeBoxShadow = [WXConvert WXBoxShadow:styles[@"lightThemeBoxShadow"] scaleFactor:self.weexInstance.pixelScaleFactor];
+    }
 }
 
 - (void)_transitionUpdateViewProperty:(NSDictionary *)styles
@@ -209,6 +224,9 @@ do {\
     }
     if (styles[@"darkThemeBackgroundColor"]) {
         self.darkThemeBackgroundColor = [WXConvert UIColor:styles[@"darkThemeBackgroundColor"]];
+    }
+    if (styles[@"lightThemeBackgroundColor"]) {
+        self.lightThemeBackgroundColor = [WXConvert UIColor:styles[@"lightThemeBackgroundColor"]];
     }
     if (styles[@"opacity"]) {
         _opacity = [WXConvert CGFloat:styles[@"opacity"]];
@@ -224,15 +242,11 @@ do {\
     if (styles[@"darkThemeBoxShadow"]) {
         _darkThemeBoxShadow = [WXConvert WXBoxShadow:styles[@"darkThemeBoxShadow"] scaleFactor:self.weexInstance.pixelScaleFactor];
     }
-    if (styles[@"boxShadow"] || styles[@"darkThemeBoxShadow"]) {
-        WXBoxShadow* usingBoxShadow = nil;
-        if (_darkThemeBoxShadow && [self.weexInstance isDarkTheme]) {
-            usingBoxShadow = _darkThemeBoxShadow;
-        }
-        else {
-            usingBoxShadow = _boxShadow;
-        }
-        
+    if (styles[@"lightThemeBoxShadow"]) {
+        _lightThemeBoxShadow = [WXConvert WXBoxShadow:styles[@"lightThemeBoxShadow"] scaleFactor:self.weexInstance.pixelScaleFactor];
+    }
+    if (styles[@"boxShadow"] || styles[@"darkThemeBoxShadow"] || styles[@"lightThemeBoxShadow"]) {
+        WXBoxShadow* usingBoxShadow = [self _chooseBoxShadow];
         if (usingBoxShadow) {
             _lastBoxShadow = usingBoxShadow;
             [self configBoxShadow:usingBoxShadow];
@@ -250,6 +264,11 @@ do {\
         [self setNeedsDisplay];
     }
     
+    if (styles[@"lightThemeBackgroundColor"]) {
+        self.lightThemeBackgroundColor = [WXConvert UIColor:styles[@"lightThemeBackgroundColor"]];
+        [self setNeedsDisplay];
+    }
+    
     if (styles[@"backgroundImage"]) {
         _backgroundImage = [WXConvert NSString:styles[@"backgroundImage"]];
     }
@@ -257,9 +276,14 @@ do {\
     if (styles[@"darkThemeBackgroundImage"]) {
         _darkThemeBackgroundImage = [WXConvert NSString:styles[@"darkThemeBackgroundImage"]];
     }
+    if (styles[@"lightThemeBackgroundImage"]) {
+        _lightThemeBackgroundImage = [WXConvert NSString:styles[@"lightThemeBackgroundImage"]];
+    }
     
-    if (styles[@"backgroundImage"] || styles[@"darkThemeBackgroundImage"]) {
-        if (_backgroundImage || _darkThemeBackgroundImage) {
+    if (styles[@"backgroundImage"] ||
+        styles[@"darkThemeBackgroundImage"] ||
+        styles[@"lightThemeBackgroundImage"]) {
+        if (_backgroundImage || _darkThemeBackgroundImage || _lightThemeBackgroundImage) {
             [self setGradientLayer];
         }
     }
@@ -344,11 +368,18 @@ do {\
     WX_BOARD_COLOR_RESET(borderLeftColor);
     WX_BOARD_COLOR_RESET(borderRightColor);
     WX_BOARD_COLOR_RESET(borderBottomColor);
+    
     WX_BOARD_RADIUS_DARK_THEME_COLOR_RESET_ALL(darkThemeBorderColor);
     WX_BOARD_COLOR_RESET(darkThemeBorderTopColor);
     WX_BOARD_COLOR_RESET(darkThemeBorderLeftColor);
     WX_BOARD_COLOR_RESET(darkThemeBorderRightColor);
     WX_BOARD_COLOR_RESET(darkThemeBorderBottomColor);
+    
+    WX_BOARD_RADIUS_LIGHT_THEME_COLOR_RESET_ALL(lightThemeBorderColor);
+    WX_BOARD_COLOR_RESET(lightThemeBorderTopColor);
+    WX_BOARD_COLOR_RESET(lightThemeBorderLeftColor);
+    WX_BOARD_COLOR_RESET(lightThemeBorderRightColor);
+    WX_BOARD_COLOR_RESET(lightThemeBorderBottomColor);
 }
 
 - (void)_resetStyles:(NSArray *)styles
@@ -361,6 +392,10 @@ do {\
         self.darkThemeBackgroundColor = nil;
         [self setNeedsDisplay];
     }
+    if (styles && [styles containsObject:@"lightThemeBackgroundColor"]) {
+        self.lightThemeBackgroundColor = nil;
+        [self setNeedsDisplay];
+    }
     
     if (styles && [styles containsObject:@"boxShadow"]) {
         _lastBoxShadow = _boxShadow;
@@ -371,6 +406,10 @@ do {\
         _darkThemeBoxShadow = nil;
         [self setNeedsDisplay];
     }
+    if (styles && [styles containsObject:@"lightThemeBoxShadow"]) {
+        _lightThemeBoxShadow = nil;
+        [self setNeedsDisplay];
+    }
     
     if (styles && [styles containsObject:@"backgroundImage"]) {
         _backgroundImage = nil;
@@ -378,7 +417,12 @@ do {\
     if (styles && [styles containsObject:@"darkThemeBackgroundImage"]) {
         _darkThemeBackgroundImage = nil;
     }
-    if (styles && ([styles containsObject:@"backgroundImage"] || [styles containsObject:@"darkThemeBackgroundImage"])) {
+    if (styles && [styles containsObject:@"lightThemeBackgroundImage"]) {
+        _lightThemeBackgroundImage = nil;
+    }
+    if (styles && ([styles containsObject:@"backgroundImage"] ||
+                   [styles containsObject:@"darkThemeBackgroundImage"] ||
+                   [styles containsObject:@"lightThemeBackgroundImage"])) {
         [self setGradientLayer];
     }
     

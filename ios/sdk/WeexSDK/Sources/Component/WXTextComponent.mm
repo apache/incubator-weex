@@ -122,6 +122,7 @@ static CGFloat WXTextDefaultLineThroughWidth = 1.2;
 @property (atomic, strong) NSString *fontFamily;
 @property (atomic, strong) UIColor *textColor;
 @property (atomic, strong) UIColor *darkThemeTextColor;
+@property (atomic, strong) UIColor *lightThemeTextColor;
 @end
 
 @implementation WXTextComponent
@@ -290,6 +291,22 @@ do {\
             }
             if (color) {
                 self.darkThemeTextColor = color;
+                [self setNeedsRepaint];
+            }
+        }
+    } while (0);
+    
+    do {
+        UIColor* color = nil;
+        id value = styles[@"lightThemeColor"];
+        if (value) {
+            if([WXUtility isBlankString:value]){
+                color = [UIColor blackColor];
+            } else {
+                color = [WXConvert UIColor:value];
+            }
+            if (color) {
+                self.lightThemeTextColor = color;
                 [self setNeedsRepaint];
             }
         }
@@ -526,7 +543,7 @@ do {\
         string = @"";
     }
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: string];
-    UIColor* textColor = [self.weexInstance chooseColor:self.textColor darkThemeColor:self.darkThemeTextColor invert:self.invertForDarkTheme scene:[self colorSceneType]];
+    UIColor* textColor = [self.weexInstance chooseColor:self.textColor lightThemeColor:self.lightThemeTextColor darkThemeColor:self.darkThemeTextColor invert:self.invertForDarkTheme scene:[self colorSceneType]];
     if (textColor) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:textColor range:NSMakeRange(0, string.length)];
     }
@@ -615,7 +632,7 @@ do {\
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
     
     // set textColor
-    UIColor* textColor = [self.weexInstance chooseColor:self.textColor darkThemeColor:self.darkThemeTextColor invert:self.invertForDarkTheme scene:[self colorSceneType]];
+    UIColor* textColor = [self.weexInstance chooseColor:self.textColor lightThemeColor:self.lightThemeTextColor darkThemeColor:self.darkThemeTextColor invert:self.invertForDarkTheme scene:[self colorSceneType]];
     if (textColor) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:textColor range:NSMakeRange(0, string.length)];
     }
@@ -1148,6 +1165,10 @@ NS_INLINE NSRange WXNSRangeFromCFRange(CFRange range) {
     }
     if ([styles containsObject:@"darkThemeColor"]) {
         self.darkThemeTextColor = nil;
+        [self setNeedsRepaint];
+    }
+    if ([styles containsObject:@"lightThemeColor"]) {
+        self.lightThemeTextColor = nil;
         [self setNeedsRepaint];
     }
     if ([styles containsObject:@"fontSize"]) {

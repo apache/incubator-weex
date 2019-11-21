@@ -59,8 +59,10 @@ static dispatch_queue_t WXImageUpdateQueue;
 
 @property (atomic, strong) NSString *src;
 @property (atomic, strong) NSString *darkThemeSrc;
+@property (atomic, strong) NSString *lightThemeSrc;
 @property (atomic, strong) NSString *placeholdSrc;
 @property (atomic, strong) NSString *darkThemePlaceholderSrc;
+@property (atomic, strong) NSString *lightThemePlaceholderSrc;
 @property (nonatomic, assign) CGFloat blurRadius;
 @property (nonatomic, assign) UIViewContentMode resizeMode;
 @property (nonatomic, assign) WXImageQuality imageQuality;
@@ -95,6 +97,9 @@ WX_EXPORT_METHOD(@selector(save:))
         }
         if (attributes[@"darkThemeSrc"]) {
             self.darkThemeSrc = [[WXConvert NSString:attributes[@"darkThemeSrc"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        }
+        if (attributes[@"lightThemeSrc"]) {
+            self.lightThemeSrc = [[WXConvert NSString:attributes[@"lightThemeSrc"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         }
         
         [self configPlaceHolder:attributes];
@@ -135,6 +140,9 @@ WX_EXPORT_METHOD(@selector(save:))
     }
     if (attributes[@"darkThemePlaceholder"]) {
         self.darkThemePlaceholderSrc = [[WXConvert NSString:attributes[@"darkThemePlaceholder"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    }
+    if (attributes[@"lightThemePlaceholder"]) {
+        self.lightThemePlaceholderSrc = [[WXConvert NSString:attributes[@"lightThemePlaceholder"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     }
 }
 
@@ -266,6 +274,9 @@ WX_EXPORT_METHOD(@selector(save:))
     if (attributes[@"darkThemeSrc"]) {
         self.darkThemeSrc = [[WXConvert NSString:attributes[@"darkThemeSrc"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     }
+    if (attributes[@"lightThemeSrc"]) {
+        self.lightThemeSrc = [[WXConvert NSString:attributes[@"lightThemeSrc"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    }
     if (attributes[@"src"]) {
         [self setImageSrc:[[WXConvert NSString:attributes[@"src"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
     }
@@ -301,7 +312,8 @@ WX_EXPORT_METHOD(@selector(save:))
 {
     [super themeDidChange:theme];
     if (_view) {
-        if (self.darkThemeSrc || self.darkThemePlaceholderSrc) {
+        if (self.darkThemeSrc || self.darkThemePlaceholderSrc ||
+            self.lightThemeSrc || self.lightThemePlaceholderSrc) {
             [self updateImage];
         }
     }
@@ -391,6 +403,24 @@ WX_EXPORT_METHOD(@selector(save:))
     }
 }
 
+- (NSString*)chooseImage:(NSString*)src lightSrc:(NSString*)lightSrc darkSrc:(NSString*)darkSrc
+{
+    if ([self.weexInstance isDarkTheme]) {
+        if (darkSrc) {
+            return darkSrc;
+        }
+        else {
+            return src;
+        }
+    }
+    else if (lightSrc) {
+        return lightSrc;
+    }
+    else {
+        return src;
+    }
+}
+
 - (void)updateImage
 {
     if (CGSizeEqualToSize(_view.frame.size, CGSizeZero)) {
@@ -398,9 +428,8 @@ WX_EXPORT_METHOD(@selector(save:))
         return;
     }
     
-    BOOL isDarkMode = [self.weexInstance isDarkTheme];
-    NSString* choosedSrc = isDarkMode ? (self.darkThemeSrc ?: self.src) : self.src;
-    NSString* choosedPlaceholder = isDarkMode ? (self.darkThemePlaceholderSrc ?: self.placeholdSrc) : self.placeholdSrc;
+    NSString* choosedSrc = [self chooseImage:self.src lightSrc:self.lightThemeSrc darkSrc:self.darkThemeSrc];
+    NSString* choosedPlaceholder = [self chooseImage:self.placeholdSrc lightSrc:self.lightThemePlaceholderSrc darkSrc:self.darkThemePlaceholderSrc];
     
     __weak typeof(self) weakSelf = self;
     if (_downloadImageWithURL && [[self imageLoader] respondsToSelector:@selector(setImageViewWithURL:url:placeholderImage:options:progress:completed:)]) {
@@ -531,8 +560,7 @@ WX_EXPORT_METHOD(@selector(save:))
 
 - (void)updatePlaceHolderWithFailedBlock:(void(^)(NSString *, NSError *))downloadFailedBlock
 {
-    BOOL isDarkMode = [self.weexInstance isDarkTheme];
-    NSString* choosedPlaceholder = isDarkMode ? (self.darkThemePlaceholderSrc ?: self.placeholdSrc) : self.placeholdSrc;
+    NSString* choosedPlaceholder = [self chooseImage:self.placeholdSrc lightSrc:self.lightThemePlaceholderSrc darkSrc:self.darkThemePlaceholderSrc];
     
     if ([WXUtility isBlankString:choosedPlaceholder]) {
         return;
@@ -562,7 +590,7 @@ WX_EXPORT_METHOD(@selector(save:))
                 return;
             }
             
-            NSString* currentPlaceholder = [strongSelf.weexInstance isDarkTheme] ? (strongSelf.darkThemePlaceholderSrc ?: strongSelf.placeholdSrc) : strongSelf.placeholdSrc;
+            NSString* currentPlaceholder = [strongSelf chooseImage:strongSelf.placeholdSrc lightSrc:strongSelf.lightThemePlaceholderSrc darkSrc:strongSelf.darkThemePlaceholderSrc];
             if (![choosedPlaceholder isEqualToString:currentPlaceholder]) {
                 return;
             }
@@ -581,8 +609,7 @@ WX_EXPORT_METHOD(@selector(save:))
 
 - (void)updateContentImageWithFailedBlock:(void(^)(NSString *, NSError *))downloadFailedBlock
 {
-    BOOL isDarkMode = [self.weexInstance isDarkTheme];
-    NSString* choosedSrc = isDarkMode ? (self.darkThemeSrc ?: self.src) : self.src;
+    NSString* choosedSrc = [self chooseImage:self.src lightSrc:self.lightThemeSrc darkSrc:self.darkThemeSrc];
     
     if ([WXUtility isBlankString:choosedSrc]) {
         WXLogError(@"image src is empty");
@@ -619,7 +646,7 @@ WX_EXPORT_METHOD(@selector(save:))
                 return ;
             }
             
-            NSString* currentSrc = [strongSelf.weexInstance isDarkTheme] ? (strongSelf.darkThemeSrc ?: strongSelf.src) : strongSelf.src;
+            NSString* currentSrc = [strongSelf chooseImage:strongSelf.src lightSrc:strongSelf.lightThemeSrc darkSrc:strongSelf.darkThemeSrc];
             if (![choosedSrc isEqualToString:currentSrc]) {
                 return ;
             }

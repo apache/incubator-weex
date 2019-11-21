@@ -1245,7 +1245,11 @@ typedef enum : NSUInteger {
     }
 }
 
-- (UIColor*)chooseColor:(UIColor*)originalColor darkThemeColor:(UIColor*)darkColor invert:(BOOL)invert scene:(WXColorScene)scene
+- (UIColor*)chooseColor:(UIColor*)originalColor
+        lightThemeColor:(UIColor*)lightColor
+         darkThemeColor:(UIColor*)darkColor
+                 invert:(BOOL)invert
+                  scene:(WXColorScene)scene
 {
     if (![WXUtility isDarkThemeSupportEnabled]) {
         return originalColor;
@@ -1265,6 +1269,9 @@ typedef enum : NSUInteger {
         else {
             return originalColor;
         }
+    }
+    else if (lightColor) {
+        return lightColor;
     }
     else {
         return originalColor;

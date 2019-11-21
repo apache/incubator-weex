@@ -84,6 +84,7 @@
                                                            @"top": @(WXTransitionOptionsTop),
                                                            @"backgroundColor": @(WXTransitionOptionsBackgroundColor),
                                                            @"darkThemeBackgroundColor": @(WXTransitionOptionsBackgroundColor),
+                                                           @"lightThemeBackgroundColor": @(WXTransitionOptionsBackgroundColor),
                                                            @"transform": @(WXTransitionOptionsTransform),
                                                            @"opacity": @(WXTransitionOptionsOpacity)
                                                            };
@@ -112,6 +113,7 @@
     
     BOOL isDarkTheme = [targetComponent.weexInstance isDarkTheme];
     BOOL updatingDarkThemeBackgroundColor = styles[@"darkThemeBackgroundColor"] != nil;
+    BOOL updatingLightThemeBackgroundColor = styles[@"lightThemeBackgroundColor"] != nil;
     
     for (NSString *key in styles) {
         if (self.transitionOptions & [self transitionOptionsFromString:key]) {
@@ -121,6 +123,11 @@
                     /* Updating "darkThemeBackgroundColor" in dark mode,
                      or this component has dark bg color explicitly defined in styels.
                      We ignore transition animation for "backgroundColor" */
+                    [futileStyles setObject:styles[key] forKey:key];
+                    continue;
+                }
+                else if (!isDarkTheme && (updatingLightThemeBackgroundColor ||
+                                          componentRawStyles[@"lightThemeBackgroundColor"] != nil)) {
                     [futileStyles setObject:styles[key] forKey:key];
                     continue;
                 }
@@ -134,6 +141,12 @@
                     continue;
                 }
             }
+            else if ([key isEqualToString:@"lightThemeBackgroundColor"]){
+                if (isDarkTheme || componentRawStyles[@"lightThemeBackgroundColor"] == nil) {
+                    [futileStyles setObject:styles[key] forKey:key];
+                    continue;
+                }
+            }
             
             [_filterStyles setObject:styles[key] forKey:key];
             if (![key isEqualToString:@"transform"]) {
@@ -141,7 +154,8 @@
                     // Get animation 'from' value from raw styles.
                     id styleValue = componentRawStyles[key];
                     if ([key isEqualToString:@"backgroundColor"] ||
-                        [key isEqualToString:@"darkThemeBackgroundColor"]) {
+                        [key isEqualToString:@"darkThemeBackgroundColor"] ||
+                        [key isEqualToString:@"lightThemeBackgroundColor"]) {
                         if (styleValue == nil) {
                             // background color is transparent by default.
                             styleValue = @"transparent";
@@ -234,7 +248,8 @@
             _propertyArray = [NSMutableArray new];
         }
         if ([singleProperty isEqualToString:@"backgroundColor"] ||
-            [singleProperty isEqualToString:@"darkThemeBackgroundColor"]) {
+            [singleProperty isEqualToString:@"darkThemeBackgroundColor"] ||
+            [singleProperty isEqualToString:@"lightThemeBackgroundColor"]) {
             UIColor* fromColor = [WXConvert UIColor:_oldFilterStyles[singleProperty]];
             UIColor* toColor = [WXConvert UIColor:_filterStyles[singleProperty]];
             if ([_targetComponent.weexInstance isDarkTheme] &&
