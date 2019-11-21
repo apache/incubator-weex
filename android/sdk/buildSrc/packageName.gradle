@@ -1,0 +1,102 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+task copyAndRenamePackage(type: Copy) {
+    if(!project.useApachePackageName) {
+        inputs.dir new File('src/main/java/org/apache/weex')
+        from new File('src/main/java/org/apache/weex')
+        into new File('src/legacyRelease/java/com/taobao/weex')
+        filter { String line ->
+            line.replaceAll(/^(package org\.apache)(\.weex.*)$/, { _, packageName, suffix ->
+                "package com.taobao${suffix}"
+            }).replaceAll(/^(import org\.apache)(\.weex.*)$/, { _, packageName, suffix ->
+                "import com.taobao${suffix}"
+            }).replaceAll(/^(import static org\.apache)(\.weex.*)$/, { _, packageName, suffix ->
+                "import static com.taobao${suffix}"
+            })
+        }
+    }
+}
+
+task copyManifest(type: Copy){
+    if(!project.useApachePackageName){
+        inputs.file new File('src/main/AndroidManifest.xml')
+        from new File('src/main/AndroidManifest.xml')
+        into new File('src/legacyRelease')
+        filter { String line ->
+            line.replaceAll(/(org\.apache)(\.weex.*)/, { _, packageName, suffix ->
+                "com.taobao${suffix}"
+            })
+        }
+    }
+}
+
+task copyProguard(type: Copy){
+    if(!project.useApachePackageName){
+        inputs.file new File('proguard-rules.pro')
+        from new File('proguard-rules.pro')
+        into new File('.')
+        rename 'proguard-rules.pro', 'proguard-rules-legacy.pro'
+        filter { String line ->
+            line.replaceAll(/(org\.apache)(\.weex.*)/, { _, packageName, suffix ->
+                "com.taobao${suffix}"
+            })
+        }
+    }
+}
+
+task(cleanCopyProguard, overwrite: true, type: Delete){
+    delete 'proguard-rules-legacy.pro'
+}
+
+task copyOtherCppFile(type: Copy){
+    if(!project.useApachePackageName) {
+        inputs.dir new File('../../weex_core')
+        from new File('../../weex_core')
+        into new File('src/legacyRelease/cpp')
+        exclude '**/*.cpp', '**/*.cc', '**/*.c', '**/*.h', '**/*.hpp'
+    }
+}
+
+task copyAndRenameCppSourceFile(type: Copy){
+    dependsOn copyOtherCppFile, copyJSCHeaderToWeexCore
+    if(!project.useApachePackageName) {
+        inputs.dir new File('../../weex_core')
+        from new File('../../weex_core')
+        into new File('src/legacyRelease/cpp')
+        include '**/*.cpp', '**/*.cc', '**/*.c', '**/*.h', '**/*.hpp'
+        filter { String line ->
+            line.replaceAll('(.*".*)(org/apache/weex)(.*".*)', { _, prefix, packageName, suffix ->
+                logger.info("Content substation in .cpp/.h files happpened, \n Input: ${line}, \n Output: ${prefix}com/taobao/weex${suffix}")
+                "${prefix}com/taobao/weex${suffix}"
+            })
+        }
+    }
+}
+
+gradle.taskGraph.beforeTask { Task task ->
+    if(task.name == 'assembleApacheRelease'){
+        throw new StopActionException('Not Supported. assembleApacheRelease is not supported, please use the following command instead.\n assembleRelease -PapachePackageName="true"')
+    }
+    else if(task.name == 'assembleLegacyRelease'){
+        throw new StopActionException('Not Supported. assembleLegacyRelease is not supported, please use the following command instead.\n assembleRelease -PapachePackageName="false"')
+    }
+}
+
+preBuild.dependsOn copyAndRenameCppSourceFile, copyAndRenamePackage, copyManifest, copyProguard
+clean.dependsOn cleanCopyAndRenamePackage, cleanCopyManifest, cleanCopyProguard, cleanCopyOtherCppFile, cleanCopyAndRenameCppSourceFile

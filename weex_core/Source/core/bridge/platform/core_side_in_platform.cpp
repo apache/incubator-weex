@@ -394,8 +394,11 @@ int CoreSideInPlatform::RefreshInstance(
     args->value.string = genWeexString(
         reinterpret_cast<const uint16_t*>(utf16_key.c_str()), utf16_key.size());
     msg.push_back(args);
-
-    WeexCore::WeexCoreManager::Instance()->script_bridge()->script_side()->ExecJS(
+    ScriptBridge* bridge = WeexCore::WeexCoreManager::Instance()->script_bridge();
+    if (!bridge){
+      return false;
+    }
+    bridge->script_side()->ExecJS(
         instanceId, "", "callJS", msg);
     freeParams(msg);
     return true;

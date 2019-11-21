@@ -17,7 +17,7 @@
 # under the License.
 
 # This script is used to build weex from source, One may invoke this script by 
-# scripts/build_from_source.sh $NDK13_dir $NDK_16dir
+# scripts/build_from_source.sh 
 
 set -e
 if [ ! -f scripts/build_from_source.sh ];then
@@ -43,60 +43,16 @@ cp dist/weex-polyfill.min.js pre-build/weex-polyfill.js
 cp dist/weex-rax.min.js pre-build/weex-rax-api.js
 
 # Build android_sdk
-if [ -d "android_sdk" ]
+cd android/
+if [ ! -d "gradle" ]
 then
-    git clone -b 0.23 --depth=1 git@github.com:alibaba/weex_js_engine.git
-    old_path=$PATH
-    export ANDROID_NDK=$1
-    export PATH=$1:$PATH
-    cd weex_js_engine/
-
-    sh build.jsc.sh
-    cp libWTF.so libJavaScriptCore.so ../android_sdk/libs/armeabi
-    cp libWTF.so libJavaScriptCore.so ../android_sdk/libs/armeabi-v7a
-
-    mkdir -p ../weex_core/Source/libs/armeabi
-    cp libWTF.so libJavaScriptCore.so ../weex_core/Source/libs/armeabi
-    mkdir -p ../weex_core/Source/libs/armeabi-v7a
-    cp libWTF.so libJavaScriptCore.so ../weex_core/Source/libs/armeabi-v7a
-
-    rm -rf build32
-    sh build.jsc.sh -t x86
-    cp libWTF.so libJavaScriptCore.so ../android_sdk/libs/x86
-    mkdir -p ../weex_core/Source/libs/x86
-    cp libWTF.so libJavaScriptCore.so ../weex_core/Source/libs/x86
-
-    PATH=$old_path
-    export ANDROID_NDK=$2
-    cd ..
-
-    gradle wrapper --gradle-version 4.4
-    echo 'include ":android_sdk"'>settings.gradle
-    echo "ndk.dir=$2">local.properties
-
-    ./gradlew :android_sdk:clean :android_sdk:assembleRelease -PignoreVersionCheck="true" -PbuildRuntimeApi=true
-
-    cp android_sdk/.externalNativeBuild/cmake/release/armeabi/Source/android/jsengine/libweexjsb.so android_sdk/libs/armeabi
-    cp android_sdk/.externalNativeBuild/cmake/release/armeabi/Source/android/jsengine/libweexjst.so android_sdk/libs/armeabi
-    cp android_sdk/.externalNativeBuild/cmake/release/armeabi-v7a/Source/android/jsengine/libweexjsb.so android_sdk/libs/armeabi-v7a
-    cp android_sdk/.externalNativeBuild/cmake/release/armeabi-v7a/Source/android/jsengine/libweexjst.so android_sdk/libs/armeabi-v7a
-    cp android_sdk/.externalNativeBuild/cmake/release/x86/Source/android/jsengine/libweexjsb.so android_sdk/libs/x86
-    cp android_sdk/.externalNativeBuild/cmake/release/x86/Source/android/jsengine/libweexjst.so android_sdk/libs/x86
-
-else
-    cd android/
-    ./gradlew :playground:clean :playground:assemble
-    cd ..
+    gradle wrapper --gradle-version 4.10.1
 fi
+
+./gradlew :weex_sdk:clean :weex_sdk:assembleRelease -PignoreVersionCheck="true" -PbuildRuntimeApi=true -PapachePackageName="true"
+cd ..
 
 # Build iOS sdk
-if [ -d "ios_sdk" ]
-then
-    xcodebuild -project ios_sdk/WeexSDK.xcodeproj -scheme WeexSDK_MTL
-else
-    cd ios
-    xcodebuild -project sdk/WeexSDK.xcodeproj -scheme WeexSDK_MTL
-    cd ..
-fi
+xcodebuild -project ios/sdk/WeexSDK.xcodeproj -scheme WeexSDK_MTL
 
 echo "Weex SDK Build completed."
