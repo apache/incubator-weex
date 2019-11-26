@@ -29,7 +29,7 @@
 #import "UIBezierPath+Weex.h"
 #import "WXRoundedRect.h"
 #import "WXSDKInstance.h"
-#import "WXDarkThemeProtocol.h"
+#import "WXDarkSchemeProtocol.h"
 #import "WXHandlerFactory.h"
 
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
@@ -104,13 +104,13 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
     WXAssertMainThread();
 }
 
-- (void)themeDidChange:(NSString*)theme
+- (void)schemeDidChange:(NSString*)scheme
 {
     WXAssertMainThread();
     if (_view) {
         if (![self _needsDrawBorder]) {
-            _layer.borderColor = [self.weexInstance chooseColor:_borderTopColor lightThemeColor:_lightThemeBorderTopColor darkThemeColor:_darkThemeBorderTopColor invert:self.invertForDarkTheme scene:[self colorSceneType]].CGColor;
-            _layer.backgroundColor = [self.weexInstance chooseColor:self.styleBackgroundColor lightThemeColor:self.lightThemeBackgroundColor darkThemeColor:self.darkThemeBackgroundColor invert:self.invertForDarkTheme scene:[self colorSceneType]].CGColor;
+            _layer.borderColor = [self.weexInstance chooseColor:_borderTopColor lightSchemeColor:_lightSchemeBorderTopColor darkSchemeColor:_darkSchemeBorderTopColor invert:self.invertForDarkScheme scene:[self colorSceneType]].CGColor;
+            _layer.backgroundColor = [self.weexInstance chooseColor:self.styleBackgroundColor lightSchemeColor:self.lightSchemeBackgroundColor darkSchemeColor:self.darkSchemeBackgroundColor invert:self.invertForDarkScheme scene:[self colorSceneType]].CGColor;
         }
         else {
             [self setNeedsDisplay];
@@ -321,7 +321,7 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
 - (void)_collectCompositingDisplayBlocks:(NSMutableArray *)displayBlocks context:(CGContextRef)context isCancelled:(BOOL(^)(void))isCancelled
 {
     // TODO: compositingChild has no chance to applyPropertiesToView, need update here?
-    UIColor *backgroundColor = [self.weexInstance chooseColor:self.styleBackgroundColor lightThemeColor:self.lightThemeBackgroundColor darkThemeColor:self.darkThemeBackgroundColor invert:self.invertForDarkTheme scene:[self colorSceneType]];
+    UIColor *backgroundColor = [self.weexInstance chooseColor:self.styleBackgroundColor lightSchemeColor:self.lightSchemeBackgroundColor darkSchemeColor:self.darkSchemeBackgroundColor invert:self.invertForDarkScheme scene:[self colorSceneType]];
     BOOL clipsToBounds = _clipToBounds;
     CGRect frame = self.calculatedFrame;
     CGRect bounds = CGRectMake(0, 0, frame.size.width, frame.size.height);
@@ -381,7 +381,7 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
     
     CGContextSetAlpha(context, _opacity);
     // fill background color
-    UIColor* bgColor = [self.weexInstance chooseColor:self.styleBackgroundColor lightThemeColor:self.lightThemeBackgroundColor darkThemeColor:self.darkThemeBackgroundColor invert:self.invertForDarkTheme scene:[self colorSceneType]];
+    UIColor* bgColor = [self.weexInstance chooseColor:self.styleBackgroundColor lightSchemeColor:self.lightSchemeBackgroundColor darkSchemeColor:self.darkSchemeBackgroundColor invert:self.invertForDarkScheme scene:[self colorSceneType]];
     
     if (bgColor && [bgColor respondsToSelector:@selector(CGColor)]) {
         if (CGColorGetAlpha(bgColor.CGColor) > 0) {
@@ -408,7 +408,7 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
         }
         CGContextSetLineWidth(context, _borderTopWidth);
         CGContextSetStrokeColorWithColor(context,
-                                         [self.weexInstance chooseColor:_borderTopColor lightThemeColor:_lightThemeBorderTopColor darkThemeColor:_darkThemeBorderTopColor invert:self.invertForDarkTheme scene:[self colorSceneType]].CGColor);
+                                         [self.weexInstance chooseColor:_borderTopColor lightSchemeColor:_lightSchemeBorderTopColor darkSchemeColor:_darkSchemeBorderTopColor invert:self.invertForDarkScheme scene:[self colorSceneType]].CGColor);
         CGContextAddArc(context, size.width-topRight, topRight, topRight-_borderTopWidth/2, -M_PI_4+(_borderRightWidth>0?0:M_PI_4), -M_PI_2, 1);
         CGContextMoveToPoint(context, size.width-topRight, _borderTopWidth/2);
         CGContextAddLineToPoint(context, topLeft, _borderTopWidth/2);
@@ -430,7 +430,7 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
         }
         CGContextSetLineWidth(context, _borderLeftWidth);
         CGContextSetStrokeColorWithColor(context,
-                                         [self.weexInstance chooseColor:_borderLeftColor lightThemeColor:_lightThemeBorderLeftColor darkThemeColor:_darkThemeBorderLeftColor invert:self.invertForDarkTheme scene:[self colorSceneType]].CGColor);
+                                         [self.weexInstance chooseColor:_borderLeftColor lightSchemeColor:_lightSchemeBorderLeftColor darkSchemeColor:_darkSchemeBorderLeftColor invert:self.invertForDarkScheme scene:[self colorSceneType]].CGColor);
         CGContextAddArc(context, topLeft, topLeft, topLeft-_borderLeftWidth/2, -M_PI, -M_PI_2-M_PI_4+(_borderTopWidth > 0?0:M_PI_4), 0);
         CGContextMoveToPoint(context, _borderLeftWidth/2, topLeft);
         CGContextAddLineToPoint(context, _borderLeftWidth/2, size.height-bottomLeft);
@@ -452,7 +452,7 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
         }
         CGContextSetLineWidth(context, _borderBottomWidth);
         CGContextSetStrokeColorWithColor(context,
-                                         [self.weexInstance chooseColor:_borderBottomColor lightThemeColor:_lightThemeBorderBottomColor darkThemeColor:_darkThemeBorderBottomColor invert:self.invertForDarkTheme scene:[self colorSceneType]].CGColor);
+                                         [self.weexInstance chooseColor:_borderBottomColor lightSchemeColor:_lightSchemeBorderBottomColor darkSchemeColor:_darkSchemeBorderBottomColor invert:self.invertForDarkScheme scene:[self colorSceneType]].CGColor);
         CGContextAddArc(context, bottomLeft, size.height-bottomLeft, bottomLeft-_borderBottomWidth/2, M_PI-M_PI_4+(_borderLeftWidth>0?0:M_PI_4), M_PI_2, 1);
         CGContextMoveToPoint(context, bottomLeft, size.height-_borderBottomWidth/2);
         CGContextAddLineToPoint(context, size.width-bottomRight, size.height-_borderBottomWidth/2);
@@ -474,7 +474,7 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
         }
         CGContextSetLineWidth(context, _borderRightWidth);
         CGContextSetStrokeColorWithColor(context,
-                                         [self.weexInstance chooseColor:_borderRightColor lightThemeColor:_lightThemeBorderRightColor darkThemeColor:_darkThemeBorderRightColor invert:self.invertForDarkTheme scene:[self colorSceneType]].CGColor);
+                                         [self.weexInstance chooseColor:_borderRightColor lightSchemeColor:_lightSchemeBorderRightColor darkSchemeColor:_darkSchemeBorderRightColor invert:self.invertForDarkScheme scene:[self colorSceneType]].CGColor);
         CGContextAddArc(context, size.width-bottomRight, size.height-bottomRight, bottomRight-_borderRightWidth/2, M_PI_4+(_borderBottomWidth>0?0:M_PI_4), 0, 1);
         CGContextMoveToPoint(context, size.width-_borderRightWidth/2, size.height-bottomRight);
         CGContextAddLineToPoint(context, size.width-_borderRightWidth/2, topRight);
@@ -531,12 +531,12 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
         return YES;
     }
     
-    BOOL invert = self.invertForDarkTheme;
+    BOOL invert = self.invertForDarkScheme;
     WXColorScene scene = [self colorSceneType];
-    UIColor* usingBorderTopColor = [self.weexInstance chooseColor:_borderTopColor lightThemeColor:_lightThemeBorderTopColor darkThemeColor:_darkThemeBorderTopColor invert:invert scene:scene];
-    UIColor* usingBorderRightColor = [self.weexInstance chooseColor:_borderRightColor lightThemeColor:_lightThemeBorderRightColor darkThemeColor:_darkThemeBorderRightColor invert:invert scene:scene];
-    UIColor* usingBorderBottomColor = [self.weexInstance chooseColor:_borderBottomColor lightThemeColor:_lightThemeBorderBottomColor darkThemeColor:_darkThemeBorderBottomColor invert:invert scene:scene];
-    UIColor* usingBorderLeftColor = [self.weexInstance chooseColor:_borderLeftColor lightThemeColor:_lightThemeBorderLeftColor darkThemeColor:_darkThemeBorderLeftColor invert:invert scene:scene];
+    UIColor* usingBorderTopColor = [self.weexInstance chooseColor:_borderTopColor lightSchemeColor:_lightSchemeBorderTopColor darkSchemeColor:_darkSchemeBorderTopColor invert:invert scene:scene];
+    UIColor* usingBorderRightColor = [self.weexInstance chooseColor:_borderRightColor lightSchemeColor:_lightSchemeBorderRightColor darkSchemeColor:_darkSchemeBorderRightColor invert:invert scene:scene];
+    UIColor* usingBorderBottomColor = [self.weexInstance chooseColor:_borderBottomColor lightSchemeColor:_lightSchemeBorderBottomColor darkSchemeColor:_darkSchemeBorderBottomColor invert:invert scene:scene];
+    UIColor* usingBorderLeftColor = [self.weexInstance chooseColor:_borderLeftColor lightSchemeColor:_lightSchemeBorderLeftColor darkSchemeColor:_darkSchemeBorderLeftColor invert:invert scene:scene];
     
     BOOL colorEqual = [usingBorderTopColor isEqual:usingBorderRightColor] &&
         [usingBorderRightColor isEqual:usingBorderBottomColor] &&
@@ -635,24 +635,24 @@ do {\
     WX_CHECK_BORDER_PROP(Color, Top, Left, Bottom, Right, UIColor)
     do {
         BOOL needsDisplay = NO;
-        if (styles[@"darkThemeBorderColor"]) {
-            _darkThemeBorderTopColor = _darkThemeBorderLeftColor = _darkThemeBorderRightColor = _darkThemeBorderBottomColor = [WXConvert UIColor:styles[@"darkThemeBorderColor"]];
+        if (styles[@"weexDarkSchemeBorderColor"]) {
+            _darkSchemeBorderTopColor = _darkSchemeBorderLeftColor = _darkSchemeBorderRightColor = _darkSchemeBorderBottomColor = [WXConvert UIColor:styles[@"weexDarkSchemeBorderColor"]];
             needsDisplay = YES;
         }
-        if (styles[@"darkThemeBorderTopColor"]) {
-            _darkThemeBorderTopColor = [WXConvert UIColor:styles[@"darkThemeBorderTopColor"]];
+        if (styles[@"weexDarkSchemeBorderTopColor"]) {
+            _darkSchemeBorderTopColor = [WXConvert UIColor:styles[@"weexDarkSchemeBorderTopColor"]];
             needsDisplay = YES;
         }
-        if (styles[@"darkThemeBorderLeftColor"]) {
-            _darkThemeBorderLeftColor = [WXConvert UIColor:styles[@"darkThemeBorderLeftColor"]];
+        if (styles[@"weexDarkSchemeBorderLeftColor"]) {
+            _darkSchemeBorderLeftColor = [WXConvert UIColor:styles[@"weexDarkSchemeBorderLeftColor"]];
             needsDisplay = YES;
         }
-        if (styles[@"darkThemeBorderRightColor"]) {
-            _darkThemeBorderRightColor = [WXConvert UIColor:styles[@"darkThemeBorderRightColor"]];
+        if (styles[@"weexDarkSchemeBorderRightColor"]) {
+            _darkSchemeBorderRightColor = [WXConvert UIColor:styles[@"weexDarkSchemeBorderRightColor"]];
             needsDisplay = YES;
         }
-        if (styles[@"darkThemeBorderBottomColor"]) {
-            _darkThemeBorderBottomColor = [WXConvert UIColor:styles[@"darkThemeBorderBottomColor"]];
+        if (styles[@"weexDarkSchemeBorderBottomColor"]) {
+            _darkSchemeBorderBottomColor = [WXConvert UIColor:styles[@"weexDarkSchemeBorderBottomColor"]];
             needsDisplay = YES;
         }
         if (needsDisplay && updating) {
@@ -661,24 +661,24 @@ do {\
     } while (0);
     do {
         BOOL needsDisplay = NO;
-        if (styles[@"lightThemeBorderColor"]) {
-            _lightThemeBorderTopColor = _lightThemeBorderLeftColor = _lightThemeBorderRightColor = _lightThemeBorderBottomColor = [WXConvert UIColor:styles[@"lightThemeBorderColor"]];
+        if (styles[@"weexLightSchemeBorderColor"]) {
+            _lightSchemeBorderTopColor = _lightSchemeBorderLeftColor = _lightSchemeBorderRightColor = _lightSchemeBorderBottomColor = [WXConvert UIColor:styles[@"weexLightSchemeBorderColor"]];
             needsDisplay = YES;
         }
-        if (styles[@"lightThemeBorderTopColor"]) {
-            _lightThemeBorderTopColor = [WXConvert UIColor:styles[@"lightThemeBorderTopColor"]];
+        if (styles[@"weexLightSchemeBorderTopColor"]) {
+            _lightSchemeBorderTopColor = [WXConvert UIColor:styles[@"weexLightSchemeBorderTopColor"]];
             needsDisplay = YES;
         }
-        if (styles[@"lightThemeBorderLeftColor"]) {
-            _lightThemeBorderLeftColor = [WXConvert UIColor:styles[@"lightThemeBorderLeftColor"]];
+        if (styles[@"weexLightSchemeBorderLeftColor"]) {
+            _lightSchemeBorderLeftColor = [WXConvert UIColor:styles[@"weexLightSchemeBorderLeftColor"]];
             needsDisplay = YES;
         }
-        if (styles[@"lightThemeBorderRightColor"]) {
-            _lightThemeBorderRightColor = [WXConvert UIColor:styles[@"lightThemeBorderRightColor"]];
+        if (styles[@"weexLightSchemeBorderRightColor"]) {
+            _lightSchemeBorderRightColor = [WXConvert UIColor:styles[@"weexLightSchemeBorderRightColor"]];
             needsDisplay = YES;
         }
-        if (styles[@"lightThemeBorderBottomColor"]) {
-            _lightThemeBorderBottomColor = [WXConvert UIColor:styles[@"lightThemeBorderBottomColor"]];
+        if (styles[@"weexLightSchemeBorderBottomColor"]) {
+            _lightSchemeBorderBottomColor = [WXConvert UIColor:styles[@"weexLightSchemeBorderBottomColor"]];
             needsDisplay = YES;
         }
         if (needsDisplay && updating) {
@@ -698,9 +698,9 @@ do {\
         } else if (!nowNeedsDrawBorder) {
             [self _resetNativeBorderRadius];
             _layer.borderWidth = _borderTopWidth;
-            _layer.borderColor = [self.weexInstance chooseColor:_borderTopColor lightThemeColor:_lightThemeBorderTopColor darkThemeColor:_darkThemeBorderTopColor invert:self.invertForDarkTheme scene:[self colorSceneType]].CGColor;
+            _layer.borderColor = [self.weexInstance chooseColor:_borderTopColor lightSchemeColor:_lightSchemeBorderTopColor darkSchemeColor:_darkSchemeBorderTopColor invert:self.invertForDarkScheme scene:[self colorSceneType]].CGColor;
             if ((_transition.transitionOptions & WXTransitionOptionsBackgroundColor) != WXTransitionOptionsBackgroundColor ) {
-                _layer.backgroundColor = [self.weexInstance chooseColor:self.styleBackgroundColor lightThemeColor:self.lightThemeBackgroundColor darkThemeColor:self.darkThemeBackgroundColor invert:self.invertForDarkTheme scene:[self colorSceneType]].CGColor;
+                _layer.backgroundColor = [self.weexInstance chooseColor:self.styleBackgroundColor lightSchemeColor:self.lightSchemeBackgroundColor darkSchemeColor:self.darkSchemeBackgroundColor invert:self.invertForDarkScheme scene:[self colorSceneType]].CGColor;
             }
         }
     }
@@ -712,7 +712,7 @@ do {\
     WXRoundedRect *borderRect = [[WXRoundedRect alloc] initWithRect:rect topLeft:_borderTopLeftRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
     WXRadii *radii = borderRect.radii;
     BOOL hasBorderRadius = [radii hasBorderRadius];
-    UIColor* currentBgColor = [self.weexInstance chooseColor:self.styleBackgroundColor lightThemeColor:self.lightThemeBackgroundColor darkThemeColor:self.darkThemeBackgroundColor invert:self.invertForDarkTheme scene:[self colorSceneType]];
+    UIColor* currentBgColor = [self.weexInstance chooseColor:self.styleBackgroundColor lightSchemeColor:self.lightSchemeBackgroundColor darkSchemeColor:self.darkSchemeBackgroundColor invert:self.invertForDarkScheme scene:[self colorSceneType]];
     return (!hasBorderRadius) && _opacity == 1.0 && CGColorGetAlpha(currentBgColor.CGColor) == 1.0 && [self _needsDrawBorder];
 }
 
@@ -736,16 +736,16 @@ do {\
 
 - (WXBoxShadow*)_chooseBoxShadow
 {
-    if ([self.weexInstance isDarkTheme]) {
-        if (_darkThemeBoxShadow) {
-            return _darkThemeBoxShadow;
+    if ([self.weexInstance isDarkScheme]) {
+        if (_darkSchemeBoxShadow) {
+            return _darkSchemeBoxShadow;
         }
         else {
             return _boxShadow;
         }
     }
-    else if (_lightThemeBoxShadow) {
-        return _lightThemeBoxShadow;
+    else if (_lightSchemeBoxShadow) {
+        return _lightSchemeBoxShadow;
     }
     else {
         return _boxShadow;

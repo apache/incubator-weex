@@ -17,16 +17,27 @@
  * under the License.
  */
 
-#import <Foundation/Foundation.h>
-#import <WeexSDK/WXDarkThemeProtocol.h>
+#import "WXDarkSchemeDefaultImpl.h"
 
-NS_ASSUME_NONNULL_BEGIN
+@implementation WXDarkSchemeDefaultImpl
 
-/* By default, this implementation class do basic invert of UIColor of RGBA color space.
- You should implementation your own handler to better handle dark theme in your application.
- */
-@interface WXDarkThemeDefaultImpl : NSObject <WXDarkThemeProtocol>
+- (BOOL)defaultInvertValueForRootComponent
+{
+    return NO;
+}
+
+- (void)configureView:(UIView *)view ofComponent:(WXComponent *)component
+{
+    // Nothing
+}
+
+- (UIColor *_Nullable)getInvertedColorFor:(UIColor *_Nonnull)color ofScene:(WXColorScene)scene withDefault:(UIColor *_Nullable)defaultColor
+{
+    CGFloat red, blue, green, alpha;
+    if ([color getRed:&red green:&green blue:&blue alpha:&alpha]) {
+        return [UIColor colorWithRed:1 - red green:1 - green blue:1 - blue alpha:alpha];
+    }
+    return color;
+}
 
 @end
-
-NS_ASSUME_NONNULL_END

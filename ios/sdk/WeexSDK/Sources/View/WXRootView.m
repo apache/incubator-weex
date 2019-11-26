@@ -73,7 +73,7 @@
         if (currentStyle != previousTraitCollection.userInterfaceStyle) {
             if (_hasFirstTraitCollectionChange) {
                 _allowFirstTraitCollectionChange = NO;
-                [self.instance setCurrentThemeName:currentStyle == UIUserInterfaceStyleDark ? @"dark" : @"light"];
+                [self.instance setCurrentSchemeName:currentStyle == UIUserInterfaceStyleDark ? @"dark" : @"light"];
             }
             else {
                 __weak WXRootView* weakSelf = self;
@@ -84,7 +84,7 @@
                     if (strongSelf) {
                         if (strongSelf->_allowFirstTraitCollectionChange) {
                             if (strongSelf.instance) {
-                                [strongSelf.instance setCurrentThemeName:currentStyle == UIUserInterfaceStyleDark ? @"dark" : @"light"];
+                                [strongSelf.instance setCurrentSchemeName:currentStyle == UIUserInterfaceStyleDark ? @"dark" : @"light"];
                             }
                         }
                         strongSelf->_hasFirstTraitCollectionChange = NO;

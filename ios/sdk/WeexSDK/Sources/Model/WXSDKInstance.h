@@ -26,7 +26,7 @@
 #import <WeexSDK/WXApmForInstance.h>
 #import <WeexSDK/WXComponentManager.h>
 
-@protocol WXDarkThemeProtocol;
+@protocol WXDarkSchemeProtocol;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -449,33 +449,33 @@ typedef enum : NSUInteger {
  */
 + (NSDictionary*)lastPageInfo;
 
-#pragma mark - Theme Support
+#pragma mark - Scheme Support
 
 /**
  Handler for handling color invert.
 
  @return Handler instance.
  */
-+ (id<WXDarkThemeProtocol>)darkThemeColorHandler;
++ (id<WXDarkSchemeProtocol>)darkSchemeColorHandler;
 
 /**
- Return true if current is dark theme for this instance.
+ Return true if current is dark scheme for this instance.
  */
-- (BOOL)isDarkTheme;
+- (BOOL)isDarkScheme;
 
 /**
  Get/set interface style of current instance.
  */
-- (NSString*)currentThemeName;
-- (void)setCurrentThemeName:(NSString*)name;
+- (NSString*)currentSchemeName;
+- (void)setCurrentSchemeName:(NSString*)name;
 
 /**
  Choose final color between original color and dark-mode one.
  Also considering invert.
  */
 - (UIColor*)chooseColor:(UIColor*)originalColor
-        lightThemeColor:(UIColor*)lightColor
-         darkThemeColor:(UIColor*)darkColor
+       lightSchemeColor:(UIColor*)lightColor
+        darkSchemeColor:(UIColor*)darkColor
                  invert:(BOOL)invert
                   scene:(WXColorScene)scene;
 

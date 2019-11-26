@@ -121,8 +121,8 @@ static CGFloat WXTextDefaultLineThroughWidth = 1.2;
 @interface WXTextComponent()
 @property (atomic, strong) NSString *fontFamily;
 @property (atomic, strong) UIColor *textColor;
-@property (atomic, strong) UIColor *darkThemeTextColor;
-@property (atomic, strong) UIColor *lightThemeTextColor;
+@property (atomic, strong) UIColor *darkSchemeTextColor;
+@property (atomic, strong) UIColor *lightSchemeTextColor;
 @end
 
 @implementation WXTextComponent
@@ -282,7 +282,7 @@ do {\
 
     do {
         UIColor* color = nil;
-        id value = styles[@"darkThemeColor"];
+        id value = styles[@"weexDarkSchemeColor"];
         if (value) {
             if([WXUtility isBlankString:value]){
                 color = [UIColor blackColor];
@@ -290,7 +290,7 @@ do {\
                 color = [WXConvert UIColor:value];
             }
             if (color) {
-                self.darkThemeTextColor = color;
+                self.darkSchemeTextColor = color;
                 [self setNeedsRepaint];
             }
         }
@@ -298,7 +298,7 @@ do {\
     
     do {
         UIColor* color = nil;
-        id value = styles[@"lightThemeColor"];
+        id value = styles[@"weexLightSchemeColor"];
         if (value) {
             if([WXUtility isBlankString:value]){
                 color = [UIColor blackColor];
@@ -306,7 +306,7 @@ do {\
                 color = [WXConvert UIColor:value];
             }
             if (color) {
-                self.lightThemeTextColor = color;
+                self.lightSchemeTextColor = color;
                 [self setNeedsRepaint];
             }
         }
@@ -403,10 +403,10 @@ do {\
     [self setNeedsRepaint];
 }
 
-- (void)themeDidChange:(NSString*)theme
+- (void)schemeDidChange:(NSString*)scheme
 {
     [self setNeedsRepaint];
-    [super themeDidChange:theme];
+    [super schemeDidChange:scheme];
     if (_view) {
         [self setNeedsDisplay];
     }
@@ -543,7 +543,7 @@ do {\
         string = @"";
     }
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: string];
-    UIColor* textColor = [self.weexInstance chooseColor:self.textColor lightThemeColor:self.lightThemeTextColor darkThemeColor:self.darkThemeTextColor invert:self.invertForDarkTheme scene:[self colorSceneType]];
+    UIColor* textColor = [self.weexInstance chooseColor:self.textColor lightSchemeColor:self.lightSchemeTextColor darkSchemeColor:self.darkSchemeTextColor invert:self.invertForDarkScheme scene:[self colorSceneType]];
     if (textColor) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:textColor range:NSMakeRange(0, string.length)];
     }
@@ -632,7 +632,7 @@ do {\
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
     
     // set textColor
-    UIColor* textColor = [self.weexInstance chooseColor:self.textColor lightThemeColor:self.lightThemeTextColor darkThemeColor:self.darkThemeTextColor invert:self.invertForDarkTheme scene:[self colorSceneType]];
+    UIColor* textColor = [self.weexInstance chooseColor:self.textColor lightSchemeColor:self.lightSchemeTextColor darkSchemeColor:self.darkSchemeTextColor invert:self.invertForDarkScheme scene:[self colorSceneType]];
     if (textColor) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:textColor range:NSMakeRange(0, string.length)];
     }
@@ -1163,12 +1163,12 @@ NS_INLINE NSRange WXNSRangeFromCFRange(CFRange range) {
         self.textColor = [UIColor blackColor];
         [self setNeedsRepaint];
     }
-    if ([styles containsObject:@"darkThemeColor"]) {
-        self.darkThemeTextColor = nil;
+    if ([styles containsObject:@"weexDarkSchemeColor"]) {
+        self.darkSchemeTextColor = nil;
         [self setNeedsRepaint];
     }
-    if ([styles containsObject:@"lightThemeColor"]) {
-        self.lightThemeTextColor = nil;
+    if ([styles containsObject:@"weexLightSchemeColor"]) {
+        self.lightSchemeTextColor = nil;
         [self setNeedsRepaint];
     }
     if ([styles containsObject:@"fontSize"]) {

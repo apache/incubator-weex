@@ -136,7 +136,7 @@ _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
  * @return Boolean
  *
  */
-+ (BOOL)isSystemInDarkTheme;
++ (BOOL)isSystemInDarkScheme;
 
 /**
  * @abstract Returns the environment of current application, you can get some necessary properties such as appVersion、sdkVersion、appName etc.
@@ -521,8 +521,8 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
 *  @abstract Switch for dark mode support.
 *
 */
-+ (void)setDarkThemeSupportEnable:(BOOL)value;
-+ (BOOL)isDarkThemeSupportEnabled;
++ (void)setDarkSchemeSupportEnable:(BOOL)value;
++ (BOOL)isDarkSchemeSupportEnabled;
 
 + (long) getUnixFixTimeMillis;
 

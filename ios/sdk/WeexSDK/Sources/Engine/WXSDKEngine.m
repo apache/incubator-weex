@@ -29,7 +29,7 @@
 #import "WXNavigationDefaultImpl.h"
 #import "WXURLRewriteDefaultImpl.h"
 #import "WXJSFrameworkLoadDefaultImpl.h"
-#import "WXDarkThemeDefaultImpl.h"
+#import "WXDarkSchemeDefaultImpl.h"
 
 #import "WXSDKManager.h"
 #import "WXSDKError.h"
@@ -206,7 +206,7 @@
     [self registerHandler:[WXNavigationDefaultImpl new] withProtocol:@protocol(WXNavigationProtocol)];
     [self registerHandler:[WXURLRewriteDefaultImpl new] withProtocol:@protocol(WXURLRewriteProtocol)];
     [self registerHandler:[WXJSFrameworkLoadDefaultImpl new] withProtocol:@protocol(WXJSFrameworkLoadProtocol)];
-    [self registerHandler:[WXDarkThemeDefaultImpl new] withProtocol:@protocol(WXDarkThemeProtocol)];
+    [self registerHandler:[WXDarkSchemeDefaultImpl new] withProtocol:@protocol(WXDarkSchemeProtocol)];
 }
 
 + (void)registerHandler:(id)handler withProtocol:(Protocol *)protocol
