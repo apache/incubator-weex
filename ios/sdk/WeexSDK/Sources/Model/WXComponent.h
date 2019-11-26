@@ -370,7 +370,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// @name Display
 ///--------------------------------------
 
-@property (nonatomic, assign) BOOL invertForDarkTheme;
+@property (nonatomic, assign) BOOL invertForDarkScheme;
 
 @property (nonatomic, assign) WXDisplayType displayType;
 
@@ -387,9 +387,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)needsDrawRect;
 
 /**
- * @abstract Fired on instance theme did changed.
+ * @abstract Fired on instance scheme did changed.
  */
-- (void)themeDidChange:(NSString*)theme;
+- (void)schemeDidChange:(NSString*)scheme;
 
 /**
  * @abstract Hint used for better do color invert in dark mode.

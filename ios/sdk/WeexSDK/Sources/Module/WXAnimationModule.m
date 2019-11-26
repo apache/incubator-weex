@@ -26,7 +26,7 @@
 #import "WXLength.h"
 #import "WXTransition.h"
 #import "WXComponent+Layout.h"
-#import "WXDarkThemeProtocol.h"
+#import "WXDarkSchemeProtocol.h"
 
 @interface WXAnimationInfo : NSObject<NSCopying>
 
@@ -210,34 +210,34 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     NSDictionary *styles = args[@"styles"];
     NSDictionary* componentRawStyles = target.styles;
     
-    BOOL isDarkTheme = [target.weexInstance isDarkTheme];
-    BOOL updatingDarkThemeBackgroundColor = styles[@"darkThemeBackgroundColor"] != nil;
-    BOOL updatingLightThemeBackgroundColor = styles[@"lightThemeBackgroundColor"] != nil;
+    BOOL isDarkScheme = [target.weexInstance isDarkScheme];
+    BOOL updatingDarkSchemeBackgroundColor = styles[@"weexDarkSchemeBackgroundColor"] != nil;
+    BOOL updatingLightSchemeBackgroundColor = styles[@"weexLightSchemeBackgroundColor"] != nil;
     
     for (NSString *property in styles) {
         if ([property isEqualToString:@"backgroundColor"]) {
-            if (isDarkTheme && (updatingDarkThemeBackgroundColor ||
-                                componentRawStyles[@"darkThemeBackgroundColor"] != nil)) {
-                /* Updating "darkThemeBackgroundColor" in dark mode,
+            if (isDarkScheme && (updatingDarkSchemeBackgroundColor ||
+                                componentRawStyles[@"weexDarkSchemeBackgroundColor"] != nil)) {
+                /* Updating "darkSchemeBackgroundColor" in dark mode,
                  or this component has dark bg color explicitly defined in styels.
                  We ignore transition animation for "backgroundColor" */
                 continue;
             }
-            else if (!isDarkTheme && (updatingLightThemeBackgroundColor ||
-                                      componentRawStyles[@"lightThemeBackgroundColor"] != nil)) {
+            else if (!isDarkScheme && (updatingLightSchemeBackgroundColor ||
+                                      componentRawStyles[@"weexLightSchemeBackgroundColor"] != nil)) {
                 continue;
             }
         }
-        else if ([property isEqualToString:@"darkThemeBackgroundColor"]) {
-            if (!isDarkTheme || componentRawStyles[@"darkThemeBackgroundColor"] == nil) {
-                /* Do not do animation for "darkThemeBackgroundColor" in light mode.
+        else if ([property isEqualToString:@"weexDarkSchemeBackgroundColor"]) {
+            if (!isDarkScheme || componentRawStyles[@"weexDarkSchemeBackgroundColor"] == nil) {
+                /* Do not do animation for "darkSchemeBackgroundColor" in light mode.
                  Or there is no dark bg color explicitly defined in styles.
                  */
                 continue;
             }
         }
-        else if ([property isEqualToString:@"lightThemeBackgroundColor"]){
-            if (isDarkTheme || componentRawStyles[@"lightThemeBackgroundColor"] == nil) {
+        else if ([property isEqualToString:@"weexLightSchemeBackgroundColor"]){
+            if (isDarkScheme || componentRawStyles[@"weexLightSchemeBackgroundColor"] == nil) {
                 continue;
             }
         }
@@ -322,15 +322,15 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             }
             target.transform = wxTransform;
         } else if ([property isEqualToString:@"backgroundColor"] ||
-                   [property isEqualToString:@"darkThemeBackgroundColor"] ||
-                   [property isEqualToString:@"lightThemeBackgroundColor"]) {
+                   [property isEqualToString:@"weexDarkSchemeBackgroundColor"] ||
+                   [property isEqualToString:@"weexLightSchemeBackgroundColor"]) {
             info.propertyName = @"backgroundColor";
             info.fromValue = (__bridge id)(layer.backgroundColor);
             UIColor* toColor = [WXConvert UIColor:value];
-            if ([target.weexInstance isDarkTheme] && target.invertForDarkTheme &&
+            if ([target.weexInstance isDarkScheme] && target.invertForDarkScheme &&
                 [property isEqualToString:@"backgroundColor"]) {
                 // Invert color
-                toColor = [[WXSDKInstance darkThemeColorHandler] getInvertedColorFor:toColor ofScene:[target colorSceneType] withDefault:toColor];
+                toColor = [[WXSDKInstance darkSchemeColorHandler] getInvertedColorFor:toColor ofScene:[target colorSceneType] withDefault:toColor];
             }
             info.toValue = (__bridge id)([toColor CGColor]);
             [infos addObject:info];

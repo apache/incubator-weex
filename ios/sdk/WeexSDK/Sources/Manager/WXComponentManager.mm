@@ -42,7 +42,7 @@
 #import "WXComponent_performance.h"
 #import "WXAnalyzerCenter.h"
 #import "WXDisplayLinkManager.h"
-#import "WXDarkThemeProtocol.h"
+#import "WXDarkSchemeProtocol.h"
 
 static NSThread *WXComponentThread;
 
@@ -262,9 +262,9 @@ static NSThread *WXComponentThread;
     
     _rootComponent = [self _buildComponent:ref type:type supercomponent:nil styles:styles attributes:attributes events:events renderObject:renderObject];
     
-    if ([WXUtility isDarkThemeSupportEnabled]) {
-        if (attributes[@"invertForDarkTheme"] == nil) {
-            _rootComponent.invertForDarkTheme = [[WXSDKInstance darkThemeColorHandler] defaultInvertValueForRootComponent];
+    if ([WXUtility isDarkSchemeSupportEnabled]) {
+        if (attributes[@"invertForDarkScheme"] == nil) {
+            _rootComponent.invertForDarkScheme = [[WXSDKInstance darkSchemeColorHandler] defaultInvertValueForRootComponent];
         }
     }
     
@@ -334,9 +334,9 @@ static NSThread *WXComponentThread;
         }
     }
     
-    // Not explicitly declare "invertForDarkTheme", inherit
-    if (attributes[@"invertForDarkTheme"] == nil) {
-        component.invertForDarkTheme = supercomponent.invertForDarkTheme;
+    // Not explicitly declare "invertForDarkScheme", inherit
+    if (attributes[@"invertForDarkScheme"] == nil) {
+        component.invertForDarkScheme = supercomponent.invertForDarkScheme;
     }
     
 #ifdef DEBUG

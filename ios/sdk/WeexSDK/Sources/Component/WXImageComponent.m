@@ -58,11 +58,11 @@ static dispatch_queue_t WXImageUpdateQueue;
 }
 
 @property (atomic, strong) NSString *src;
-@property (atomic, strong) NSString *darkThemeSrc;
-@property (atomic, strong) NSString *lightThemeSrc;
+@property (atomic, strong) NSString *darkSchemeSrc;
+@property (atomic, strong) NSString *lightSchemeSrc;
 @property (atomic, strong) NSString *placeholdSrc;
-@property (atomic, strong) NSString *darkThemePlaceholderSrc;
-@property (atomic, strong) NSString *lightThemePlaceholderSrc;
+@property (atomic, strong) NSString *darkSchemePlaceholderSrc;
+@property (atomic, strong) NSString *lightSchemePlaceholderSrc;
 @property (nonatomic, assign) CGFloat blurRadius;
 @property (nonatomic, assign) UIViewContentMode resizeMode;
 @property (nonatomic, assign) WXImageQuality imageQuality;
@@ -95,11 +95,11 @@ WX_EXPORT_METHOD(@selector(save:))
         } else {
             WXLogWarning(@"image src is nil");
         }
-        if (attributes[@"darkThemeSrc"]) {
-            self.darkThemeSrc = [[WXConvert NSString:attributes[@"darkThemeSrc"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        if (attributes[@"darkSchemeSrc"]) {
+            self.darkSchemeSrc = [[WXConvert NSString:attributes[@"darkSchemeSrc"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         }
-        if (attributes[@"lightThemeSrc"]) {
-            self.lightThemeSrc = [[WXConvert NSString:attributes[@"lightThemeSrc"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        if (attributes[@"lightSchemeSrc"]) {
+            self.lightSchemeSrc = [[WXConvert NSString:attributes[@"lightSchemeSrc"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         }
         
         [self configPlaceHolder:attributes];
@@ -138,11 +138,11 @@ WX_EXPORT_METHOD(@selector(save:))
     if (attributes[@"placeHolder"] || attributes[@"placeholder"]) {
         self.placeholdSrc = [[WXConvert NSString:attributes[@"placeHolder"]?:attributes[@"placeholder"]]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     }
-    if (attributes[@"darkThemePlaceholder"]) {
-        self.darkThemePlaceholderSrc = [[WXConvert NSString:attributes[@"darkThemePlaceholder"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if (attributes[@"darkSchemePlaceholder"]) {
+        self.darkSchemePlaceholderSrc = [[WXConvert NSString:attributes[@"darkSchemePlaceholder"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     }
-    if (attributes[@"lightThemePlaceholder"]) {
-        self.lightThemePlaceholderSrc = [[WXConvert NSString:attributes[@"lightThemePlaceholder"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if (attributes[@"lightSchemePlaceholder"]) {
+        self.lightSchemePlaceholderSrc = [[WXConvert NSString:attributes[@"lightSchemePlaceholder"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     }
 }
 
@@ -271,11 +271,11 @@ WX_EXPORT_METHOD(@selector(save:))
 
 - (void)updateAttributes:(NSDictionary *)attributes
 {
-    if (attributes[@"darkThemeSrc"]) {
-        self.darkThemeSrc = [[WXConvert NSString:attributes[@"darkThemeSrc"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if (attributes[@"darkSchemeSrc"]) {
+        self.darkSchemeSrc = [[WXConvert NSString:attributes[@"darkSchemeSrc"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     }
-    if (attributes[@"lightThemeSrc"]) {
-        self.lightThemeSrc = [[WXConvert NSString:attributes[@"lightThemeSrc"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if (attributes[@"lightSchemeSrc"]) {
+        self.lightSchemeSrc = [[WXConvert NSString:attributes[@"lightSchemeSrc"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     }
     if (attributes[@"src"]) {
         [self setImageSrc:[[WXConvert NSString:attributes[@"src"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
@@ -308,12 +308,12 @@ WX_EXPORT_METHOD(@selector(save:))
     [self updateImage];
 }
 
-- (void)themeDidChange:(NSString*)theme
+- (void)schemeDidChange:(NSString*)scheme
 {
-    [super themeDidChange:theme];
+    [super schemeDidChange:scheme];
     if (_view) {
-        if (self.darkThemeSrc || self.darkThemePlaceholderSrc ||
-            self.lightThemeSrc || self.lightThemePlaceholderSrc) {
+        if (self.darkSchemeSrc || self.darkSchemePlaceholderSrc ||
+            self.lightSchemeSrc || self.lightSchemePlaceholderSrc) {
             [self updateImage];
         }
     }
@@ -405,7 +405,7 @@ WX_EXPORT_METHOD(@selector(save:))
 
 - (NSString*)chooseImage:(NSString*)src lightSrc:(NSString*)lightSrc darkSrc:(NSString*)darkSrc
 {
-    if ([self.weexInstance isDarkTheme]) {
+    if ([self.weexInstance isDarkScheme]) {
         if (darkSrc) {
             return darkSrc;
         }
@@ -428,8 +428,8 @@ WX_EXPORT_METHOD(@selector(save:))
         return;
     }
     
-    NSString* choosedSrc = [self chooseImage:self.src lightSrc:self.lightThemeSrc darkSrc:self.darkThemeSrc];
-    NSString* choosedPlaceholder = [self chooseImage:self.placeholdSrc lightSrc:self.lightThemePlaceholderSrc darkSrc:self.darkThemePlaceholderSrc];
+    NSString* choosedSrc = [self chooseImage:self.src lightSrc:self.lightSchemeSrc darkSrc:self.darkSchemeSrc];
+    NSString* choosedPlaceholder = [self chooseImage:self.placeholdSrc lightSrc:self.lightSchemePlaceholderSrc darkSrc:self.darkSchemePlaceholderSrc];
     
     __weak typeof(self) weakSelf = self;
     if (_downloadImageWithURL && [[self imageLoader] respondsToSelector:@selector(setImageViewWithURL:url:placeholderImage:options:progress:completed:)]) {
@@ -560,7 +560,7 @@ WX_EXPORT_METHOD(@selector(save:))
 
 - (void)updatePlaceHolderWithFailedBlock:(void(^)(NSString *, NSError *))downloadFailedBlock
 {
-    NSString* choosedPlaceholder = [self chooseImage:self.placeholdSrc lightSrc:self.lightThemePlaceholderSrc darkSrc:self.darkThemePlaceholderSrc];
+    NSString* choosedPlaceholder = [self chooseImage:self.placeholdSrc lightSrc:self.lightSchemePlaceholderSrc darkSrc:self.darkSchemePlaceholderSrc];
     
     if ([WXUtility isBlankString:choosedPlaceholder]) {
         return;
@@ -590,7 +590,7 @@ WX_EXPORT_METHOD(@selector(save:))
                 return;
             }
             
-            NSString* currentPlaceholder = [strongSelf chooseImage:strongSelf.placeholdSrc lightSrc:strongSelf.lightThemePlaceholderSrc darkSrc:strongSelf.darkThemePlaceholderSrc];
+            NSString* currentPlaceholder = [strongSelf chooseImage:strongSelf.placeholdSrc lightSrc:strongSelf.lightSchemePlaceholderSrc darkSrc:strongSelf.darkSchemePlaceholderSrc];
             if (![choosedPlaceholder isEqualToString:currentPlaceholder]) {
                 return;
             }
@@ -609,7 +609,7 @@ WX_EXPORT_METHOD(@selector(save:))
 
 - (void)updateContentImageWithFailedBlock:(void(^)(NSString *, NSError *))downloadFailedBlock
 {
-    NSString* choosedSrc = [self chooseImage:self.src lightSrc:self.lightThemeSrc darkSrc:self.darkThemeSrc];
+    NSString* choosedSrc = [self chooseImage:self.src lightSrc:self.lightSchemeSrc darkSrc:self.darkSchemeSrc];
     
     if ([WXUtility isBlankString:choosedSrc]) {
         WXLogError(@"image src is empty");
@@ -646,7 +646,7 @@ WX_EXPORT_METHOD(@selector(save:))
                 return ;
             }
             
-            NSString* currentSrc = [strongSelf chooseImage:strongSelf.src lightSrc:strongSelf.lightThemeSrc darkSrc:strongSelf.darkThemeSrc];
+            NSString* currentSrc = [strongSelf chooseImage:strongSelf.src lightSrc:strongSelf.lightSchemeSrc darkSrc:strongSelf.darkSchemeSrc];
             if (![choosedSrc isEqualToString:currentSrc]) {
                 return ;
             }

@@ -50,11 +50,11 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
      *  View
      */
     UIColor *_styleBackgroundColor;
-    UIColor *_darkThemeBackgroundColor;
-    UIColor *_lightThemeBackgroundColor;
+    UIColor *_darkSchemeBackgroundColor;
+    UIColor *_lightSchemeBackgroundColor;
     NSString *_backgroundImage;
-    NSString *_darkThemeBackgroundImage;
-    NSString *_lightThemeBackgroundImage;
+    NSString *_darkSchemeBackgroundImage;
+    NSString *_lightSchemeBackgroundImage;
     NSString *_clipRadius;
     WXClipType _clipToBounds;
     UIView *_view;
@@ -63,8 +63,8 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     WXBoxShadow *_originalBoxShadow;
     WXBoxShadow *_lastBoxShadow;
     WXBoxShadow *_boxShadow;
-    WXBoxShadow *_darkThemeBoxShadow;
-    WXBoxShadow *_lightThemeBoxShadow;
+    WXBoxShadow *_darkSchemeBoxShadow;
+    WXBoxShadow *_lightSchemeBoxShadow;
     
     /**
      * accessibility support
@@ -121,17 +121,17 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     WXThreadSafeCounter *_displayCounter;
     
     UIColor *_borderTopColor;
-    UIColor *_darkThemeBorderTopColor;
-    UIColor *_lightThemeBorderTopColor;
+    UIColor *_darkSchemeBorderTopColor;
+    UIColor *_lightSchemeBorderTopColor;
     UIColor *_borderRightColor;
-    UIColor *_darkThemeBorderRightColor;
-    UIColor *_lightThemeBorderRightColor;
+    UIColor *_darkSchemeBorderRightColor;
+    UIColor *_lightSchemeBorderRightColor;
     UIColor *_borderLeftColor;
-    UIColor *_darkThemeBorderLeftColor;
-    UIColor *_lightThemeBorderLeftColor;
+    UIColor *_darkSchemeBorderLeftColor;
+    UIColor *_lightSchemeBorderLeftColor;
     UIColor *_borderBottomColor;
-    UIColor *_darkThemeBorderBottomColor;
-    UIColor *_lightThemeBorderBottomColor;
+    UIColor *_darkSchemeBorderBottomColor;
+    UIColor *_lightSchemeBorderBottomColor;
     
     CGFloat _borderTopWidth;
     CGFloat _borderRightWidth;
@@ -193,8 +193,8 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
  DO NOT use "_backgroundColor" directly. The same reason as '_transform'.
  */
 @property (atomic, strong) UIColor* styleBackgroundColor;
-@property (atomic, strong) UIColor* darkThemeBackgroundColor;
-@property (atomic, strong) UIColor* lightThemeBackgroundColor;
+@property (atomic, strong) UIColor* darkSchemeBackgroundColor;
+@property (atomic, strong) UIColor* lightSchemeBackgroundColor;
 
 ///--------------------------------------
 /// @name Package Internal Methods

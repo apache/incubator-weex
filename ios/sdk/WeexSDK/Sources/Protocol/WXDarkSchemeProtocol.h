@@ -21,15 +21,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol WXDarkThemeProtocol <WXModuleProtocol>
+@protocol WXDarkSchemeProtocol <WXModuleProtocol>
 
 /**
- Return YES so that Weex root component will be enabled for 'invertForDarkTheme' property.
+ Return YES so that Weex root component will be enabled for 'invertForDarkScheme' property.
 */
 - (BOOL)defaultInvertValueForRootComponent;
 
 /**
-After any view of Weex component is created. Callback dark theme handler to provide a
+After any view of Weex component is created. Callback dark scheme handler to provide a
  chance to configure the view.
 */
 - (void)configureView:(UIView*_Nonnull)view ofComponent:(WXComponent*_Nonnull)component;

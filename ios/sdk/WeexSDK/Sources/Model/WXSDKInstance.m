@@ -52,7 +52,7 @@
 #import "WXConvertUtility.h"
 #import "WXCoreBridge.h"
 #import "WXDataRenderHandler.h"
-#import "WXDarkThemeProtocol.h"
+#import "WXDarkSchemeProtocol.h"
 
 #define WEEX_LITE_URL_SUFFIX           @"wlasm"
 #define WEEX_RENDER_TYPE_PLATFORM       @"platform"
@@ -103,11 +103,11 @@ typedef enum : NSUInteger {
 {
     self = [super init];
     if (self) {
-        if ([WXUtility isDarkThemeSupportEnabled]) {
-            self.themeName = [WXUtility isSystemInDarkTheme] ? @"dark" : @"light";
+        if ([WXUtility isDarkSchemeSupportEnabled]) {
+            self.schemeName = [WXUtility isSystemInDarkScheme] ? @"dark" : @"light";
         }
         else {
-            self.themeName = @"light";
+            self.schemeName = @"light";
         }
         
         _renderType = renderType;
@@ -611,8 +611,8 @@ typedef enum : NSUInteger {
         BOOL alwaysUseMRCForObjectToWeexCore = [[configCenter configForKey:@"iOS_weex_ext_config.alwaysUseMRC" defaultValue:@(NO) isDefault:NULL] boolValue];
         ConvertSwitches(isIOS13, useMRCForInvalidJSONObject, alwaysUseMRCForObjectToWeexCore);
         
-        BOOL isDarkThemeSupportEnabled = [[configCenter configForKey:@"iOS_weex_ext_config.supportDarkTheme" defaultValue:@(YES) isDefault:NULL] boolValue];
-        [WXUtility setDarkThemeSupportEnable:isDarkThemeSupportEnabled];
+        BOOL isDarkSchemeSupportEnabled = [[configCenter configForKey:@"iOS_weex_ext_config.supportDarkScheme" defaultValue:@(YES) isDefault:NULL] boolValue];
+        [WXUtility setDarkSchemeSupportEnable:isDarkSchemeSupportEnabled];
     }
     else {
         BOOL isIOS13 = [[[UIDevice currentDevice] systemVersion] integerValue] == 13;
@@ -1180,41 +1180,41 @@ typedef enum : NSUInteger {
     return result;
 }
 
-+ (id<WXDarkThemeProtocol>)darkThemeColorHandler
++ (id<WXDarkSchemeProtocol>)darkSchemeColorHandler
 {
-    static id<WXDarkThemeProtocol> colorHandler;
+    static id<WXDarkSchemeProtocol> colorHandler;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        colorHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDarkThemeProtocol)];
+        colorHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDarkSchemeProtocol)];
     });
     return colorHandler;
 }
 
-- (NSString*)currentThemeName
+- (NSString*)currentSchemeName
 {
-    return self.themeName;
+    return self.schemeName;
 }
 
-- (BOOL)isDarkTheme
+- (BOOL)isDarkScheme
 {
-    return [self.themeName isEqualToString:@"dark"];
+    return [self.schemeName isEqualToString:@"dark"];
 }
 
-- (void)setCurrentThemeName:(NSString*)name
+- (void)setCurrentSchemeName:(NSString*)name
 {
-    if (![WXUtility isDarkThemeSupportEnabled]) {
-        self.themeName = @"light";
+    if (![WXUtility isDarkSchemeSupportEnabled]) {
+        self.schemeName = @"light";
         return;
     }
     
-    if (name && ![name isEqualToString:self.themeName]) {
-        self.themeName = name;
+    if (name && ![name isEqualToString:self.schemeName]) {
+        self.schemeName = name;
         
         if (self.isCustomRenderType) {
             return;
         }
         
-        // Recursively visit all components and notify that theme had changed.
+        // Recursively visit all components and notify that scheme had changed.
         __weak WXSDKInstance* weakSelf = self;
         WXPerformBlockOnComponentThread(^{
             __strong WXSDKInstance* strongSelf = weakSelf;
@@ -1231,7 +1231,7 @@ typedef enum : NSUInteger {
                 WXPerformBlockOnMainThread(^{
                     __strong WXComponent* scomp = wcomp;
                     if (scomp) {
-                        [scomp themeDidChange:name];
+                        [scomp schemeDidChange:name];
                     }
                 });
             }];
@@ -1239,23 +1239,23 @@ typedef enum : NSUInteger {
         
         [[WXSDKManager bridgeMgr] fireEvent:_instanceId
                                         ref:WX_SDK_ROOT_REF
-                                       type:@"themechange"
-                                     params:@{@"theme": self.themeName?:@"light"}
+                                       type:@"schemechange"
+                                     params:@{@"scheme": self.schemeName?:@"light"}
                                  domChanges:nil];
     }
 }
 
 - (UIColor*)chooseColor:(UIColor*)originalColor
-        lightThemeColor:(UIColor*)lightColor
-         darkThemeColor:(UIColor*)darkColor
+       lightSchemeColor:(UIColor*)lightColor
+        darkSchemeColor:(UIColor*)darkColor
                  invert:(BOOL)invert
                   scene:(WXColorScene)scene
 {
-    if (![WXUtility isDarkThemeSupportEnabled]) {
+    if (![WXUtility isDarkSchemeSupportEnabled]) {
         return originalColor;
     }
     
-    if ([self isDarkTheme]) {
+    if ([self isDarkScheme]) {
         if (darkColor) {
             return darkColor;
         }
@@ -1264,7 +1264,7 @@ typedef enum : NSUInteger {
             if (originalColor == [UIColor clearColor]) {
                 return originalColor;
             }
-            return [[WXSDKInstance darkThemeColorHandler] getInvertedColorFor:originalColor ofScene:scene withDefault:originalColor];
+            return [[WXSDKInstance darkSchemeColorHandler] getInvertedColorFor:originalColor ofScene:scene withDefault:originalColor];
         }
         else {
             return originalColor;

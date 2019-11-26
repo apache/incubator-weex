@@ -43,7 +43,7 @@
 #define KEY_USERNAME_PASSWORD  @"com.taobao.Weex.weex123456"
 
 static BOOL enableRTLLayoutDirection = YES;
-static BOOL isDarkThemeSupportEnabled = YES;
+static BOOL isDarkSchemeSupportEnabled = YES;
 
 void WXPerformBlockOnMainThread(void (^ _Nonnull block)(void))
 {
@@ -164,7 +164,7 @@ CGFloat WXFloorPixelValue(CGFloat value)
     return [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:UISemanticContentAttributeUnspecified] == UIUserInterfaceLayoutDirectionRightToLeft ? WXLayoutDirectionRTL : WXLayoutDirectionLTR;
 }
 
-+ (BOOL)isSystemInDarkTheme
++ (BOOL)isSystemInDarkScheme
 {
     if (@available(iOS 13.0, *)) {
         __block BOOL result = NO;
@@ -182,9 +182,9 @@ CGFloat WXFloorPixelValue(CGFloat value)
 
 + (NSDictionary *)getEnvironment
 {
-    NSString* currentTheme = @"light";
-    if ([WXUtility isDarkThemeSupportEnabled]) {
-        currentTheme = [self isSystemInDarkTheme] ? @"dark" : @"light";
+    NSString* currentScheme = @"light";
+    if ([WXUtility isDarkSchemeSupportEnabled]) {
+        currentScheme = [self isSystemInDarkScheme] ? @"dark" : @"light";
     }
     
     NSString *platform = @"iOS";
@@ -210,7 +210,7 @@ CGFloat WXFloorPixelValue(CGFloat value)
                                     @"deviceHeight":@(deviceHeight * scale),
                                     @"scale":@(scale),
                                     @"layoutDirection": [self getEnvLayoutDirection] == WXLayoutDirectionRTL ? @"rtl" : @"ltr",
-                                    @"theme": currentTheme
+                                    @"scheme": currentScheme
                                 }];
     
     if ([[[UIDevice currentDevice] systemVersion] integerValue] >= 11) {
@@ -816,16 +816,16 @@ CGFloat WXFloorPixelValue(CGFloat value)
     return enableRTLLayoutDirection;
 }
 
-#pragma mark - Dark theme
+#pragma mark - Dark scheme
 
-+ (void)setDarkThemeSupportEnable:(BOOL)value
++ (void)setDarkSchemeSupportEnable:(BOOL)value
 {
-    isDarkThemeSupportEnabled = value;
+    isDarkSchemeSupportEnabled = value;
 }
 
-+ (BOOL)isDarkThemeSupportEnabled
++ (BOOL)isDarkSchemeSupportEnabled
 {
-    return isDarkThemeSupportEnabled;
+    return isDarkSchemeSupportEnabled;
 }
 
 #pragma mark - get deviceID

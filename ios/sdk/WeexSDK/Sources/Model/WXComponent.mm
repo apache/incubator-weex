@@ -42,7 +42,7 @@
 #import "WXSDKInstance_performance.h"
 #import "WXComponent_performance.h"
 #import "WXCoreBridge.h"
-#import "WXDarkThemeProtocol.h"
+#import "WXDarkSchemeProtocol.h"
 
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
@@ -72,8 +72,8 @@ static BOOL bNeedRemoveEvents = YES;
 
 @synthesize transform = _transform;
 @synthesize styleBackgroundColor = _styleBackgroundColor;
-@synthesize darkThemeBackgroundColor = _darkThemeBackgroundColor;
-@synthesize lightThemeBackgroundColor = _lightThemeBackgroundColor;
+@synthesize darkSchemeBackgroundColor = _darkSchemeBackgroundColor;
+@synthesize lightSchemeBackgroundColor = _lightSchemeBackgroundColor;
 
 #pragma mark Life Cycle
 
@@ -107,7 +107,7 @@ static BOOL bNeedRemoveEvents = YES;
         _eventPenetrationEnabled = NO;
         _accessibilityHintContent = nil;
         _cancelsTouchesInView = YES;
-        _invertForDarkTheme = NO;
+        _invertForDarkScheme = NO;
         
         _async = NO;
         
@@ -126,8 +126,8 @@ static BOOL bNeedRemoveEvents = YES;
             }
         }
         
-        if (attributes[@"invertForDarkTheme"]) {
-            _invertForDarkTheme = [WXConvert BOOL:attributes[@"invertForDarkTheme"]];
+        if (attributes[@"invertForDarkScheme"]) {
+            _invertForDarkScheme = [WXConvert BOOL:attributes[@"invertForDarkScheme"]];
         }
         
         if (attributes[@"userInteractionEnabled"]) {
@@ -389,9 +389,9 @@ static BOOL bNeedRemoveEvents = YES;
         
         _view = [self loadView];
         
-        // Provide a chance for dark theme handler to process the view
-        if ([WXUtility isDarkThemeSupportEnabled]) {
-            [[WXSDKInstance darkThemeColorHandler] configureView:_view ofComponent:self];
+        // Provide a chance for dark scheme handler to process the view
+        if ([WXUtility isDarkSchemeSupportEnabled]) {
+            [[WXSDKInstance darkSchemeColorHandler] configureView:_view ofComponent:self];
         }
         
 #ifdef DEBUG
@@ -402,7 +402,7 @@ static BOOL bNeedRemoveEvents = YES;
         _view.hidden = _visibility == WXVisibilityShow ? NO : YES;
         _view.clipsToBounds = _clipToBounds;
         if (![self _needsDrawBorder]) {
-            _layer.borderColor = [self.weexInstance chooseColor:_borderTopColor lightThemeColor:_lightThemeBorderTopColor darkThemeColor:_darkThemeBorderTopColor invert:_invertForDarkTheme scene:[self colorSceneType]].CGColor;
+            _layer.borderColor = [self.weexInstance chooseColor:_borderTopColor lightSchemeColor:_lightSchemeBorderTopColor darkSchemeColor:_darkSchemeBorderTopColor invert:_invertForDarkScheme scene:[self colorSceneType]].CGColor;
             _layer.borderWidth = _borderTopWidth;
             [self _resetNativeBorderRadius];
             _layer.opacity = _opacity;
@@ -410,7 +410,7 @@ static BOOL bNeedRemoveEvents = YES;
             /* Also set background color to view to fix that problem that system may
              set dynamic color to UITableView. Without these codes, event if we set
              clear color to layer, the table view could not be transparent. */
-            UIColor* choosedColor = [self.weexInstance chooseColor:self.styleBackgroundColor lightThemeColor:self.lightThemeBackgroundColor darkThemeColor:self.darkThemeBackgroundColor invert:_invertForDarkTheme scene:[self colorSceneType]];
+            UIColor* choosedColor = [self.weexInstance chooseColor:self.styleBackgroundColor lightSchemeColor:self.lightSchemeBackgroundColor darkSchemeColor:self.darkSchemeBackgroundColor invert:_invertForDarkScheme scene:[self colorSceneType]];
             if (choosedColor == [UIColor clearColor]) {
                 _view.backgroundColor = choosedColor;
             }
@@ -871,17 +871,17 @@ static BOOL bNeedRemoveEvents = YES;
     }
     
     NSString* styleValue = nil;
-    BOOL isDark = [self.weexInstance isDarkTheme];
+    BOOL isDark = [self.weexInstance isDarkScheme];
     if (isDark) {
-        if (_darkThemeBackgroundImage) {
-            styleValue = _darkThemeBackgroundImage;
+        if (_darkSchemeBackgroundImage) {
+            styleValue = _darkSchemeBackgroundImage;
         }
         else {
             styleValue = _backgroundImage;
         }
     }
-    else if (_lightThemeBackgroundImage) {
-        styleValue = _lightThemeBackgroundImage;
+    else if (_lightSchemeBackgroundImage) {
+        styleValue = _lightSchemeBackgroundImage;
     }
     else {
         styleValue = _backgroundImage;
@@ -896,7 +896,7 @@ static BOOL bNeedRemoveEvents = YES;
     dispatch_async(dispatch_get_main_queue(), ^{
         __strong typeof(self) strongSelf = weakSelf;
         if(strongSelf) {
-            // No need to auto-invert linear-gradient colors. We only allows using 'dark-theme-background-image' style.
+            // No need to auto-invert linear-gradient colors. We only allows using 'dark-scheme-background-image' style.
             UIColor * startColor = (UIColor*)linearGradient[@"startColor"];
             UIColor * endColor = (UIColor*)linearGradient[@"endColor"];
             CAGradientLayer * gradientLayer = [WXUtility gradientLayerFromColors:@[startColor, endColor] locations:nil frame:strongSelf.view.bounds gradientType:(WXGradientType)[linearGradient[@"gradientType"] integerValue]];
