@@ -612,6 +612,11 @@ typedef enum : NSUInteger {
         ConvertSwitches(isIOS13, useMRCForInvalidJSONObject, alwaysUseMRCForObjectToWeexCore);
         
         BOOL isDarkSchemeSupportEnabled = [[configCenter configForKey:@"iOS_weex_ext_config.supportDarkScheme" defaultValue:@(YES) isDefault:NULL] boolValue];
+        if (@available(iOS 13.0, *)) {
+        }
+        else {
+            isDarkSchemeSupportEnabled = NO;
+        }
         [WXUtility setDarkSchemeSupportEnable:isDarkSchemeSupportEnabled];
     }
     else {
