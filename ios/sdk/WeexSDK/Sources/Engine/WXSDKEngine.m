@@ -227,6 +227,12 @@
 
 + (void)initSDKEnvironment
 {
+    if (@available(iOS 13.0, *)) {
+    }
+    else {
+        [WXUtility setDarkSchemeSupportEnable:NO];
+    }
+    
     NSString *fileName = @"weex-main-jsfm";
     NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:fileName ofType:@"js"];
 	if (filePath == nil) {
