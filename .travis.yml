@@ -7,6 +7,7 @@ matrix:
       - env: TEST_SUITE=danger 
       - env: TEST_SUITE=jsfm
       - env: TEST_SUITE=ios
+        osx_image: xcode11.2
         language: objective-c
       - env: TEST_SUITE=android ABI=armeabi-v7a
         language: android
