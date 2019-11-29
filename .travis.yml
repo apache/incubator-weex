@@ -7,6 +7,7 @@ matrix:
       - env: TEST_SUITE=danger 
       - env: TEST_SUITE=jsfm
       - env: TEST_SUITE=ios
+        os: osx
         osx_image: xcode11.2
         language: objective-c
       - env: TEST_SUITE=android ABI=armeabi-v7a
@@ -35,6 +36,7 @@ matrix:
             - extra-android-m2repository 
       # static check
       - env: TEST_SUITE=static_code_analysis OCLINT=true
+        os: osx
         osx_image: xcode11.2
         language: objective-c
       - env: TEST_SUITE=static_code_analysis ANDROID_LINT=true
