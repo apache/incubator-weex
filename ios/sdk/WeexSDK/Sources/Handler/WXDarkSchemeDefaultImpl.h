@@ -18,12 +18,15 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <WeexSDK/WXDarkSchemeProtocol.h>
 
-@protocol WXDestroyProtocol <NSObject>
+NS_ASSUME_NONNULL_BEGIN
 
-/**
- *  @abstract execute unload function before dealloc
+/* By default, this implementation class do basic invert of UIColor of RGBA color space.
+ You should implementation your own handler to better handle dark scheme in your application.
  */
-- (void)unload;
+@interface WXDarkSchemeDefaultImpl : NSObject <WXDarkSchemeProtocol>
 
 @end
+
+NS_ASSUME_NONNULL_END

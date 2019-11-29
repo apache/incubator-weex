@@ -67,6 +67,22 @@ do {\
     }\
 } while(0);
 
+#define WX_BOARD_RADIUS_DARK_SCHEME_COLOR_RESET_ALL(key)\
+do {\
+    if (styles && [styles containsObject:@#key]) {\
+        _darkSchemeBorderTopColor = _darkSchemeBorderLeftColor = _darkSchemeBorderRightColor = _darkSchemeBorderBottomColor = [UIColor blackColor];\
+        [self setNeedsDisplay];\
+    }\
+} while(0);
+
+#define WX_BOARD_RADIUS_LIGHT_SCHEME_COLOR_RESET_ALL(key)\
+do {\
+    if (styles && [styles containsObject:@#key]) {\
+        _lightSchemeBorderTopColor = _lightSchemeBorderLeftColor = _lightSchemeBorderRightColor = _lightSchemeBorderBottomColor = [UIColor blackColor];\
+        [self setNeedsDisplay];\
+    }\
+} while(0);
+
 #define WX_BOARD_COLOR_RESET(key)\
 do {\
     if (styles && [styles containsObject:@#key]) {\
@@ -175,7 +191,15 @@ do {\
 - (void)_initViewPropertyWithStyles:(NSDictionary *)styles
 {
     self.styleBackgroundColor = styles[@"backgroundColor"] ? [WXConvert UIColor:styles[@"backgroundColor"]] : [UIColor clearColor];
+    if (styles[@"weexDarkSchemeBackgroundColor"]) {
+        self.darkSchemeBackgroundColor = [WXConvert UIColor:styles[@"weexDarkSchemeBackgroundColor"]];
+    }
+    if (styles[@"weexLightSchemeBackgroundColor"]) {
+        self.lightSchemeBackgroundColor = [WXConvert UIColor:styles[@"weexLightSchemeBackgroundColor"]];
+    }
     _backgroundImage = styles[@"backgroundImage"] ? [WXConvert NSString:styles[@"backgroundImage"]]: nil;
+    _darkSchemeBackgroundImage = styles[@"weexDarkSchemeBackgroundImage"] ? [WXConvert NSString:styles[@"weexDarkSchemeBackgroundImage"]] : nil;
+    _lightSchemeBackgroundImage = styles[@"weexLightSchemeBackgroundImage"] ? [WXConvert NSString:styles[@"weexLightSchemeBackgroundImage"]] : nil;
     _opacity = styles[@"opacity"] ? [WXConvert CGFloat:styles[@"opacity"]] : 1.0;
     _clipToBounds = styles[@"overflow"] ? [WXConvert WXClipType:styles[@"overflow"]] : NO;
     _visibility = styles[@"visibility"] ? [WXConvert WXVisibility:styles[@"visibility"]] : WXVisibilityShow;
@@ -184,8 +208,11 @@ do {\
     [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:styles[@"transform"]] origin:[WXConvert NSString:styles[@"transformOrigin"]] instance:self.weexInstance] :
     [[WXTransform alloc] initWithCSSValue:nil origin:nil instance:self.weexInstance];
     _boxShadow = styles[@"boxShadow"]?[WXConvert WXBoxShadow:styles[@"boxShadow"] scaleFactor:self.weexInstance.pixelScaleFactor]:nil;
-    if (_boxShadow) {
-        _lastBoxShadow = _boxShadow;
+    if (styles[@"weexDarkSchemeBoxShadow"]) {
+        _darkSchemeBoxShadow = [WXConvert WXBoxShadow:styles[@"weexDarkSchemeBoxShadow"] scaleFactor:self.weexInstance.pixelScaleFactor];
+    }
+    if (styles[@"weexLightSchemeBoxShadow"]) {
+        _lightSchemeBoxShadow = [WXConvert WXBoxShadow:styles[@"weexLightSchemeBoxShadow"] scaleFactor:self.weexInstance.pixelScaleFactor];
     }
 }
 
@@ -194,6 +221,12 @@ do {\
     WX_CHECK_COMPONENT_TYPE(self.componentType)
     if (styles[@"backgroundColor"]) {
         self.styleBackgroundColor = [WXConvert UIColor:styles[@"backgroundColor"]];
+    }
+    if (styles[@"weexDarkSchemeBackgroundColor"]) {
+        self.darkSchemeBackgroundColor = [WXConvert UIColor:styles[@"weexDarkSchemeBackgroundColor"]];
+    }
+    if (styles[@"weexLightSchemeBackgroundColor"]) {
+        self.lightSchemeBackgroundColor = [WXConvert UIColor:styles[@"weexLightSchemeBackgroundColor"]];
     }
     if (styles[@"opacity"]) {
         _opacity = [WXConvert CGFloat:styles[@"opacity"]];
@@ -204,9 +237,20 @@ do {\
 {
     WX_CHECK_COMPONENT_TYPE(self.componentType)
     if (styles[@"boxShadow"]) {
-        _lastBoxShadow = _boxShadow;
         _boxShadow = styles[@"boxShadow"]?[WXConvert WXBoxShadow:styles[@"boxShadow"] scaleFactor:self.weexInstance.pixelScaleFactor]:nil;
-        [self configBoxShadow:_boxShadow];
+    }
+    if (styles[@"weexDarkSchemeBoxShadow"]) {
+        _darkSchemeBoxShadow = [WXConvert WXBoxShadow:styles[@"weexDarkSchemeBoxShadow"] scaleFactor:self.weexInstance.pixelScaleFactor];
+    }
+    if (styles[@"weexLightSchemeBoxShadow"]) {
+        _lightSchemeBoxShadow = [WXConvert WXBoxShadow:styles[@"weexLightSchemeBoxShadow"] scaleFactor:self.weexInstance.pixelScaleFactor];
+    }
+    if (styles[@"boxShadow"] || styles[@"weexDarkSchemeBoxShadow"] || styles[@"weexLightSchemeBoxShadow"]) {
+        WXBoxShadow* usingBoxShadow = [self _chooseBoxShadow];
+        if (usingBoxShadow) {
+            _lastBoxShadow = usingBoxShadow;
+            [self configBoxShadow:usingBoxShadow];
+        }
         [self setNeedsDisplay];
     }
     
@@ -215,9 +259,31 @@ do {\
         [self setNeedsDisplay];
     }
     
+    if (styles[@"weexDarkSchemeBackgroundColor"]) {
+        self.darkSchemeBackgroundColor = [WXConvert UIColor:styles[@"weexDarkSchemeBackgroundColor"]];
+        [self setNeedsDisplay];
+    }
+    
+    if (styles[@"weexLightSchemeBackgroundColor"]) {
+        self.lightSchemeBackgroundColor = [WXConvert UIColor:styles[@"weexLightSchemeBackgroundColor"]];
+        [self setNeedsDisplay];
+    }
+    
     if (styles[@"backgroundImage"]) {
-        _backgroundImage = styles[@"backgroundImage"] ? [WXConvert NSString:styles[@"backgroundImage"]]: nil;
-        if (_backgroundImage) {
+        _backgroundImage = [WXConvert NSString:styles[@"backgroundImage"]];
+    }
+    
+    if (styles[@"weexDarkSchemeBackgroundImage"]) {
+        _darkSchemeBackgroundImage = [WXConvert NSString:styles[@"weexDarkSchemeBackgroundImage"]];
+    }
+    if (styles[@"weexLightSchemeBackgroundImage"]) {
+        _lightSchemeBackgroundImage = [WXConvert NSString:styles[@"weexLightSchemeBackgroundImage"]];
+    }
+    
+    if (styles[@"backgroundImage"] ||
+        styles[@"weexDarkSchemeBackgroundImage"] ||
+        styles[@"weexLightSchemeBackgroundImage"]) {
+        if (_backgroundImage || _darkSchemeBackgroundImage || _lightSchemeBackgroundImage) {
             [self setGradientLayer];
         }
     }
@@ -302,6 +368,18 @@ do {\
     WX_BOARD_COLOR_RESET(borderLeftColor);
     WX_BOARD_COLOR_RESET(borderRightColor);
     WX_BOARD_COLOR_RESET(borderBottomColor);
+    
+    WX_BOARD_RADIUS_DARK_SCHEME_COLOR_RESET_ALL(darkSchemeBorderColor);
+    WX_BOARD_COLOR_RESET(darkSchemeBorderTopColor);
+    WX_BOARD_COLOR_RESET(darkSchemeBorderLeftColor);
+    WX_BOARD_COLOR_RESET(darkSchemeBorderRightColor);
+    WX_BOARD_COLOR_RESET(darkSchemeBorderBottomColor);
+    
+    WX_BOARD_RADIUS_LIGHT_SCHEME_COLOR_RESET_ALL(lightSchemeBorderColor);
+    WX_BOARD_COLOR_RESET(lightSchemeBorderTopColor);
+    WX_BOARD_COLOR_RESET(lightSchemeBorderLeftColor);
+    WX_BOARD_COLOR_RESET(lightSchemeBorderRightColor);
+    WX_BOARD_COLOR_RESET(lightSchemeBorderBottomColor);
 }
 
 - (void)_resetStyles:(NSArray *)styles
@@ -310,13 +388,41 @@ do {\
         self.styleBackgroundColor = [UIColor clearColor];
         [self setNeedsDisplay];
     }
+    if (styles && [styles containsObject:@"weexDarkSchemeBackgroundColor"]) {
+        self.darkSchemeBackgroundColor = nil;
+        [self setNeedsDisplay];
+    }
+    if (styles && [styles containsObject:@"weexLightSchemeBackgroundColor"]) {
+        self.lightSchemeBackgroundColor = nil;
+        [self setNeedsDisplay];
+    }
+    
     if (styles && [styles containsObject:@"boxShadow"]) {
         _lastBoxShadow = _boxShadow;
         _boxShadow = nil;
         [self setNeedsDisplay];
     }
+    if (styles && [styles containsObject:@"weexDarkSchemeBoxShadow"]) {
+        _darkSchemeBoxShadow = nil;
+        [self setNeedsDisplay];
+    }
+    if (styles && [styles containsObject:@"weexLightSchemeBoxShadow"]) {
+        _lightSchemeBoxShadow = nil;
+        [self setNeedsDisplay];
+    }
+    
     if (styles && [styles containsObject:@"backgroundImage"]) {
         _backgroundImage = nil;
+    }
+    if (styles && [styles containsObject:@"weexDarkSchemeBackgroundImage"]) {
+        _darkSchemeBackgroundImage = nil;
+    }
+    if (styles && [styles containsObject:@"weexLightSchemeBackgroundImage"]) {
+        _lightSchemeBackgroundImage = nil;
+    }
+    if (styles && ([styles containsObject:@"backgroundImage"] ||
+                   [styles containsObject:@"weexDarkSchemeBackgroundImage"] ||
+                   [styles containsObject:@"weexLightSchemeBackgroundImage"])) {
         [self setGradientLayer];
     }
     

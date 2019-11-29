@@ -32,6 +32,12 @@ typedef enum : NSUInteger {
     WXComponentUpdateStylesCallback
 } WXComponentCallbackType;
 
+typedef enum : NSUInteger {
+    WXColorSceneBackground,
+    WXColorSceneText,
+    WXColorSceneUnknown,
+} WXColorScene;
+
 /**
  * @abstract the component callback , result can be string or dictionary.
  * @discussion callback data to js, the id of callback function will be removed to save memory.
@@ -364,6 +370,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// @name Display
 ///--------------------------------------
 
+@property (nonatomic, assign) BOOL invertForDarkScheme;
+
 @property (nonatomic, assign) WXDisplayType displayType;
 
 /**
@@ -377,6 +385,16 @@ NS_ASSUME_NONNULL_BEGIN
  * @abstract Returns a Boolean indicating whether the component needs to be drawn by `drawRect:`
  */
 - (BOOL)needsDrawRect;
+
+/**
+ * @abstract Fired on instance scheme did changed.
+ */
+- (void)schemeDidChange:(NSString*)scheme;
+
+/**
+ * @abstract Hint used for better do color invert in dark mode.
+ */
+- (WXColorScene)colorSceneType;
 
 /**
  * @abstract Draws the component’s image within the passed-in rectangle.

@@ -26,6 +26,8 @@
 #import <WeexSDK/WXApmForInstance.h>
 #import <WeexSDK/WXComponentManager.h>
 
+@protocol WXDarkSchemeProtocol;
+
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString *const bundleUrlOptionKey;
@@ -446,6 +448,36 @@ typedef enum : NSUInteger {
  Useful fot debugging and fixing online bugs.
  */
 + (NSDictionary*)lastPageInfo;
+
+#pragma mark - Scheme Support
+
+/**
+ Handler for handling color invert.
+
+ @return Handler instance.
+ */
++ (id<WXDarkSchemeProtocol>)darkSchemeColorHandler;
+
+/**
+ Return true if current is dark scheme for this instance.
+ */
+- (BOOL)isDarkScheme;
+
+/**
+ Get/set interface style of current instance.
+ */
+- (NSString*)currentSchemeName;
+- (void)setCurrentSchemeName:(NSString*)name;
+
+/**
+ Choose final color between original color and dark-mode one.
+ Also considering invert.
+ */
+- (UIColor*)chooseColor:(UIColor*)originalColor
+       lightSchemeColor:(UIColor*)lightColor
+        darkSchemeColor:(UIColor*)darkColor
+                 invert:(BOOL)invert
+                  scene:(WXColorScene)scene;
 
 /** 
  * Deprecated 

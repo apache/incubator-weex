@@ -115,7 +115,7 @@ install:
         git submodule update --init --remote
         cd weex-playground/ios && bash update_podfile_for_travisci.sh
         cd ../../ && npm install
-        cd weex-playground/ios && pod install --repo-update
+        cd weex-playground/ios && bundle install && pod install --repo-update
         cd ../../
     fi
     
