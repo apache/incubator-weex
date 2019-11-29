@@ -834,7 +834,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     }
 
     boolean isRemoveAnimation = false;
-    Object attr = getAttrs().get(Constants.Name.DELETE_CELL_ANIMATION);
+    Object attr = child.getAttrs().get(Constants.Name.DELETE_CELL_ANIMATION);
     if (Constants.Value.DEFAULT.equals(attr)) {
       isRemoveAnimation = true;
     }

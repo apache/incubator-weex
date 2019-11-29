@@ -181,9 +181,16 @@ static void *newIPCServer(void *_td) {
       listener->listen();
     } catch (IPCException &e) {
         LOGE("IPCException server died %s",e.msg());
-        base::android::DetachFromVM();
         WeexCore::WeexCoreManager::Instance()->server_queue_= nullptr;
+        if (WeexCoreManager::Instance()->do_release_map()){
+            futexPageQueue.reset();
+        }
+        base::android::DetachFromVM();
         pthread_exit(NULL);
+    }
+    WeexCore::WeexCoreManager::Instance()->server_queue_= nullptr;
+    if (WeexCoreManager::Instance()->do_release_map()){
+        futexPageQueue.reset();
     }
     return nullptr;
 }
