@@ -42,6 +42,7 @@
 #import "WXComponent_performance.h"
 #import "WXAnalyzerCenter.h"
 #import "WXDisplayLinkManager.h"
+#import "WXDarkSchemeProtocol.h"
 
 static NSThread *WXComponentThread;
 
@@ -261,6 +262,12 @@ static NSThread *WXComponentThread;
     
     _rootComponent = [self _buildComponent:ref type:type supercomponent:nil styles:styles attributes:attributes events:events renderObject:renderObject];
     
+    if ([WXUtility isDarkSchemeSupportEnabled]) {
+        if (attributes[@"invertForDarkScheme"] == nil) {
+            _rootComponent.invertForDarkScheme = [[WXSDKInstance darkSchemeColorHandler] defaultInvertValueForRootComponent];
+        }
+    }
+    
     CGSize size = _weexInstance.frame.size;
     [WXCoreBridge setDefaultDimensionIntoRoot:_weexInstance.instanceId
                                         width:size.width height:size.height
@@ -325,6 +332,11 @@ static NSThread *WXComponentThread;
                 component.ignoreInteraction = NO;
             }
         }
+    }
+    
+    // Not explicitly declare "invertForDarkScheme", inherit
+    if (attributes[@"invertForDarkScheme"] == nil) {
+        component.invertForDarkScheme = supercomponent.invertForDarkScheme;
     }
     
 #ifdef DEBUG
@@ -919,6 +931,9 @@ static NSThread *WXComponentThread;
     [self _addUITask:^{
         UIView *rootView = instance.rootView;
         [instance.performance onInstanceRenderSuccess:instance];
+        if (instance.wlasmRender) {
+            [instance.apmInstance forceSetInteractionTime:[WXUtility getUnixFixTimeMillis]];
+        }
         if (instance.renderFinish) {
             instance.renderFinish(rootView);
         }

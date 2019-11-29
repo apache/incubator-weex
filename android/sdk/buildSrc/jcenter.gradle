@@ -1,0 +1,120 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+def siteUrl = 'https://weex.apache.org/'
+def gitUrl = 'https://github.com/apache/incubator-weex.git'
+def mailingList = 'dev@weex.apache.org'
+def description='Apache Weex is an effort undergoing incubation at The Apache Software Foundation (ASF), sponsored by the Apache Incubator. Incubation is required of all newly accepted projects until a further review indicates that the infrastructure, communications, and decision making process have stabilized in a manner consistent with other successful ASF projects. While incubation status is not necessarily a reflection of the completeness or stability of the code, it does indicate that the project has yet to be fully endorsed by the ASF.All Apache Weex releases are in the form of source code, binary/bytecode packages are produced as a convenience to users. View https://weex.apache.org/download/download.html for official Apache Release.'
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'aar'
+                name 'Apache Incubator-Weex'
+                artifactId project.artifactName
+                groupId project.groupId
+                url siteUrl
+                version = project.weexVersion
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'https://raw.githubusercontent.com/apache/incubator-weex/master/LICENSE'
+                    }
+                }
+                developers {
+                    developer {
+                        name 'Apache Weex PPMC'
+                        email mailingList
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection mailingList
+                    url siteUrl
+                }
+            }
+        }
+    }
+}
+
+bintray {
+    configurations = ['archives']
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+    pkg {
+        repo = 'Android'
+        name = project.artifactName
+        websiteUrl = siteUrl
+        desc = description
+        vcsUrl = gitUrl
+        licenses = ["Apache-2.0"]
+        publish = true
+        version {
+            desc = description
+            released = new Date()
+            name = project.weexVersion
+            vcsTag = project.hasProperty('vcsTag') ? project.property('vcsTag') :  project.weexVersion
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+if (project.gradle.startParameter.taskNames.contains('artifactoryPublish') ||
+        project.gradle.startParameter.taskNames.contains(':weex_sdk:artifactoryPublish')) {
+    apply plugin: 'maven-publish'
+    publishing {
+        publications {
+            artifactorySnapthost(MavenPublication) {
+                groupId project.groupId
+                artifactId project.artifactName
+                version project.weexVersion
+                artifact bundleReleaseAar
+            }
+        }
+        repositories {
+            maven {
+                name = 'OJOSnapshot'
+                url = 'http://oss.jfrog.org/artifactory'
+            }
+        }
+    }
+}
+
+artifactory {
+    contextUrl = 'http://oss.jfrog.org/artifactory'
+    publish {
+        repository {
+            repoKey = 'oss-snapshot-local'
+            username = bintray.user
+            password = bintray.key
+            maven = true
+        }
+        defaults {
+            publications ('artifactorySnapthost')
+        }
+    }
+}

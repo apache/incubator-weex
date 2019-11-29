@@ -36,5 +36,5 @@ fi
 mkdir -p "$TMPDIR""weex_release_candidate/""$1/$2"
 cp "apache-weex-incubating-$1-$2-src.tar.gz" "apache-weex-incubating-$1-$2-src.tar.gz.asc" "apache-weex-incubating-$1-$2-src.tar.gz.sha512" "$TMPDIR""weex_release_candidate/""$1/$2"
 cd "$TMPDIR""weex_release_candidate"
-svn add "$1/$2"
-svn commit -m "$4"
+svn add . --force
+svn commit -m "Update for $1-$2"
