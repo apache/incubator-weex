@@ -229,15 +229,13 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             }
         }
         else if ([property isEqualToString:@"weexDarkSchemeBackgroundColor"]) {
-            if (!isDarkScheme || componentRawStyles[@"weexDarkSchemeBackgroundColor"] == nil) {
-                /* Do not do animation for "darkSchemeBackgroundColor" in light mode.
-                 Or there is no dark bg color explicitly defined in styles.
-                 */
+            if (!isDarkScheme) {
+                /* Do not do animation for "darkSchemeBackgroundColor" in light mode. */
                 continue;
             }
         }
         else if ([property isEqualToString:@"weexLightSchemeBackgroundColor"]){
-            if (isDarkScheme || componentRawStyles[@"weexLightSchemeBackgroundColor"] == nil) {
+            if (isDarkScheme) {
                 continue;
             }
         }

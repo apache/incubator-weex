@@ -133,16 +133,14 @@
                 }
             }
             else if ([key isEqualToString:@"weexDarkSchemeBackgroundColor"]) {
-                if (!isDarkScheme || componentRawStyles[@"weexDarkSchemeBackgroundColor"] == nil) {
-                    /* Do not do animation for "darkSchemeBackgroundColor" in light mode.
-                     Or there is no dark bg color explicitly defined in styles.
-                     */
+                if (!isDarkScheme) {
+                    /* Do not do animation for "darkSchemeBackgroundColor" in light mode. */
                     [futileStyles setObject:styles[key] forKey:key];
                     continue;
                 }
             }
             else if ([key isEqualToString:@"weexLightSchemeBackgroundColor"]){
-                if (isDarkScheme || componentRawStyles[@"weexLightSchemeBackgroundColor"] == nil) {
+                if (isDarkScheme) {
                     [futileStyles setObject:styles[key] forKey:key];
                     continue;
                 }
