@@ -760,7 +760,7 @@ static int binaryPrecedence(WXJSToken *token)
 
 - (WXJSExpression *)parsePrimaryExpression
 {
-    int type = _lookahead->type;
+    WXJSTokenType type = _lookahead->type;
     
     if (type == WXJSTokenTypePunctuator) {
         if (_lookahead->value == "[") {

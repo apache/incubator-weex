@@ -135,13 +135,14 @@ bool flexIsUndefined(float value) {
                 strongSelf.layer.transform = CATransform3DIdentity;
             }
             
+            WXBoxShadow* usingBoxShadow = [strongSelf _chooseBoxShadow];            
             if (!CGRectEqualToRect(strongSelf.view.frame,strongSelf.calculatedFrame)) {
                 strongSelf.view.frame = strongSelf.calculatedFrame;
                 strongSelf->_absolutePosition = CGPointMake(NAN, NAN);
-                [strongSelf configBoxShadow:strongSelf->_boxShadow];
+                [strongSelf configBoxShadow:usingBoxShadow];
             } else {
-                if (![strongSelf equalBoxShadow:strongSelf->_boxShadow withBoxShadow:strongSelf->_lastBoxShadow]) {
-                    [strongSelf configBoxShadow:strongSelf->_boxShadow];
+                if (![strongSelf equalBoxShadow:usingBoxShadow withBoxShadow:strongSelf->_lastBoxShadow]) {
+                    [strongSelf configBoxShadow:usingBoxShadow];
                 }
             }
             

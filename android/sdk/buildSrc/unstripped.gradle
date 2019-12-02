@@ -1,0 +1,68 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+def processNativeLibs = { unstripped, stripped ->
+    copy{
+        from unstripped
+        into new File(project.buildDir, "unstrippedSo")
+        include '**/libweexjss.so', '**/libweexcore.so'
+        eachFile {
+            it.path = "${it.relativePath.segments[-2]}_${it.name}"
+        }
+    }
+
+    if(project.hasProperty('supportArmeabi') && "true" == project.getProperty('supportArmeabi')){
+        //Copy stripped shared library from armeabi-v7a into armeabi
+        copy{
+            from stripped
+            into project.android.sourceSets.main.jniLibs.srcDirs[-1]
+            include '**/armeabi-v7a/**'
+            exclude '**/libc++_shared.so'
+            eachFile {
+                it.path = "armeabi/${it.name}"
+            }
+        }
+
+        //Copy Unstripped shared library from armeabi-v7a into armeabi
+        copy{
+            from unstripped
+            into new File(project.buildDir, "unstrippedSo")
+            include '**/armeabi-v7a/libweexjss.so', '**/armeabi-v7a/libweexcore.so'
+            eachFile {
+                it.path = "armeabi_${it.name}"
+            }
+        }
+    }
+}
+
+afterEvaluate { project ->
+    transformNativeLibsWithStripDebugSymbolForRelease.doLast {
+        processNativeLibs transformNativeLibsWithMergeJniLibsForRelease,
+                transformNativeLibsWithStripDebugSymbolForRelease
+    }
+
+    transformNativeLibsWithStripDebugSymbolForApacheRelease.doLast {
+        processNativeLibs transformNativeLibsWithMergeJniLibsForApacheRelease,
+                transformNativeLibsWithStripDebugSymbolForApacheRelease
+    }
+
+    transformNativeLibsWithStripDebugSymbolForLegacyRelease.doLast {
+        processNativeLibs transformNativeLibsWithMergeJniLibsForLegacyRelease,
+                transformNativeLibsWithStripDebugSymbolForLegacyRelease
+    }
+}
