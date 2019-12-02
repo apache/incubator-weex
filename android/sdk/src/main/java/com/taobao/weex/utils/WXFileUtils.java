@@ -40,6 +40,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
+import static com.taobao.weex.utils.WXSoInstallMgrSdk._cpuType;
+
 public class WXFileUtils {
 
   /**
@@ -211,8 +213,8 @@ public class WXFileUtils {
       if(zipEntry.isDirectory()){
         continue;
       }
-      if(zipEntry.getName().contains("lib/armeabi/") &&
-              (zipEntry.getName().contains("weex") || zipEntry.getName().equals("libJavaScriptCore.so"))){
+      if (zipEntry.getName().contains("lib/" + _cpuType() + "/") &&
+              (zipEntry.getName().contains("weex") || zipEntry.getName().equals("libJavaScriptCore.so"))) {
         String[] fileNames = zipEntry.getName().split("/");
         String fileName = fileNames[fileNames.length - 1];
         InputStream inputStream = zip.getInputStream(zipEntry);
