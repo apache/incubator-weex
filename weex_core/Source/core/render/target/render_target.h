@@ -56,23 +56,23 @@ namespace WeexCore {
         virtual void deletePage(const std::string& page) = 0;
 
         virtual void createBody(const std::string& page, const std::string& ref, const std::string& type,
-                                std::shared_ptr<std::map<std::string, std::string>> styles,
-                                std::shared_ptr<std::map<std::string, std::string>> attrs,
-                                std::shared_ptr<std::set<std::string>> events) = 0;
+                                std::map<std::string, std::string>* styles,
+                                std::map<std::string, std::string>* attrs,
+                                std::set<std::string>* events) = 0;
 
         virtual void addElement(const std::string& page, const std::string& ref, const std::string& type,
                                 const std::string &parent_ref, int index,
-                                std::shared_ptr<std::map<std::string, std::string>> styles,
-                                std::shared_ptr<std::map<std::string, std::string>> attrs,
-                                std::shared_ptr<std::set<std::string>> events) = 0;
+                                std::map<std::string, std::string>* styles,
+                                std::map<std::string, std::string>* attrs,
+                                std::set<std::string>* events) = 0;
 
         virtual void removeElement(const std::string& page, const std::string &ref) = 0;
 
         virtual void moveElement(const std::string& page, const std::string &ref, const std::string &parent_ref, int index) = 0;
 
-        virtual void updateStyles(const std::string& page, const std::string &ref, std::shared_ptr<std::map<std::string, std::string>> styles) = 0;
+        virtual void updateStyles(const std::string& page, const std::string &ref, std::map<std::string, std::string>* styles) = 0;
 
-        virtual void updateAttributes(const std::string& page, const std::string &ref, std::shared_ptr<std::map<std::string, std::string>> attrs) = 0;
+        virtual void updateAttributes(const std::string& page, const std::string &ref, std::map<std::string, std::string>* attrs) = 0;
 
         virtual void addEvent(const std::string& page, const std::string &ref, const std::string &event) = 0;
 
