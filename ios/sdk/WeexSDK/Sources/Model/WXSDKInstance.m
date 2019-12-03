@@ -111,6 +111,12 @@ typedef enum : NSUInteger {
             self.schemeName = @"light";
         }
         
+        // Update scheme value in JS environment.
+        if (([WXUtility isEnvironmentUsingDarkScheme] && [self.schemeName isEqualToString:@"light"]) ||
+            (![WXUtility isEnvironmentUsingDarkScheme] && [self.schemeName isEqualToString:@"dark"])) {
+            [[WXBridgeManager sharedManager] resetEnvironment];
+        }
+        
         _autoInvertingBehavior = WXAutoInvertingBehaviorDefault;
         _renderType = renderType;
         _appearState = YES;

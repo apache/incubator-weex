@@ -27,13 +27,13 @@
 
 @synthesize weexInstance;
 
-WX_EXPORT_METHOD_SYNC(@selector(isUsingDarkScheme))
+WX_EXPORT_METHOD_SYNC(@selector(getCurrentScheme))
 WX_EXPORT_METHOD(@selector(registerSchemeChangeListener:))
 WX_EXPORT_METHOD(@selector(unregisterSchemeChangeListener))
 
-- (BOOL)isUsingDarkScheme
+- (NSString*)getCurrentScheme
 {
-    return [self.weexInstance isDarkScheme];
+    return [self.weexInstance isDarkScheme] ? @"dark" : @"light";
 }
 
 - (void)registerSchemeChangeListener:(WXModuleKeepAliveCallback)callback

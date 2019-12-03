@@ -234,6 +234,20 @@ CGFloat WXFloorPixelValue(CGFloat value)
     return data;
 }
 
+static BOOL gIsEnvironmentUsingDarkScheme = NO;
+
++ (NSDictionary *_Nonnull)getEnvironmentForJSContext
+{
+    NSDictionary* result = [self getEnvironment];
+    gIsEnvironmentUsingDarkScheme = [result[@"scheme"] isEqualToString:@"dark"];
+    return result;
+}
+
++ (BOOL)isEnvironmentUsingDarkScheme
+{
+    return gIsEnvironmentUsingDarkScheme;
+}
+
 + (NSDictionary *)getDebugEnvironment {
     NSString *platform = @"iOS";
     NSString *weexVersion = [WXSDKEngine SDKEngineVersion];

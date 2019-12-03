@@ -21,6 +21,8 @@
 #import "WXSDKInstance.h"
 #import "WXPageEventNotifyEvent.h"
 #import "WXSDKEngine.h"
+#import "WXUtility.h"
+#import "WXBridgeManager.h"
 
 @interface WXRootView()
 {
@@ -63,6 +65,18 @@
     return _mHasEvent;
 }
 
+- (void)checkUpdateEnvironment:(NSInteger)currentStyle
+{
+    if (@available(iOS 13.0, *)) {
+        if (([WXUtility isEnvironmentUsingDarkScheme] && (UIUserInterfaceStyle)currentStyle == UIUserInterfaceStyleLight) ||
+            (![WXUtility isEnvironmentUsingDarkScheme] && (UIUserInterfaceStyle)currentStyle == UIUserInterfaceStyleDark)) {
+            // Update scheme value in JS environment.
+            [WXUtility getEnvironmentForJSContext]; // Update gIsEnvironmentUsingDarkScheme
+            [[WXBridgeManager sharedManager] resetEnvironment];
+        }
+    }
+}
+
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection
 {
     [super traitCollectionDidChange:previousTraitCollection];
@@ -73,6 +87,7 @@
         if (currentStyle != previousTraitCollection.userInterfaceStyle) {
             if (_hasFirstTraitCollectionChange) {
                 _allowFirstTraitCollectionChange = NO;
+                [self checkUpdateEnvironment:(NSInteger)currentStyle];
                 [self.instance setCurrentSchemeName:currentStyle == UIUserInterfaceStyleDark ? @"dark" : @"light"];
             }
             else {
@@ -84,6 +99,7 @@
                     if (strongSelf) {
                         if (strongSelf->_allowFirstTraitCollectionChange) {
                             if (strongSelf.instance) {
+                                [self checkUpdateEnvironment:(NSInteger)currentStyle];
                                 [strongSelf.instance setCurrentSchemeName:currentStyle == UIUserInterfaceStyleDark ? @"dark" : @"light"];
                             }
                         }
