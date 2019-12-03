@@ -271,8 +271,8 @@ public class WXSoInstallMgrSdk {
 
 
       if(!oldfile.exists()) {
-        WXEnvironment.extractSo();
-        oldfile = new File(copyPath, STARTUPSO);
+        String extractSoPath = WXEnvironment.extractSo();
+        oldfile = new File(extractSoPath, STARTUPSO);
       }
 
       if (oldfile.exists()) {
@@ -341,7 +341,7 @@ public class WXSoInstallMgrSdk {
     }
   }
 
-  private static String _cpuType() {
+  public static String _cpuType() {
     if(TextUtils.isEmpty(mAbi)) {
       try {
         mAbi = Build.CPU_ABI;
