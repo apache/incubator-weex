@@ -29,6 +29,7 @@
 
 WX_EXPORT_METHOD_SYNC(@selector(isUsingDarkScheme))
 WX_EXPORT_METHOD(@selector(registerSchemeChangeListener:))
+WX_EXPORT_METHOD(@selector(unregisterSchemeChangeListener))
 
 - (BOOL)isUsingDarkScheme
 {
@@ -47,6 +48,11 @@ WX_EXPORT_METHOD(@selector(registerSchemeChangeListener:))
                                  @"scheme": self.weexInstance.schemeName?:@"light"},
                                YES);
     }
+}
+
+- (void)unregisterSchemeChangeListener
+{
+    _schemeChangedCallback = nil;
 }
 
 @end
