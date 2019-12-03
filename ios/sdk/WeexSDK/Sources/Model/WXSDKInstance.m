@@ -53,6 +53,7 @@
 #import "WXCoreBridge.h"
 #import "WXDataRenderHandler.h"
 #import "WXDarkSchemeProtocol.h"
+#import "WXDarkSchemeModule.h"
 
 #define WEEX_LITE_URL_SUFFIX           @"wlasm"
 #define WEEX_RENDER_TYPE_PLATFORM       @"platform"
@@ -110,6 +111,7 @@ typedef enum : NSUInteger {
             self.schemeName = @"light";
         }
         
+        _autoInvertingBehavior = WXAutoInvertingBehaviorDefault;
         _renderType = renderType;
         _appearState = YES;
         
@@ -1185,6 +1187,11 @@ typedef enum : NSUInteger {
     return result;
 }
 
+- (void)setAutoInvertingBehavior:(WXAutoInvertingBehavior)behavior
+{
+    _autoInvertingBehavior = behavior;
+}
+
 + (id<WXDarkSchemeProtocol>)darkSchemeColorHandler
 {
     static id<WXDarkSchemeProtocol> colorHandler;
@@ -1218,6 +1225,9 @@ typedef enum : NSUInteger {
         if (self.isCustomRenderType) {
             return;
         }
+        
+        WXDarkSchemeModule* darkSchemeModule = [self moduleForClass:[WXDarkSchemeModule class]];
+        [darkSchemeModule onInstanceSchemeChanged];
         
         // Recursively visit all components and notify that scheme had changed.
         __weak WXSDKInstance* weakSelf = self;

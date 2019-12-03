@@ -43,6 +43,7 @@
 #import "WXConfigCenterProtocol.h"
 #import "WXComponent+Layout.h"
 #import "WXCoreBridge.h"
+#import "WXDarkSchemeModule.h"
 
 @implementation WXSDKEngine
 
@@ -69,6 +70,7 @@
     [self registerModule:@"webSocket" withClass:NSClassFromString(@"WXWebSocketModule")];
     [self registerModule:@"voice-over" withClass:NSClassFromString(@"WXVoiceOverModule")];
     [self registerModule:@"sdk-console-log" withClass:NSClassFromString(@"WXConsoleLogModule")];
+    [self registerModule:@"dark-scheme" withClass:NSClassFromString(@"WXDarkSchemeModule")];
 }
 
 + (void)registerModule:(NSString *)name withClass:(Class)clazz

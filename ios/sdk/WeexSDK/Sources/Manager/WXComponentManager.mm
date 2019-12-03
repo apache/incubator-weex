@@ -43,6 +43,7 @@
 #import "WXAnalyzerCenter.h"
 #import "WXDisplayLinkManager.h"
 #import "WXDarkSchemeProtocol.h"
+#import "WXSDKInstance_private.h"
 
 static NSThread *WXComponentThread;
 
@@ -264,7 +265,16 @@ static NSThread *WXComponentThread;
     
     if ([WXUtility isDarkSchemeSupportEnabled]) {
         if (attributes[@"invertForDarkScheme"] == nil) {
-            _rootComponent.invertForDarkScheme = [[WXSDKInstance darkSchemeColorHandler] defaultInvertValueForRootComponent];
+            WXAutoInvertingBehavior invertingBehavior = _weexInstance.autoInvertingBehavior;
+            if (invertingBehavior == WXAutoInvertingBehaviorDefault) {
+                _rootComponent.invertForDarkScheme = [[WXSDKInstance darkSchemeColorHandler] defaultInvertValueForRootComponent];
+            }
+            else if (invertingBehavior == WXAutoInvertingBehaviorAlways) {
+                _rootComponent.invertForDarkScheme = YES;
+            }
+            else {
+                _rootComponent.invertForDarkScheme = NO;
+            }
         }
     }
     

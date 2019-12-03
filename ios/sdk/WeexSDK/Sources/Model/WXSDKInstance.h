@@ -451,6 +451,27 @@ typedef enum : NSUInteger {
 
 #pragma mark - Scheme Support
 
+typedef enum : NSUInteger {
+    WXAutoInvertingBehaviorDefault,
+    WXAutoInvertingBehaviorAlways,
+    WXAutoInvertingBehaviorNever,
+} WXAutoInvertingBehavior;
+
+/**
+ Set auto-inverting behavior for dark scheme.
+    WXAutoInvertingBehaviorDefault: Use components attribute and
+        defaultInvertValueForRootComponent of WXDarkSchemeProtocol.
+    WXAutoInvertingBehaviorAlways: Always set 'autoInvertForDarkScheme' as
+        true for root component.
+    WXAutoInvertingBehaviorNever: Always set 'autoInvertForDarkScheme' as
+        false for root component.
+ 
+ This function should be called before rendering URL.
+
+ @return Handler instance.
+*/
+- (void)setAutoInvertingBehavior:(WXAutoInvertingBehavior)behavior;
+
 /**
  Handler for handling color invert.
 
