@@ -618,6 +618,10 @@
 		D735F1B222D761F800B53CDF /* log_utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D735F1AC22D761F800B53CDF /* log_utils.cpp */; };
 		D735F1B322D761F800B53CDF /* log_utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D735F1AC22D761F800B53CDF /* log_utils.cpp */; };
 		D77286FF22C9B22C00E1DA7D /* eagle_bridge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD9205FA223651D800EDF93D /* eagle_bridge.cpp */; };
+		D7D15AF723960F5D0024BC33 /* WXDarkSchemeModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D7D15AF523960F5C0024BC33 /* WXDarkSchemeModule.m */; };
+		D7D15AF823960F5D0024BC33 /* WXDarkSchemeModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D7D15AF523960F5C0024BC33 /* WXDarkSchemeModule.m */; };
+		D7D15AF923960F5D0024BC33 /* WXDarkSchemeModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D7D15AF623960F5D0024BC33 /* WXDarkSchemeModule.h */; };
+		D7D15AFA23960F5D0024BC33 /* WXDarkSchemeModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D7D15AF623960F5D0024BC33 /* WXDarkSchemeModule.h */; };
 		D7D6B6E2238E1B1D00BE56DD /* WXDarkSchemeProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = D7D6B6E1238E1B1D00BE56DD /* WXDarkSchemeProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D7D6B6E3238E1B1D00BE56DD /* WXDarkSchemeProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = D7D6B6E1238E1B1D00BE56DD /* WXDarkSchemeProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D7D6B6E6238E1B2A00BE56DD /* WXDarkSchemeDefaultImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = D7D6B6E4238E1B2A00BE56DD /* WXDarkSchemeDefaultImpl.m */; };
@@ -1357,6 +1361,8 @@
 		D3FC0DF61C508B2A002B9E31 /* WXTimerModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTimerModule.m; sourceTree = "<group>"; };
 		D735F1AB22D761F800B53CDF /* log_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = log_utils.h; sourceTree = "<group>"; };
 		D735F1AC22D761F800B53CDF /* log_utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = log_utils.cpp; sourceTree = "<group>"; };
+		D7D15AF523960F5C0024BC33 /* WXDarkSchemeModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXDarkSchemeModule.m; sourceTree = "<group>"; };
+		D7D15AF623960F5D0024BC33 /* WXDarkSchemeModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXDarkSchemeModule.h; sourceTree = "<group>"; };
 		D7D6B6E1238E1B1D00BE56DD /* WXDarkSchemeProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXDarkSchemeProtocol.h; sourceTree = "<group>"; };
 		D7D6B6E4238E1B2A00BE56DD /* WXDarkSchemeDefaultImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXDarkSchemeDefaultImpl.m; sourceTree = "<group>"; };
 		D7D6B6E5238E1B2A00BE56DD /* WXDarkSchemeDefaultImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXDarkSchemeDefaultImpl.h; sourceTree = "<group>"; };
@@ -1949,6 +1955,8 @@
 		77E659D71C07F585008B8775 /* Module */ = {
 			isa = PBXGroup;
 			children = (
+				D7D15AF623960F5D0024BC33 /* WXDarkSchemeModule.h */,
+				D7D15AF523960F5C0024BC33 /* WXDarkSchemeModule.m */,
 				7704894622AA358400E7606F /* WXConsoleLogModule.h */,
 				BD35ADE92303BEA60050ED82 /* WXConsoleLogModule.mm */,
 				BA5F00EF1FC5AFFE00F76B5C /* WXLocaleModule.h */,
@@ -2630,6 +2638,7 @@
 				B8D66CA921255730003960BD /* wson_util.h in Headers */,
 				7704894822AA358500E7606F /* WXConsoleLogModule.h in Headers */,
 				B8D66C8B21255730003960BD /* render_list_factory.h in Headers */,
+				D7D15AF923960F5D0024BC33 /* WXDarkSchemeModule.h in Headers */,
 				745B2D681E5A8E1E0092D38A /* WXMultiColumnLayout.h in Headers */,
 				B89543F720EB18B5006EAD63 /* WXCoreBridge.h in Headers */,
 				2A60CE9C1C91733E00857B9F /* WXSwitchComponent.h in Headers */,
@@ -2838,6 +2847,7 @@
 				B8D66C3E21255730003960BD /* render_action_createfinish.h in Headers */,
 				DCA445F21EFA5A2300D0CFA8 /* WXHeaderComponent.h in Headers */,
 				DCA445DD1EFA59B300D0CFA8 /* WXRecyclerUpdateController.h in Headers */,
+				D7D15AFA23960F5D0024BC33 /* WXDarkSchemeModule.h in Headers */,
 				DCA4461E1EFA5AAF00D0CFA8 /* WXComponentFactory.h in Headers */,
 				33CE190F2153443000CF9670 /* WXJSFrameworkLoadDefaultImpl.h in Headers */,
 				B87B9E7E21539B3300B6DC61 /* WXVersion.h in Headers */,
@@ -3334,6 +3344,7 @@
 				742AD72F1DF98C45007DC46C /* WXResourceRequest.m in Sources */,
 				7461F8931CFB373100F62D44 /* WXLayer.m in Sources */,
 				74D205211E091B8000128F44 /* WXCallJSMethod.m in Sources */,
+				D7D15AF723960F5D0024BC33 /* WXDarkSchemeModule.m in Sources */,
 				BD88C14522F02120004467AA /* render_action_update_richtext_child_attr.cpp in Sources */,
 				C41E1A981DC1FD15009C7F90 /* WXDatePickerManager.m in Sources */,
 				BDEEADBA22F2902E0099F1D7 /* time_calculator.cpp in Sources */,
@@ -3526,6 +3537,7 @@
 				DCA445931EFA55B300D0CFA8 /* WXComponentManager.mm in Sources */,
 				DCA445941EFA55B300D0CFA8 /* WXComponentFactory.m in Sources */,
 				DCA445951EFA55B300D0CFA8 /* WXRuleManager.m in Sources */,
+				D7D15AF823960F5D0024BC33 /* WXDarkSchemeModule.m in Sources */,
 				BD88C14622F02120004467AA /* render_action_update_richtext_child_attr.cpp in Sources */,
 				DCA445961EFA55B300D0CFA8 /* WXMonitor.m in Sources */,
 				BDEEADBB22F2902E0099F1D7 /* time_calculator.cpp in Sources */,
