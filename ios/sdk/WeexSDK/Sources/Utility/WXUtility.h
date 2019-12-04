@@ -145,6 +145,8 @@ _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
  *
  */
 + (NSDictionary *_Nonnull)getEnvironment;
++ (NSDictionary *_Nonnull)getEnvironmentForJSContext;
++ (BOOL)isEnvironmentUsingDarkScheme;
 
 + (NSDictionary *_Nonnull)getDebugEnvironment;
 

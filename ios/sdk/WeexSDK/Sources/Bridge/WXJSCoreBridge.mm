@@ -401,7 +401,7 @@
 
 - (void)resetEnvironment
 {
-    NSDictionary *data = [WXUtility getEnvironment];
+    NSDictionary *data = [WXUtility getEnvironmentForJSContext];
     _jsContext[@"WXEnvironment"] = data;
 }
 
