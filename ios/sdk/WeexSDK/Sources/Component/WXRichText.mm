@@ -190,7 +190,7 @@ do {\
             [self recursivelyAddChildNode:dict toSuperNode:rootNode];
         }
         
-        _backgroundColor = rootNode.backgroundColor?:[UIColor whiteColor];
+        _backgroundColor = rootNode.backgroundColor?:[UIColor clearColor];
     }
 }
 
@@ -319,7 +319,7 @@ do {\
         if (_styles) {
             [self fillCSSStyles:_styles toNode:rootNode superNode:nil];
         }
-        _backgroundColor = rootNode.backgroundColor?:[UIColor whiteColor];
+        _backgroundColor = rootNode.backgroundColor?:[UIColor clearColor];
     }
 
     WXRichNode* superNode = [self findRichNode:@"_root"];
