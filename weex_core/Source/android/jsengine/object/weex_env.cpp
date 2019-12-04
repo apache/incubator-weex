@@ -105,9 +105,29 @@ bool WeexEnv::sendLog(int level,
                       const char *file,
                       unsigned long line,
                       const char *log) {
-
   if (scriptBridge_ == nullptr) {
     return false;
   }
   return scriptBridge_->core_side()->Log(level, tag, file, line, log);
+}
+void WeexEnv::destroyJSAction(long ctxContainer) {
+  if (ctxContainer == 0) {
+    return;
+  }
+  JSAction *pAction = m_jsActionMap[ctxContainer];
+  delete pAction;
+  pAction = nullptr;
+  m_jsActionMap.erase(ctxContainer);
+}
+JSAction *WeexEnv::createJSAction(long ctxContainer) {
+  auto jsAction = new JSAction(ctxContainer);
+  m_jsActionMap[ctxContainer] = jsAction;
+  return jsAction;
+}
+JSAction *WeexEnv::getJSAction(long ctxContainer) {
+  if (ctxContainer == 0) {
+    return nullptr;
+  }
+
+  return m_jsActionMap[ctxContainer];
 }

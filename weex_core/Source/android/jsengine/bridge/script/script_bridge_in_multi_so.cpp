@@ -60,7 +60,7 @@ FunctionsExposedByJS *ScriptBridgeInMultiSo::GetExposedFunctions() {
       ExecJSOnAppWithResult, CallJSOnAppContext, DestroyAppContext,
       ExecJSService,         ExecTimeCallback,   ExecJS,
       ExecJSWithResult,      ExecJSWithCallback, CreateInstance,     ExecJSOnInstance,
-      DestroyInstance,       UpdateGlobalConfig,  UpdateInitFrameworkParams, SetLogType};
+      DestroyInstance,       UpdateGlobalConfig,  UpdateInitFrameworkParams, SetLogType, JsAction};
   auto functions = (FunctionsExposedByJS *)malloc(sizeof(FunctionsExposedByJS));
   memset(functions, 0, sizeof(FunctionsExposedByJS));
   memcpy(functions, &temp, sizeof(FunctionsExposedByJS));
@@ -159,6 +159,10 @@ int ScriptBridgeInMultiSo::UpdateInitFrameworkParams(const std::string& key, con
 
 void ScriptBridgeInMultiSo::SetLogType(const int logLevel, const bool isPerf) {
   return Instance()->script_side()->SetLogType(logLevel, isPerf);
+}
+
+int64_t ScriptBridgeInMultiSo::JsAction(long ctxContainer, int32_t jsActionType, const char *arg) {
+   return Instance()->script_side()->JsAction(ctxContainer, jsActionType, arg);
 }
 
 

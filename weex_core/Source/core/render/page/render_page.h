@@ -142,7 +142,7 @@ public:
 
   inline bool is_dirty() { return this->is_dirty_.load(); }
 
-  inline void set_is_dirty(bool dirty) { this->is_dirty_.store(dirty); }
+  void set_is_dirty(bool dirty);
 
   inline void set_is_render_container_width_wrap_content(bool wrap) {
     this->is_render_container_width_wrap_content_.store(wrap);

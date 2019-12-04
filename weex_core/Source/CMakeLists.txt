@@ -154,6 +154,9 @@ if(ANDROID)
     ./android/bridge/multi_process_and_so_initializer.cpp
     ./android/bridge/multi_so_initializer.cpp
     ./android/wrap/wml_bridge.cpp
+    ./android/wrap/js_context.cpp
+    ./android/wrap/js_processer.h
+    ./android/wrap/js_processer.cpp
     ./android/utils/cache_utils.cpp
     ./android/utils/params_utils.cpp
     ./android/utils/so_utils.cpp

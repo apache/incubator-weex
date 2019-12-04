@@ -1,15 +1,5 @@
 rootProject.name = 'weex-project'
 
-def updateSubmodule(){
-    def command = "git submodule update --init --remote"
-    exec {
-        executable "bash"
-        args "-c", command
-    }
-}
-
-updateSubmodule()
-
 include ":playground"
 project(":playground").projectDir=new File("../weex-playground/android/playground")
 

@@ -67,6 +67,7 @@ class ScriptBridgeInMultiProcess : public WeexCore::ScriptBridge {
   IPC_METHOD(UpdateGlobalConfig)
   IPC_METHOD(UpdateInitFrameworkParams)
   IPC_METHOD(setLogType)
+  IPC_METHOD(JsAction)
 
  private:
   static ScriptBridgeInMultiProcess* g_instance;

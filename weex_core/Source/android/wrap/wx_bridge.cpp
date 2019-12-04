@@ -1171,6 +1171,15 @@ int WXBridge::UpdateFinish(JNIEnv* env, const char* page_id, const char* task,
                                         jCallback.Get());
 }
 
+void WXBridge::SetPageDirty(JNIEnv *env, const char *page_id, bool dirty) {
+  auto jPageId = base::android::ScopedLocalJavaRef<jstring>(
+      env, env->NewStringUTF(page_id));
+  Java_WXBridge_setPageDirty(env,
+                             jni_object(),
+                             jPageId.Get(),
+                             static_cast<jboolean>(dirty ? 1 : 0));
+}
+
 void WXBridge::SetTimeout(JNIEnv* env, const char* callback_id,
                           const char* time) {
   auto jCallbackID = base::android::ScopedLocalJavaRef<jstring>(

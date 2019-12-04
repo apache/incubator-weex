@@ -34,11 +34,13 @@
 #include <android/jsengine/task/weex_task.h>
 #include "android/jsengine/task/back_to_weex_core_queue.h"
 #include "android/jsengine/task/timer_queue.h"
+#include "base/android/jsengine_ptr_container.h"
 #endif
 
 
 #include "android/jsengine/weex_ipc_server.h"
 #include "android/jsengine/weex_ipc_client.h"
+#include "js_action.h"
 
 class WeexEnv {
 
@@ -85,6 +87,11 @@ public:
         WeexEnv::enableTrace_ = enableTrace_;
     }
 
+    JSAction* createJSAction(long ctxContainer);
+
+    JSAction* getJSAction(long ctxContainer);
+
+    void destroyJSAction(long ctxContainer);
 
     void initIPC();
 
@@ -141,12 +148,11 @@ public:
  public:
   volatile bool can_m_cache_task_() const;
   void set_m_cache_task_(volatile bool m_cache_task_);
+
  private:
-
   ThreadLocker thread_locker_;
-
-   std::unique_ptr<crash_handler::CrashHandlerInfo> crashHandler;
-
+  std::unique_ptr<crash_handler::CrashHandlerInfo> crashHandler;
+  std::map<long, JSAction*> m_jsActionMap;
 };
 
 

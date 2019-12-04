@@ -61,6 +61,7 @@ import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.CSSShorthand;
+import com.taobao.weex.jsEngine.JSEngine;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.performance.WXStateRecord;
@@ -380,6 +381,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     WXStateRecord.getInstance().recoreJsfmInitHistory("setJsfmInitFlag:"+init);
     if (init == true) {
       onJsFrameWorkInitSuccees();
+      JSEngine.getInstance().engineInitFinished();
     }
   }
 
@@ -908,7 +910,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         WXStateRecord.getInstance().onJSEngineReload(TextUtils.isEmpty(instanceId)?"null":instanceId);
          commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE, WXErrorCode.WX_ERR_RELOAD_PAGE, "reboot jsc Engine", instanceId, url,extInfo);
       }
-
+      JSEngine.getInstance().engineCrashed();
       WXLogUtils.e("reInitCount:"+reInitCount);
 
       if (reInitCount > CRASHREINIT) {

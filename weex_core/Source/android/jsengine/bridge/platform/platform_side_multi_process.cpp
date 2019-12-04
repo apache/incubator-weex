@@ -675,6 +675,9 @@ int PlatformSideInMultiProcess::AppendTreeCreateFinish(const char *page_id,
   std::unique_ptr<IPCResult> result = sender->send(buffer.get());
   return result->get<int>();
 }
+void PlatformSideInMultiProcess::SetPageDirty(const char *page_id, bool dirty) {
+//do Nothing
+}
 
 int PlatformSideInMultiProcess::HasTransitionPros(
     const char *page_id, const char *ref,

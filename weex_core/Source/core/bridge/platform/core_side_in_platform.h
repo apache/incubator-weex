@@ -115,6 +115,8 @@ class CoreSideInPlatform : public PlatformBridge::CoreSide {
   void SetLogType(const int logType, const bool isPerf) override;
   double GetLayoutTime(const char* instanceId) const override;
 
+  int64_t JsAction(long ctxContainer, int32_t jsActionType, const char *arg) override ;
+
 private:
   DISALLOW_COPY_AND_ASSIGN(CoreSideInPlatform);
 };

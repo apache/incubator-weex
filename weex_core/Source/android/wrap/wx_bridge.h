@@ -98,6 +98,7 @@ class WXBridge : public JNIObjectWrap {
   int RenderSuccess(JNIEnv *env, const char *page_id);
   int UpdateFinish(JNIEnv *env, const char *page_id, const char *task,
                    const char *callback);
+  void SetPageDirty(JNIEnv* env, const char *page_id, bool dirty);
   void SetTimeout(JNIEnv *env, const char *callback_id, const char *time);
   void CallNativeComponent(JNIEnv *env, const char *page_id, const char *ref,
                            const char *method, const char *arguments,

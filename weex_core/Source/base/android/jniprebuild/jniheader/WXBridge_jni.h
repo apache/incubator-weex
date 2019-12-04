@@ -367,6 +367,30 @@ instanceId,
 
 }
 
+static intptr_t g_WXBridge_setPageDirty = 0;
+static void Java_WXBridge_setPageDirty(JNIEnv *env, jobject obj, jstring
+page_id, jboolean dirty) {
+  /* Must call RegisterNativesImpl()  */
+  //CHECK_CLAZZ(env, obj,
+  //    WXBridge_clazz(env));
+  jmethodID method_id =
+      base::android::GetMethod(
+          env, WXBridge_clazz(env),
+          base::android::INSTANCE_METHOD,
+          "setPageDirty",
+          "("
+          "Ljava/lang/String;"
+          "Z"
+          ")"
+          "V",
+          &g_WXBridge_setPageDirty);
+
+  env->CallVoidMethod(obj,
+                      method_id, page_id, dirty);
+  base::android::CheckException(env);
+}
+
+
 static intptr_t g_WXBridge_setTimeoutNative = 0;
 static void Java_WXBridge_setTimeoutNative(JNIEnv *env, jobject obj, jstring
 callbackId,
@@ -379,7 +403,6 @@ callbackId,
           env, WXBridge_clazz(env),
           base::android::INSTANCE_METHOD,
           "setTimeoutNative",
-
           "("
           "Ljava/lang/String;"
           "Ljava/lang/String;"

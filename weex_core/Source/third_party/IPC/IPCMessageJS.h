@@ -45,6 +45,7 @@ enum class IPCJSMsg {
     CALLJSONAPPCONTEXT,
     DESTORYAPPCONTEXT,
     SETLOGLEVEL,
+    JSACTION,
 };
 
 // Message from Script to Core in ScriptBridge
@@ -78,8 +79,22 @@ enum class IPCProxyMsg {
     UPDATECOMPONENTDATA,
     HEARTBEAT,
     POSTLOGDETAIL,
+    JSACTIONCALLBACK,
 };
 // Message from Script to Core in ScriptBridge
+
+enum class JSACTION {
+  CREATE,
+  DESTROY,
+  BIND,
+  UNBIND,
+  EXEJS,
+};
+
+enum class JSCALLBACK {
+  INVOKE,
+  EXCEPTION,
+};
 
 // Message from Core to Platform in PlatformBridge
 enum class IPCMsgFromCoreToPlatform {

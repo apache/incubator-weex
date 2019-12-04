@@ -18,6 +18,7 @@
  */
 
 #include <jni.h>
+#include <android/wrap/js_context.h>
 #include "core/bridge/platform_bridge.h"
 #include "android/bridge/platform/android_bridge.h"
 #include "core/manager/weex_core_manager.h"
@@ -49,7 +50,8 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
                 WeexCore::LogUtils::RegisterJNIUtils(env) &&
                 WeexCore::WXMap::RegisterJNIUtils(env) &&
                 WeexCore::HashSet::RegisterJNIUtils(env) &&
-                weex::core::network::DefaultRequestHandler::RegisterJNIUtils(env);
+                weex::core::network::DefaultRequestHandler::RegisterJNIUtils(env) &&
+                WeexCore::JSContext::RegisterJNIUtils(env);
   if (result) {
     WeexCore::SoUtils::Init(env);
     WeexCore::WMLBridge::RegisterJNIUtils(env);
