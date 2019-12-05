@@ -582,7 +582,9 @@ typedef NS_ENUM(NSInteger, Direction) {
     
     WXRecycleSliderView *recycleSliderView = (WXRecycleSliderView *)_view;
     [recycleSliderView removeItemView:view];
-    [recycleSliderView setCurrentIndex:0];
+    if (self.childrenView.count <= _index) {
+        [recycleSliderView setCurrentIndex:0];
+    }
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes
