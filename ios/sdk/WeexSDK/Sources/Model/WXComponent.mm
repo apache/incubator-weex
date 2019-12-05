@@ -406,31 +406,12 @@ static BOOL bNeedRemoveEvents = YES;
             _layer.borderWidth = _borderTopWidth;
             [self _resetNativeBorderRadius];
             _layer.opacity = _opacity;
-            
-            /* Also set background color to view to fix that problem that system may
-             set dynamic color to UITableView. Without these codes, event if we set
-             clear color to layer, the table view could not be transparent. */
+
             if ([WXUtility isDarkSchemeSupportEnabled]) {
                 UIColor* choosedColor = [self.weexInstance chooseColor:self.styleBackgroundColor lightSchemeColor:self.lightSchemeBackgroundColor darkSchemeColor:self.darkSchemeBackgroundColor invert:_invertForDarkScheme scene:[self colorSceneType]];
-                if (choosedColor == [UIColor clearColor]) {
-                    _view.backgroundColor = choosedColor;
-                }
-                _layer.backgroundColor = choosedColor.CGColor;
+                _view.backgroundColor = choosedColor;
             }
             else {
-                /* On iOS10, there is an annoying problem that if we only
-                 set backgroundColor to layer(not to view), for UIScrollView
-                 the background color would be black. So we have to set
-                 background color to UIView itself on iOS10(or lower).
-                 
-                 For iOS13, we have SDK which hooked setBackgroundColor
-                 of UIView to support autoinverting(no in WeexSDK).
-                 But that SDK would finally set a UIDynamicColor to view.
-                 Weex can handle dark mode, so we don't want background
-                 color of a UIView in Weex page to be set to UIDynamicColor.
-                 So in code above, we only set color to layer but which
-                 also caused the black problem that on iOS10.
-                 */
                 _view.backgroundColor = self.styleBackgroundColor;
             }
         }
