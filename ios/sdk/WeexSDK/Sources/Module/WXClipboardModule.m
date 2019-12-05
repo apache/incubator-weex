@@ -24,8 +24,8 @@
 WX_EXPORT_METHOD(@selector(setString:))
 WX_EXPORT_METHOD(@selector(getString:))
 
-- (dispatch_queue_t)targetExecuteQueue {
-    return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+- (NSThread *)targetExecuteThread {
+    return [NSThread mainThread];
 }
 
 - (void)setString:(NSString *)content
@@ -37,9 +37,10 @@ WX_EXPORT_METHOD(@selector(getString:))
 - (void)getString:(WXModuleKeepAliveCallback)callback{
     UIPasteboard *clipboard = [UIPasteboard generalPasteboard];
     NSDictionary *result = [@{} mutableCopy];
-    if(clipboard.string)
+    NSString* content = [clipboard string];
+    if(content)
     {
-        [result setValue:clipboard.string forKey:@"data"];
+        [result setValue:content forKey:@"data"];
         [result setValue:@"success" forKey:@"result"];
     }else
     {

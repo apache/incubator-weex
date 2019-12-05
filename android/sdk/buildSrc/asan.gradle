@@ -1,0 +1,73 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+def asanAbi = project.hasProperty('asanAbi') ? project.getProperty('asanAbi') : 'arm64-v8a'
+def ndkDir = ''
+
+task checkNdkVersion() {
+    def rootDir = project.rootDir
+    def localProperties = new File(rootDir, "local.properties")
+    if (localProperties.exists()) {
+        Properties properties = new Properties()
+        localProperties.withInputStream { instr ->
+            properties.load(instr)
+        }
+        ndkDir = properties.getProperty('ndk.dir')
+    }
+}
+
+task clearASanLibs(type: Delete){
+    delete project.android.sourceSets.main.resources.srcDirs
+    delete fileTree(project.android.sourceSets.main.jniLibs.srcDirs[-1]) {
+        include '**/libclang_rt.asan-*-android.so'
+    }
+}
+task copyWrapScript(type: Copy,dependsOn: clearASanLibs) {
+    if(project.hasProperty('enableASan') && "true" == project.getProperty('enableASan')) {
+        from 'wrap.sh'
+        into new File(project.android.sourceSets.main.resources.srcDirs[-1], "lib")
+        eachFile {
+            it.path = "${asanAbi}/${it.name}"
+        }
+    }
+}
+task copyASanLib(type: Copy){
+    dependsOn copyWrapScript, copyJscToJniDir
+    if(project.hasProperty('enableASan') && "true" == project.getProperty('enableASan')) {
+        def ndkPath = ndkDir == '' ? System.getenv("ANDROID_NDK_HOME"):ndkDir
+        def dir = ndkPath + '/toolchains/llvm/prebuilt/'
+        def renamedAbi = asanAbi
+        if (asanAbi == "armeabi-v7a" || asanAbi == "armeabi")
+            renamedAbi = "arm"
+        if (asanAbi == "arm64-v8a")
+            renamedAbi = "aarch64"
+        if (asanAbi == "x86")
+            renamedAbi = "i686"
+        new File(dir).eachFileRecurse { file ->
+            if (file.name == 'libclang_rt.asan-' + renamedAbi + '-android.so')
+                from file.absolutePath
+            into project.android.sourceSets.main.jniLibs.srcDirs[-1]
+            eachFile {
+                it.path = "${asanAbi}/${it.name}"
+            }
+            includeEmptyDirs = false
+        }
+    }
+}
+
+preBuild.dependsOn copyASanLib, checkNdkVersion

@@ -1,0 +1,540 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package org.apache.weex;
+
+import android.os.Looper;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
+
+import org.apache.weex.adapter.ClassLoaderAdapter;
+import org.apache.weex.adapter.DefaultUriAdapter;
+import org.apache.weex.adapter.DefaultWXHttpAdapter;
+import org.apache.weex.adapter.IWXConfigAdapter;
+import org.apache.weex.adapter.ICrashInfoReporter;
+import org.apache.weex.adapter.IDrawableLoader;
+import org.apache.weex.adapter.IWXJscProcessManager;
+import org.apache.weex.adapter.ITracingAdapter;
+import org.apache.weex.adapter.IWXAccessibilityRoleAdapter;
+import org.apache.weex.adapter.IWXHttpAdapter;
+import org.apache.weex.adapter.IWXImgLoaderAdapter;
+import org.apache.weex.adapter.IWXJSExceptionAdapter;
+import org.apache.weex.adapter.IWXJsFileLoaderAdapter;
+import org.apache.weex.adapter.IWXSoLoaderAdapter;
+import org.apache.weex.adapter.IWXUserTrackAdapter;
+import org.apache.weex.adapter.URIAdapter;
+import org.apache.weex.appfram.navigator.IActivityNavBarSetter;
+import org.apache.weex.appfram.navigator.INavigator;
+import org.apache.weex.appfram.storage.DefaultWXStorage;
+import org.apache.weex.appfram.storage.IWXStorageAdapter;
+import org.apache.weex.appfram.websocket.IWebSocketAdapter;
+import org.apache.weex.appfram.websocket.IWebSocketAdapterFactory;
+import org.apache.weex.bridge.WXBridgeManager;
+import org.apache.weex.bridge.WXModuleManager;
+import org.apache.weex.bridge.WXValidateProcessor;
+import org.apache.weex.common.WXRefreshData;
+import org.apache.weex.common.WXRuntimeException;
+import org.apache.weex.common.WXThread;
+import org.apache.weex.common.WXWorkThreadManager;
+import org.apache.weex.font.FontAdapter;
+import org.apache.weex.performance.IApmGenerator;
+import org.apache.weex.performance.IWXAnalyzer;
+import org.apache.weex.ui.WXRenderManager;
+import org.apache.weex.utils.WXLogUtils;
+import org.apache.weex.utils.WXUtils;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
+
+/**
+ * Manger class for weex context.
+ */
+public class WXSDKManager {
+
+  private static volatile WXSDKManager sManager;
+  private static AtomicInteger sInstanceId = new AtomicInteger(0);
+  private final WXWorkThreadManager mWXWorkThreadManager;
+  private WXBridgeManager mBridgeManager;
+  /** package **/ WXRenderManager mWXRenderManager;
+
+  private IWXUserTrackAdapter mIWXUserTrackAdapter;
+  private IWXImgLoaderAdapter mIWXImgLoaderAdapter;
+  private IWXSoLoaderAdapter mIWXSoLoaderAdapter;
+  private IDrawableLoader mDrawableLoader;
+  private IWXHttpAdapter mIWXHttpAdapter;
+  private IActivityNavBarSetter mActivityNavBarSetter;
+  private IWXAccessibilityRoleAdapter mRoleAdapter;
+  private List<IWXAnalyzer> mWXAnalyzerList;
+  private IApmGenerator mApmGenerater;
+  private IWXJsFileLoaderAdapter mWXJsFileLoaderAdapter;
+
+  private ICrashInfoReporter mCrashInfo;
+
+  private IWXJSExceptionAdapter mIWXJSExceptionAdapter;
+
+  private IWXConfigAdapter mConfigAdapter;
+  private IWXStorageAdapter mIWXStorageAdapter;
+  private IWXStatisticsListener mStatisticsListener;
+  private URIAdapter mURIAdapter;
+  private ClassLoaderAdapter mClassLoaderAdapter;
+  private IWebSocketAdapterFactory mIWebSocketAdapterFactory;
+  private ITracingAdapter mTracingAdapter;
+  private WXValidateProcessor mWXValidateProcessor;
+  private IWXJscProcessManager mWXJscProcessManager;
+  // Tell weexv8 to initialize v8, default is true.
+  private boolean mNeedInitV8 = true;
+
+  //add when instance create,rm when instance destroy, not like WXRenderManager
+  private Map<String,WXSDKInstance> mAllInstanceMap;
+
+  private List<InstanceLifeCycleCallbacks> mLifeCycleCallbacks;
+
+  private static final int DEFAULT_VIEWPORT_WIDTH = 750;
+
+  private WXSDKManager() {
+    this(new WXRenderManager());
+  }
+
+  private WXSDKManager(WXRenderManager renderManager) {
+    mWXRenderManager = renderManager;
+    mBridgeManager = WXBridgeManager.getInstance();
+    mWXWorkThreadManager = new WXWorkThreadManager();
+    mWXAnalyzerList = new CopyOnWriteArrayList<>();
+    mAllInstanceMap = new HashMap<>();
+  }
+
+  /**
+   * Used in junit test
+   */
+  static void initInstance(WXRenderManager renderManager){
+    sManager = new WXSDKManager(renderManager);
+  }
+
+  public void registerStatisticsListener(IWXStatisticsListener listener) {
+    mStatisticsListener = listener;
+  }
+
+  public IWXStatisticsListener getWXStatisticsListener() {
+    return mStatisticsListener;
+  }
+
+  public void onSDKEngineInitialize() {
+    if (mStatisticsListener != null) {
+      mStatisticsListener.onSDKEngineInitialize();
+    }
+  }
+
+  public void setNeedInitV8(boolean need) {
+    mNeedInitV8 = need;
+  }
+
+  public boolean needInitV8() {
+    return mNeedInitV8;
+  }
+
+  public void takeJSHeapSnapshot(String path) {
+    File file = new File(path);
+    if (!file.exists()) {
+      if (!file.mkdir()) {
+        return;
+      }
+    }
+
+    String name = String.valueOf(sInstanceId.get());
+    String filename = path;
+
+    if (!path.endsWith(File.separator)) {
+      filename += File.separator;
+    }
+    filename += name;
+    filename += ".heapsnapshot";
+
+    mBridgeManager.takeJSHeapSnapshot(filename);
+  }
+
+  public static WXSDKManager getInstance() {
+    if (sManager == null) {
+      synchronized (WXSDKManager.class) {
+        if(sManager == null) {
+          sManager = new WXSDKManager();
+        }
+      }
+    }
+    return sManager;
+  }
+
+  public static int getInstanceViewPortWidth(String instanceId){
+    WXSDKInstance instance = getInstance().getSDKInstance(instanceId);
+    if (instance == null) {
+      return DEFAULT_VIEWPORT_WIDTH;
+    }
+    return instance.getInstanceViewPortWidth();
+  }
+
+  static void setInstance(WXSDKManager manager){
+    sManager = manager;
+  }
+
+  public IActivityNavBarSetter getActivityNavBarSetter() {
+    return mActivityNavBarSetter;
+  }
+
+  public void setActivityNavBarSetter(IActivityNavBarSetter mActivityNavBarSetter) {
+    this.mActivityNavBarSetter = mActivityNavBarSetter;
+  }
+
+  public void restartBridge() {
+    mBridgeManager.restart();
+  }
+
+  public WXBridgeManager getWXBridgeManager() {
+    return mBridgeManager;
+  }
+
+  public WXRenderManager getWXRenderManager() {
+    return mWXRenderManager;
+  }
+  public IWXJscProcessManager getWXJscProcessManager() {
+    return mWXJscProcessManager;
+  }
+  public WXWorkThreadManager getWXWorkThreadManager() {
+    return mWXWorkThreadManager;
+  }
+
+  public void setWxConfigAdapter(IWXConfigAdapter mConfigAdapter) {
+    this.mConfigAdapter = mConfigAdapter;
+  }
+
+  public IWXConfigAdapter getWxConfigAdapter() {
+    return mConfigAdapter;
+  }
+
+  public @Nullable WXSDKInstance getSDKInstance(String instanceId) {
+    return instanceId == null? null : mWXRenderManager.getWXSDKInstance(instanceId);
+  }
+
+  public void postOnUiThread(Runnable runnable, long delayMillis) {
+    mWXRenderManager.postOnUiThread(WXThread.secure(runnable), delayMillis);
+  }
+  public Map<String, WXSDKInstance> getAllInstanceMap() {
+    return mAllInstanceMap;
+  }
+
+  public void destroy() {
+    if (mWXWorkThreadManager != null) {
+      mWXWorkThreadManager.destroy();
+    }
+    mAllInstanceMap.clear();
+  }
+
+  @Deprecated
+  public void callback(String instanceId, String funcId, Map<String, Object> data) {
+    mBridgeManager.callback(instanceId, funcId, data);
+  }
+
+  @Deprecated
+  public void callback(String instanceId, String funcId, Map<String, Object> data,boolean keepAlive) {
+    mBridgeManager.callback(instanceId, funcId, data,keepAlive);
+  }
+
+  public void initScriptsFramework(String framework) {
+    mBridgeManager.initScriptsFramework(framework);
+  }
+
+  public void registerComponents(List<Map<String, Object>> components) {
+    mBridgeManager.registerComponents(components);
+  }
+
+  public void registerModules(Map<String, Object> modules) {
+    mBridgeManager.registerModules(modules);
+  }
+
+  /**
+   * Do not direct invoke this method in Components, use {@link WXSDKInstance#fireEvent(String, String, Map, Map)} instead.
+   */
+  @Deprecated
+  public void fireEvent(final String instanceId, String ref, String type) {
+    fireEvent(instanceId, ref, type, new HashMap<String, Object>());
+  }
+
+  /**
+   * FireEvent back to JS
+   * Do not direct invoke this method in Components, use {@link WXSDKInstance#fireEvent(String, String, Map, Map)} instead.
+   */
+  @Deprecated
+  public void fireEvent(final String instanceId, String ref, String type, Map<String, Object> params){
+    fireEvent(instanceId,ref,type,params,null);
+  }
+
+  /**
+   * Do not direct invoke this method in Components, use {@link WXSDKInstance#fireEvent(String, String, Map, Map)} instead.
+   **/
+  @Deprecated
+  public void fireEvent(final String instanceId, String ref, String type, Map<String, Object> params,Map<String,Object> domChanges) {
+    if (WXEnvironment.isApkDebugable() && Looper.getMainLooper().getThread().getId() != Thread.currentThread().getId()) {
+      throw new WXRuntimeException("[WXSDKManager]  fireEvent error");
+    }
+    mBridgeManager.fireEventOnNode(instanceId, ref, type, params,domChanges);
+  }
+
+  void createInstance(WXSDKInstance instance, Script code, Map<String, Object> options, String jsonInitData) {
+    mWXRenderManager.registerInstance(instance);
+    mBridgeManager.createInstance(instance.getInstanceId(), code, options, jsonInitData);
+    if (mLifeCycleCallbacks != null) {
+      for (InstanceLifeCycleCallbacks callbacks : mLifeCycleCallbacks) {
+        callbacks.onInstanceCreated(instance.getInstanceId());
+      }
+    }
+  }
+
+  void refreshInstance(String instanceId, WXRefreshData jsonData) {
+    mBridgeManager.refreshInstance(instanceId, jsonData);
+  }
+
+  void destroyInstance(String instanceId) {
+    setCrashInfo(WXEnvironment.WEEX_CURRENT_KEY,"");
+    if (TextUtils.isEmpty(instanceId)) {
+      return;
+    }
+    if (!WXUtils.isUiThread()) {
+      throw new WXRuntimeException("[WXSDKManager] destroyInstance error");
+    }
+    if (mLifeCycleCallbacks != null) {
+      for (InstanceLifeCycleCallbacks callbacks : mLifeCycleCallbacks) {
+        callbacks.onInstanceDestroyed(instanceId);
+      }
+    }
+    mWXRenderManager.removeRenderStatement(instanceId);
+    mBridgeManager.destroyInstance(instanceId);
+    WXModuleManager.destroyInstanceModules(instanceId);
+  }
+
+  String generateInstanceId() {
+    return String.valueOf(sInstanceId.incrementAndGet());
+  }
+
+  public IWXUserTrackAdapter getIWXUserTrackAdapter() {
+    return mIWXUserTrackAdapter;
+  }
+
+  public IWXImgLoaderAdapter getIWXImgLoaderAdapter() {
+    return mIWXImgLoaderAdapter;
+  }
+
+  public IWXJsFileLoaderAdapter getIWXJsFileLoaderAdapter() {
+    return mWXJsFileLoaderAdapter;
+  }
+
+  public IDrawableLoader getDrawableLoader() {
+    return mDrawableLoader;
+  }
+
+  public IWXJSExceptionAdapter getIWXJSExceptionAdapter() {
+    return mIWXJSExceptionAdapter;
+  }
+
+  public void setIWXJSExceptionAdapter(IWXJSExceptionAdapter IWXJSExceptionAdapter) {
+    mIWXJSExceptionAdapter = IWXJSExceptionAdapter;
+  }
+
+  public @NonNull IWXHttpAdapter getIWXHttpAdapter() {
+    if (mIWXHttpAdapter == null) {
+      mIWXHttpAdapter = new DefaultWXHttpAdapter();
+    }
+    return mIWXHttpAdapter;
+  }
+
+  public IApmGenerator getApmGenerater() {
+    return mApmGenerater;
+  }
+
+  public @NonNull URIAdapter getURIAdapter() {
+    if(mURIAdapter == null){
+      mURIAdapter = new DefaultUriAdapter();
+    }
+    return mURIAdapter;
+  }
+
+  public ClassLoaderAdapter getClassLoaderAdapter() {
+    if(mClassLoaderAdapter == null){
+      mClassLoaderAdapter = new ClassLoaderAdapter();
+    }
+    return mClassLoaderAdapter;
+  }
+
+  public IWXSoLoaderAdapter getIWXSoLoaderAdapter() {
+    return mIWXSoLoaderAdapter;
+  }
+
+  public List<IWXAnalyzer> getWXAnalyzerList(){
+    return mWXAnalyzerList;
+  }
+
+  public void addWXAnalyzer(IWXAnalyzer analyzer){
+    if (!mWXAnalyzerList.contains(analyzer)) {
+      mWXAnalyzerList.add(analyzer);
+    }
+  }
+
+  public void rmWXAnalyzer(IWXAnalyzer analyzer){
+    mWXAnalyzerList.remove(analyzer);
+  }
+
+  void setInitConfig(InitConfig config){
+    this.mIWXHttpAdapter = config.getHttpAdapter();
+    this.mIWXImgLoaderAdapter = config.getImgAdapter();
+    this.mDrawableLoader = config.getDrawableLoader();
+    this.mIWXStorageAdapter = config.getStorageAdapter();
+    this.mIWXUserTrackAdapter = config.getUtAdapter();
+    this.mURIAdapter = config.getURIAdapter();
+    this.mIWebSocketAdapterFactory = config.getWebSocketAdapterFactory();
+    this.mIWXJSExceptionAdapter = config.getJSExceptionAdapter();
+    this.mIWXSoLoaderAdapter = config.getIWXSoLoaderAdapter();
+    this.mClassLoaderAdapter = config.getClassLoaderAdapter();
+    this.mApmGenerater = config.getApmGenerater();
+    this.mWXJsFileLoaderAdapter = config.getJsFileLoaderAdapter();
+    this.mWXJscProcessManager = config.getJscProcessManager();
+  }
+
+  public IWXStorageAdapter getIWXStorageAdapter(){
+    if(mIWXStorageAdapter == null){
+      if(WXEnvironment.sApplication != null){
+        mIWXStorageAdapter = new DefaultWXStorage(WXEnvironment.sApplication);
+      }else{
+        WXLogUtils.e("WXStorageModule", "No Application context found,you should call WXSDKEngine#initialize() method in your application");
+      }
+    }
+    return mIWXStorageAdapter;
+  }
+
+  /**
+   * Weex embedders can use <code>notifyTrimMemory</code> to reduce
+   * memory at a proper time.
+   *
+   * It's not a good idea to reduce memory at any time, because
+   * memory trimming is a expense operation, and V8 needs to do
+   * a full GC and all the inline caches get to be cleared.
+   *
+   * The embedder needs to make some scheduling strategies to
+   * ensure that the embedded application is just on an idle time.
+   * If the application use the same js bundle to render pages,
+   * it's not a good idea to trim memory every time of exiting
+   * pages.
+   */
+  public void notifyTrimMemory() {
+    mBridgeManager.notifyTrimMemory();
+  }
+
+  /**
+   * Weex embedders can use <code>notifySerializeCodeCache</code> to
+   * serialize code caches if the jsfm has the alility to compile 'new Function'
+   * against js bundles on the weex native side.
+   *
+   * It's a good time to serialize a code cache after exiting a weex page.
+   * Then, the next time of entering the same weex page, V8 would compile
+   * 'new Function' against the code cache deseriazed from the js bundle.
+   */
+  public void notifySerializeCodeCache() {
+    mBridgeManager.notifySerializeCodeCache();
+  }
+
+  public @Nullable
+  IWebSocketAdapter getIWXWebSocketAdapter() {
+    if (mIWebSocketAdapterFactory != null) {
+      return mIWebSocketAdapterFactory.createWebSocketAdapter();
+    }
+    return null;
+  }
+
+  public void registerValidateProcessor(WXValidateProcessor processor){
+    this.mWXValidateProcessor = processor;
+  }
+
+  public WXValidateProcessor getValidateProcessor(){
+    return mWXValidateProcessor;
+  }
+
+
+  public void setCrashInfoReporter(ICrashInfoReporter mCrashInfo) {
+    this.mCrashInfo = mCrashInfo;
+  }
+
+  public void setCrashInfo(String key, String value) {
+    if(mCrashInfo!=null){
+      mCrashInfo.addCrashInfo(key,value);
+    }
+  }
+
+  public void setTracingAdapter(ITracingAdapter adapter) {
+    this.mTracingAdapter = adapter;
+  }
+
+  public ITracingAdapter getTracingAdapter() {
+    return mTracingAdapter;
+  }
+
+  public void registerInstanceLifeCycleCallbacks(InstanceLifeCycleCallbacks callbacks) {
+    if (mLifeCycleCallbacks == null) {
+      mLifeCycleCallbacks = new ArrayList<>();
+    }
+    mLifeCycleCallbacks.add(callbacks);
+  }
+
+  public void setAccessibilityRoleAdapter(IWXAccessibilityRoleAdapter adapter) {
+    this.mRoleAdapter = adapter;
+  }
+
+  public IWXAccessibilityRoleAdapter getAccessibilityRoleAdapter() {
+    return mRoleAdapter;
+  }
+
+  public interface InstanceLifeCycleCallbacks {
+    void onInstanceDestroyed(String instanceId);
+    void onInstanceCreated(String instanceId);
+  }
+
+  private INavigator mNavigator;
+
+  public INavigator getNavigator() {
+    return mNavigator;
+  }
+
+  public void setNavigator(INavigator mNavigator) {
+    this.mNavigator = mNavigator;
+  }
+
+
+  private FontAdapter mFontAdapter;
+
+  public FontAdapter getFontAdapter(){
+      if(mFontAdapter == null){
+        synchronized (this){
+          if(mFontAdapter == null){
+              mFontAdapter = new FontAdapter();
+          }
+        }
+      }
+      return mFontAdapter;
+  }
+}

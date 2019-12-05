@@ -38,6 +38,7 @@
 #include "js_runtime/weex/task/impl/exe_js_task.h"
 #include "js_runtime/weex/task/impl/take_heap_snapshot.h"
 #include "js_runtime/weex/task/impl/native_timer_task.h"
+#include "js_runtime/weex/task/impl/js_action_task.h"
 
 namespace weex {
 namespace bridge {
@@ -357,6 +358,13 @@ WeexTaskQueue *ScriptSideInQueue::taskQueue(const char *id, bool log) {
   }
   return weexTaskQueue_;
 }
+
+int64_t ScriptSideInQueue::JsAction(long ctxContainer, int32_t jsActionType, const char *arg) {
+  WeexTask *task = new JSActionTask(ctxContainer, jsActionType, arg);
+  weexTaskQueue_->addTask(task);
+  return 0;
+}
+
 }  // namespace js
 }  // namespace bridge
 

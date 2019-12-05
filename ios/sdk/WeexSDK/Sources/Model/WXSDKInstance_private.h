@@ -39,6 +39,9 @@
 @property (nonatomic, strong) NSString *createInstanceContextResult;
 @property (nonatomic, strong) NSString *executeRaxApiResult;
 
+@property (nonatomic, assign) WXAutoInvertingBehavior autoInvertingBehavior;
+@property (atomic, strong) NSString* schemeName;
+
 - (void)addModuleEventObservers:(NSString*)event callback:(NSString*)callbackId option:(NSDictionary*)option moduleClassName:(NSString*)moduleClassName;
 - (void)_addModuleEventObserversWithModuleMethod:(WXModuleMethod*)method;
 - (void)removeModuleEventObserver:(NSString*)event moduleClassName:(NSString*)moduleClassName;

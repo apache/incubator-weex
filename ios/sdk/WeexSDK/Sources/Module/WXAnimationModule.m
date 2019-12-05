@@ -26,6 +26,7 @@
 #import "WXLength.h"
 #import "WXTransition.h"
 #import "WXComponent+Layout.h"
+#import "WXDarkSchemeProtocol.h"
 
 @interface WXAnimationInfo : NSObject<NSCopying>
 
@@ -207,7 +208,38 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     }
     CAMediaTimingFunction *timingFunction = [WXConvert CAMediaTimingFunction:args[@"timingFunction"]];
     NSDictionary *styles = args[@"styles"];
+    NSDictionary* componentRawStyles = target.styles;
+    
+    BOOL isDarkScheme = [target.weexInstance isDarkScheme];
+    BOOL updatingDarkSchemeBackgroundColor = styles[@"weexDarkSchemeBackgroundColor"] != nil;
+    BOOL updatingLightSchemeBackgroundColor = styles[@"weexLightSchemeBackgroundColor"] != nil;
+    
     for (NSString *property in styles) {
+        if ([property isEqualToString:@"backgroundColor"]) {
+            if (isDarkScheme && (updatingDarkSchemeBackgroundColor ||
+                                componentRawStyles[@"weexDarkSchemeBackgroundColor"] != nil)) {
+                /* Updating "darkSchemeBackgroundColor" in dark mode,
+                 or this component has dark bg color explicitly defined in styels.
+                 We ignore transition animation for "backgroundColor" */
+                continue;
+            }
+            else if (!isDarkScheme && (updatingLightSchemeBackgroundColor ||
+                                      componentRawStyles[@"weexLightSchemeBackgroundColor"] != nil)) {
+                continue;
+            }
+        }
+        else if ([property isEqualToString:@"weexDarkSchemeBackgroundColor"]) {
+            if (!isDarkScheme) {
+                /* Do not do animation for "darkSchemeBackgroundColor" in light mode. */
+                continue;
+            }
+        }
+        else if ([property isEqualToString:@"weexLightSchemeBackgroundColor"]){
+            if (isDarkScheme) {
+                continue;
+            }
+        }
+        
         WXAnimationInfo *info = [WXAnimationInfo new];
         info.duration = duration;
         info.delay = delay;
@@ -287,10 +319,18 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
                 [infos addObject:newInfo];
             }
             target.transform = wxTransform;
-        } else if ([property isEqualToString:@"backgroundColor"]) {
+        } else if ([property isEqualToString:@"backgroundColor"] ||
+                   [property isEqualToString:@"weexDarkSchemeBackgroundColor"] ||
+                   [property isEqualToString:@"weexLightSchemeBackgroundColor"]) {
             info.propertyName = @"backgroundColor";
             info.fromValue = (__bridge id)(layer.backgroundColor);
-            info.toValue = (__bridge id)[WXConvert CGColor:value];
+            UIColor* toColor = [WXConvert UIColor:value];
+            if ([target.weexInstance isDarkScheme] && target.invertForDarkScheme &&
+                [property isEqualToString:@"backgroundColor"]) {
+                // Invert color
+                toColor = [[WXSDKInstance darkSchemeColorHandler] getInvertedColorFor:toColor ofScene:[target colorSceneType] withDefault:toColor];
+            }
+            info.toValue = (__bridge id)([toColor CGColor]);
             [infos addObject:info];
         } else if ([property isEqualToString:@"opacity"]) {
             info.propertyName = @"opacity";

@@ -86,8 +86,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 include_directories(${WEEX_CORE_SOURCE_DIR})
 include_directories(${WEEX_CORE_SOURCE_DIR}/include)
-include_directories(${WEEX_CORE_SOURCE_DIR}/include/JavaScriptCore)
-include_directories(${WEEX_CORE_SOURCE_DIR}/include/JavaScriptCore/ForwardingHeaders)
+include_directories(${WEEX_CORE_SOURCE_DIR}/include/JSCHeaderNew)
 
 
 
@@ -169,6 +168,8 @@ set(${WEEXJSSERVER_NAME}_SOURCES
         ${WEEX_CORE_SOURCE_DIR}/android/jsengine/object/args.cpp
         ${WEEX_CORE_SOURCE_DIR}/android/jsengine/object/weex_env.h
         ${WEEX_CORE_SOURCE_DIR}/android/jsengine/object/weex_env.cpp
+        ${WEEX_CORE_SOURCE_DIR}/android/jsengine/object/js_action.h
+        ${WEEX_CORE_SOURCE_DIR}/android/jsengine/object/js_action.cpp
 
         weex/task/impl/init_framework_task.cpp
         weex/task/impl/create_app_context_task.cpp
@@ -182,6 +183,7 @@ set(${WEEXJSSERVER_NAME}_SOURCES
         weex/task/impl/exe_js_services_task.cpp
         weex/task/impl/exe_js_on_instance_task.cpp
         weex/task/impl/exe_js_task.cpp
+        weex/task/impl/js_action_task.cpp
         weex/task/impl/take_heap_snapshot.cpp
         weex/task/impl/native_timer_task.cpp
         weex/task/impl/update_init_framework_params_task.cpp
@@ -212,16 +214,26 @@ set(${WEEXJSSERVER_NAME}_LIBRARIES
 weexbase
 weexipc
 wson
-#c++_shared
-JavaScriptCore
-WTF
-#jsc
 log
 z
 -lc
 -ldl
 -pthread
 )
+
+if (DEFINED BUILD_RUNTIME_API)
+    set(${WEEXJSSERVER_NAME}_LIBRARIES
+        ${${WEEXJSSERVER_NAME}_LIBRARIES}
+        c++_shared
+        jsc
+    )
+else()
+    set(${WEEXJSSERVER_NAME}_LIBRARIES
+        ${${WEEXJSSERVER_NAME}_LIBRARIES}
+        JavaScriptCore
+        WTF
+    )
+endif()
 
 add_library(${WEEXJSSERVER_NAME} SHARED
             ${${WEEXJSSERVER_NAME}_SOURCES} )

@@ -27,6 +27,7 @@
 #import "WXImgLoaderProtocol.h"
 #import "WXComponentManager.h"
 #import "WXLog.h"
+#import "WXDarkSchemeProtocol.h"
 #include <pthread/pthread.h>
 
 @interface WXRichNode : NSObject
@@ -35,7 +36,11 @@
 @property (nonatomic, strong) NSString  *ref;
 @property (nonatomic, strong) NSString  *text;
 @property (nonatomic, strong) UIColor   *color;
+@property (nonatomic, strong) UIColor   *darkSchemeColor;
+@property (nonatomic, strong) UIColor   *lightSchemeColor;
 @property (nonatomic, strong) UIColor   *backgroundColor;
+@property (nonatomic, strong) UIColor   *darkSchemeBackgroundColor;
+@property (nonatomic, strong) UIColor   *lightSchemeBackgroundColor;
 @property (nonatomic, strong) NSString  *fontFamily;
 @property (nonatomic, assign) CGFloat   fontSize;
 @property (nonatomic, assign) CGFloat   fontWeight;
@@ -91,7 +96,9 @@ do {\
     id value = styles[@#key]; \
     if (value) { \
         node.key = [WXConvert type:value];\
-    } else if (!([@#key isEqualToString:@"backgroundColor"] || [@#key isEqualToString:@"textDecoration"]) && superNode.key ) { \
+    } else if (!([@#key isEqualToString:@"backgroundColor"] || \
+        [@#key isEqualToString:@"weexDarkSchemeBackgroundColor"] || \
+        [@#key isEqualToString:@"textDecoration"]) && superNode.key ) { \
         node.key = superNode.key; \
     } \
 } while(0);
@@ -183,14 +190,18 @@ do {\
             [self recursivelyAddChildNode:dict toSuperNode:rootNode];
         }
         
-        _backgroundColor = rootNode.backgroundColor?:[UIColor whiteColor];
+        _backgroundColor = rootNode.backgroundColor?:[UIColor clearColor];
     }
 }
 
 - (void)fillCSSStyles:(NSDictionary *)styles toNode:(WXRichNode *)node superNode:(WXRichNode *)superNode
 {
     WX_STYLE_FILL_RICHTEXT(color, UIColor)
+    WX_STYLE_FILL_RICHTEXT(darkSchemeColor, UIColor)
+    WX_STYLE_FILL_RICHTEXT(lightSchemeColor, UIColor)
     WX_STYLE_FILL_RICHTEXT(backgroundColor, UIColor)
+    WX_STYLE_FILL_RICHTEXT(darkSchemeBackgroundColor, UIColor)
+    WX_STYLE_FILL_RICHTEXT(lightSchemeBackgroundColor, UIColor)
     WX_STYLE_FILL_RICHTEXT(fontFamily, NSString)
     WX_STYLE_FILL_RICHTEXT_PIXEL(fontSize)
     WX_STYLE_FILL_RICHTEXT(fontWeight, WXTextWeight)
@@ -308,7 +319,7 @@ do {\
         if (_styles) {
             [self fillCSSStyles:_styles toNode:rootNode superNode:nil];
         }
-        _backgroundColor = rootNode.backgroundColor?:[UIColor whiteColor];
+        _backgroundColor = rootNode.backgroundColor?:[UIColor clearColor];
     }
 
     WXRichNode* superNode = [self findRichNode:@"_root"];
@@ -421,6 +432,20 @@ do {\
     };
 }
 
+- (void)schemeDidChange:(NSString*)scheme
+{
+    [super schemeDidChange:scheme];
+    if ([self isViewLoaded]) {
+        // Force inner layout
+        [self innerLayout];
+    }
+}
+
+- (WXColorScene)colorSceneType
+{
+    return WXColorSceneText;
+}
+
 #pragma mark Text Building
 
 - (NSMutableAttributedString *)buildAttributeString
@@ -434,6 +459,16 @@ do {\
     NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] init];
     NSUInteger location;
     
+    BOOL invert = self.invertForDarkScheme;
+    
+    // Invert default background color.
+    UIColor* defaultTextColor = [UIColor blackColor];
+    UIColor* defaultBackgroundColor = _backgroundColor;
+    if (invert && [self.weexInstance isDarkScheme]) {
+        defaultTextColor = [[WXSDKInstance darkSchemeColorHandler] getInvertedColorFor:[UIColor blackColor] ofScene:[self colorSceneType] withDefault:[UIColor blackColor]];
+        defaultBackgroundColor = [[WXSDKInstance darkSchemeColorHandler] getInvertedColorFor:_backgroundColor ofScene:[self colorSceneType] withDefault:_backgroundColor];
+    }
+    
     __weak typeof(self) weakSelf = self;
     for (WXRichNode *node in array) {
         location = attrStr.length;
@@ -444,8 +479,10 @@ do {\
                 [attrStr.mutableString appendString:text];
                 
                 NSRange range = NSMakeRange(location, text.length);
-                [attrStr addAttribute:NSForegroundColorAttributeName value:node.color ?: [UIColor blackColor] range:range];
-                [attrStr addAttribute:NSBackgroundColorAttributeName value:node.backgroundColor ?: _backgroundColor range:range];
+                UIColor* textColor = [self.weexInstance chooseColor:node.color lightSchemeColor:node.lightSchemeColor darkSchemeColor:node.darkSchemeColor invert:invert scene:[self colorSceneType]];
+                UIColor* bgColor = [self.weexInstance chooseColor:node.backgroundColor lightSchemeColor:node.lightSchemeBackgroundColor darkSchemeColor:node.darkSchemeBackgroundColor invert:invert scene:[self colorSceneType]];
+                [attrStr addAttribute:NSForegroundColorAttributeName value:textColor ?: defaultTextColor range:range];
+                [attrStr addAttribute:NSBackgroundColorAttributeName value:bgColor ?: defaultBackgroundColor range:range];
                 
                 UIFont *font = [WXUtility fontWithSize:node.fontSize textWeight:node.fontWeight textStyle:WXTextStyleNormal fontFamily:node.fontFamily scaleFactor:self.weexInstance.pixelScaleFactor];
                 if (font) {

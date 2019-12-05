@@ -21,11 +21,6 @@
 #include "render_page_custom.h"
 
 namespace WeexCore {
-    
-    template<typename T>
-    static std::shared_ptr<T> SharedMove(T& source) {
-        return std::make_shared<T>(std::move(source));
-    }
 
     RenderPageCustom::RenderPageCustom(const std::string& page_id, const std::string& page_type, const PageOptions& options): RenderPageBase(page_id, page_type) {
         valid_ = true;
@@ -37,7 +32,7 @@ namespace WeexCore {
             targetOptions.is_round_off = options.is_round_off;
             targetOptions.viewport_width = options.viewport_width;
             targetOptions.device_width = options.device_width;
-            target_->createPage(page_id, targetOptions);;
+            target_->createPage(page_id, targetOptions);
         }
     }
     
@@ -46,10 +41,8 @@ namespace WeexCore {
                             std::map<std::string, std::string>* attrs,
                             std::set<std::string>* events) {
         if (target_) {
-            auto managedStyles = SharedMove(*styles);
-            auto managedAttrs = SharedMove(*attrs);
-            auto managedEvents = SharedMove(*events);
-            target_->createBody(page_id_, ref, type, managedStyles, managedAttrs, managedEvents);
+            target_->createBody(page_id_, ref, type, styles, attrs, events);
+            return true;
         }
         delete styles;
         delete attrs;
@@ -63,10 +56,8 @@ namespace WeexCore {
                                            std::map<std::string, std::string>* attrs,
                                            std::set<std::string>* events) {
         if (target_) {
-            auto managedStyles = SharedMove(*styles);
-            auto managedAttrs = SharedMove(*attrs);
-            auto managedEvents = SharedMove(*events);
-            target_->addElement(page_id_, ref, type, parent_ref, index, managedStyles, managedAttrs, managedEvents);
+            target_->addElement(page_id_, ref, type, parent_ref, index, styles, attrs, events);
+            return true;
         }
         delete styles;
         delete attrs;
@@ -90,11 +81,11 @@ namespace WeexCore {
     
     bool RenderPageCustom::UpdateStyle(const std::string &ref, std::vector<std::pair<std::string, std::string>> *styles) {
         if (target_) {
-            std::shared_ptr<std::map<std::string, std::string>> managedStyles = std::make_shared<std::map<std::string, std::string>>();
+            std::map<std::string, std::string>* stylesMap = new std::map<std::string, std::string>();
             for (auto& p : *styles) {
-                (*managedStyles)[std::move(p.first)] = std::move(p.second);
+                (*stylesMap)[std::move(p.first)] = std::move(p.second);
             }
-            target_->updateStyles(page_id_, ref, managedStyles);
+            target_->updateStyles(page_id_, ref, stylesMap);
         }
         delete styles;
         return true;
@@ -102,11 +93,11 @@ namespace WeexCore {
     
     bool RenderPageCustom::UpdateAttr(const std::string &ref, std::vector<std::pair<std::string, std::string>> *attrs) {
         if (target_) {
-            std::shared_ptr<std::map<std::string, std::string>> managedAttrs = std::make_shared<std::map<std::string, std::string>>();
+            std::map<std::string, std::string>* attrsMap = new std::map<std::string, std::string>();
             for (auto& p : *attrs) {
-                (*managedAttrs)[std::move(p.first)] = std::move(p.second);
+                (*attrsMap)[std::move(p.first)] = std::move(p.second);
             }
-            target_->updateAttributes(page_id_, ref, managedAttrs);
+            target_->updateAttributes(page_id_, ref, attrsMap);
         }
         delete attrs;
         return true;

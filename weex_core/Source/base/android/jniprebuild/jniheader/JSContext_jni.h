@@ -25,7 +25,7 @@
 #include <jni.h>
 #include "base/android/jni/android_jni.h"
 
-const char kJSContextClassPath[] = "com/taobao/weex/jsEngine/JSContext";
+const char kJSContextClassPath[] = "org/apache/weex/jsEngine/JSContext";
 // Leaking this jclass as we cannot use LazyInstance from some threads.
 jclass g_JSContext_clazz = NULL;
 

@@ -7,6 +7,8 @@ matrix:
       - env: TEST_SUITE=danger 
       - env: TEST_SUITE=jsfm
       - env: TEST_SUITE=ios
+        os: osx
+        osx_image: xcode11.2
         language: objective-c
       - env: TEST_SUITE=android ABI=armeabi-v7a
         language: android
@@ -34,7 +36,8 @@ matrix:
             - extra-android-m2repository 
       # static check
       - env: TEST_SUITE=static_code_analysis OCLINT=true
-        osx_image: xcode7.2
+        os: osx
+        osx_image: xcode11.2
         language: objective-c
       - env: TEST_SUITE=static_code_analysis ANDROID_LINT=true
         language: android
@@ -112,7 +115,7 @@ install:
         git submodule update --init --remote
         cd weex-playground/ios && bash update_podfile_for_travisci.sh
         cd ../../ && npm install
-        cd weex-playground/ios && pod install --repo-update
+        cd weex-playground/ios && bundle install && pod install --repo-update
         cd ../../
     fi
     
@@ -137,8 +140,10 @@ script:
         esac
         if npm run danger -- ci --dangerfile ./dangerfile-android.js | grep -q "hasAndroidFile" ; then
           cd android
-          ./gradlew clean assembleRelease -PbuildRuntimeApi=true ${GRADLE_ABI} --info || exit 1
-          ./gradlew assembleRelease -PbuildRuntimeApi=false ${GRADLE_ABI} --info || exit 1
+          ./gradlew clean assembleRelease --quiet -PbuildRuntimeApi=true ${GRADLE_ABI} -PapachePackageName="false" || exit 1
+          ./gradlew assembleRelease --quiet ${GRADLE_ABI} -PbuildRuntimeApi=false -Pjsc_url="https://raw.githubusercontent.com/apache/incubator-weex/release/0.26/android/sdk/weex_sdk-0.26.0.aar" -Paar_name="weex_sdk" -PJSInterpolatorName="JavaScriptCore" -PapachePackageName="false" || exit 1
+          ./gradlew :weex_sdk:assembleRelease --quiet -PbuildRuntimeApi=true ${GRADLE_ABI} -PapachePackageName="true" || exit 1
+          ./gradlew :weex_sdk:assembleRelease --quiet  ${GRADLE_ABI} -PbuildRuntimeApi=false -Pjsc_url="https://raw.githubusercontent.com/apache/incubator-weex/release/0.26/android/sdk/weex_sdk-0.26.0.aar" -Paar_name="weex_sdk" -PJSInterpolatorName="JavaScriptCore" -PapachePackageName="true" || exit 1
         fi
         ;;
       "jsfm" )
@@ -188,7 +193,8 @@ script:
       if npm run danger -- ci --dangerfile ./dangerfile-static-check.js | grep -q "hasAndroidFile" ; then
         echo "hasAndroidFile"
         cd android
-        ./gradlew :weex_sdk:lint --quiet
+        ./gradlew :weex_sdk:lintLegacyRelease -PapachePackageName="false" --quiet
+        ./gradlew :weex_sdk:lintApacheRelease -PapachePackageName="true" --quiet
         export TITLE="AndroidLint Result"
         cd ../ && npm run danger -- ci -i androidlint --dangerfile ./dangerfile-output.js || exit 1
       fi

@@ -22,7 +22,7 @@
 #include "base/android/jni/android_jni.h"
 
 namespace WeexCore {
-const char kWXJSObjectClassPath[] = "com/taobao/weex/bridge/WXJSObject";
+const char kWXJSObjectClassPath[] = "org/apache/weex/bridge/WXJSObject";
 jclass g_WXJSObject_clazz = nullptr;
 
 jfieldID g_WXJSObject_filedID_type = nullptr;
