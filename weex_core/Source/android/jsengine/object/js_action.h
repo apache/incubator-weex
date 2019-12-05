@@ -24,9 +24,16 @@
 #define WEEX_PROJECT_RUN_JS_NOT_FOR_WEEX_H
 
 #include <string>
-#include <task/back_to_weex_core_queue.h>
+
+#ifdef USE_JS_RUNTIME
+#include "js_runtime/weex/task/back_to_weex_core_queue.h"
+#include "js_runtime/weex/object/weex_global_object_v2.h"
+#include "js_runtime/weex/utils/weex_jsc_utils.h"
+#else
+#include "android/jsengine/task/back_to_weex_core_queue.h"
+#include "android/jsengine/object/weex_global_object.h
 #include "android/jsengine/weex_jsc_utils.h"
-#include "weex_global_object.h"
+#endif
 
 class JSAction {
  public:

@@ -131,12 +131,22 @@ _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
 + (void)performBlock:(void (^_Nonnull)(void))block onThread:(NSThread *_Nonnull)thread;
 
 /**
+ * @abstract Check if system is in dark mode.
+ *
+ * @return Boolean
+ *
+ */
++ (BOOL)isSystemInDarkScheme;
+
+/**
  * @abstract Returns the environment of current application, you can get some necessary properties such as appVersion、sdkVersion、appName etc.
  *
  * @return A dictionary object which contains these properties.
  *
  */
 + (NSDictionary *_Nonnull)getEnvironment;
++ (NSDictionary *_Nonnull)getEnvironmentForJSContext;
++ (BOOL)isEnvironmentUsingDarkScheme;
 
 + (NSDictionary *_Nonnull)getDebugEnvironment;
 
@@ -502,9 +512,19 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
  */
 + (NSData *_Nonnull)base64DictToData:(NSDictionary *_Nullable)base64Dict;
 
+/**
+*  @abstract Switch for RTL.
+*
+*/
 + (void)setEnableRTLLayoutDirection:(BOOL)value;
-
 + (BOOL)enableRTLLayoutDirection;
+
+/**
+*  @abstract Switch for dark mode support.
+*
+*/
++ (void)setDarkSchemeSupportEnable:(BOOL)value;
++ (BOOL)isDarkSchemeSupportEnabled;
 
 + (long) getUnixFixTimeMillis;
 

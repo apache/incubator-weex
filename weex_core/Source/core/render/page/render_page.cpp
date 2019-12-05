@@ -221,6 +221,16 @@ bool RenderPage::MoveRenderObject(const std::string &ref,
     }
   }
 
+  if(index > new_parent->getChildCount()){
+    std::stringstream msg;
+    msg << "Out of array bounds when RenderPage::MoveRenderObject, specified index: "
+    << index << "array size " << new_parent->getChildCount();
+
+    WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()
+    ->ReportException(page_id().c_str(), "RenderPage::MoveRenderObject", msg.str().c_str());
+    return false;
+  }
+
   set_is_dirty(true);
   child->getParent()->removeChild(child);
   new_parent->addChildAt(child, index);

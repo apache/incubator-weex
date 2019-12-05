@@ -39,6 +39,7 @@
 #import "WXCoreBridge.h"
 #import "WXAnalyzerCenter.h"
 
+
 #import <dlfcn.h>
 
 #import <mach/mach.h>
@@ -80,6 +81,7 @@
 {
     _jsContext.instanceId = nil;
     __block JSContext* theContext = _jsContext;
+    _jsContext = nil; // Make sure that the context MUST be freed in JS thread.
     WXPerformBlockOnBridgeThreadForInstance(^{
          theContext = nil; // release the context in js thread to avoid main-thread deadlock
     }, _weexInstanceId);
@@ -142,7 +144,10 @@
 - (JSValue *)callJSMethod:(NSString *)method args:(NSArray *)args
 {
     WXLogDebug(@"Calling JS... method:%@, args:%@", method, args);
-//    __checkMutable(args);
+    WXPerformBlockOnMainThread(^{
+        [[WXBridgeManager sharedManager].lastMethodInfo setObject:method ?: @"" forKey:@"method"];
+        [[WXBridgeManager sharedManager].lastMethodInfo setObject:args ?: @[] forKey:@"args"];
+    });
     return [[_jsContext globalObject] invokeMethod:method withArguments:args];
 }
 
@@ -396,7 +401,7 @@
 
 - (void)resetEnvironment
 {
-    NSDictionary *data = [WXUtility getEnvironment];
+    NSDictionary *data = [WXUtility getEnvironmentForJSContext];
     _jsContext[@"WXEnvironment"] = data;
 }
 

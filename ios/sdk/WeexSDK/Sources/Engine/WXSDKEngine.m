@@ -29,6 +29,7 @@
 #import "WXNavigationDefaultImpl.h"
 #import "WXURLRewriteDefaultImpl.h"
 #import "WXJSFrameworkLoadDefaultImpl.h"
+#import "WXDarkSchemeDefaultImpl.h"
 
 #import "WXSDKManager.h"
 #import "WXSDKError.h"
@@ -42,6 +43,7 @@
 #import "WXConfigCenterProtocol.h"
 #import "WXComponent+Layout.h"
 #import "WXCoreBridge.h"
+#import "WXDarkSchemeModule.h"
 
 @implementation WXSDKEngine
 
@@ -68,6 +70,7 @@
     [self registerModule:@"webSocket" withClass:NSClassFromString(@"WXWebSocketModule")];
     [self registerModule:@"voice-over" withClass:NSClassFromString(@"WXVoiceOverModule")];
     [self registerModule:@"sdk-console-log" withClass:NSClassFromString(@"WXConsoleLogModule")];
+    [self registerModule:@"dark-scheme" withClass:NSClassFromString(@"WXDarkSchemeModule")];
 }
 
 + (void)registerModule:(NSString *)name withClass:(Class)clazz
@@ -205,6 +208,7 @@
     [self registerHandler:[WXNavigationDefaultImpl new] withProtocol:@protocol(WXNavigationProtocol)];
     [self registerHandler:[WXURLRewriteDefaultImpl new] withProtocol:@protocol(WXURLRewriteProtocol)];
     [self registerHandler:[WXJSFrameworkLoadDefaultImpl new] withProtocol:@protocol(WXJSFrameworkLoadProtocol)];
+    [self registerHandler:[WXDarkSchemeDefaultImpl new] withProtocol:@protocol(WXDarkSchemeProtocol)];
 }
 
 + (void)registerHandler:(id)handler withProtocol:(Protocol *)protocol
@@ -225,6 +229,12 @@
 
 + (void)initSDKEnvironment
 {
+    if (@available(iOS 13.0, *)) {
+    }
+    else {
+        [WXUtility setDarkSchemeSupportEnable:NO];
+    }
+    
     NSString *fileName = @"weex-main-jsfm";
     NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:fileName ofType:@"js"];
 	if (filePath == nil) {

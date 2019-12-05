@@ -49,8 +49,12 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     /**
      *  View
      */
-    UIColor *_backgroundColor;
+    UIColor *_styleBackgroundColor;
+    UIColor *_darkSchemeBackgroundColor;
+    UIColor *_lightSchemeBackgroundColor;
     NSString *_backgroundImage;
+    NSString *_darkSchemeBackgroundImage;
+    NSString *_lightSchemeBackgroundImage;
     NSString *_clipRadius;
     WXClipType _clipToBounds;
     UIView *_view;
@@ -59,6 +63,8 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     WXBoxShadow *_originalBoxShadow;
     WXBoxShadow *_lastBoxShadow;
     WXBoxShadow *_boxShadow;
+    WXBoxShadow *_darkSchemeBoxShadow;
+    WXBoxShadow *_lightSchemeBoxShadow;
     
     /**
      * accessibility support
@@ -115,9 +121,17 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     WXThreadSafeCounter *_displayCounter;
     
     UIColor *_borderTopColor;
+    UIColor *_darkSchemeBorderTopColor;
+    UIColor *_lightSchemeBorderTopColor;
     UIColor *_borderRightColor;
+    UIColor *_darkSchemeBorderRightColor;
+    UIColor *_lightSchemeBorderRightColor;
     UIColor *_borderLeftColor;
+    UIColor *_darkSchemeBorderLeftColor;
+    UIColor *_lightSchemeBorderLeftColor;
     UIColor *_borderBottomColor;
+    UIColor *_darkSchemeBorderBottomColor;
+    UIColor *_lightSchemeBorderBottomColor;
     
     CGFloat _borderTopWidth;
     CGFloat _borderRightWidth;
@@ -170,10 +184,17 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     NSMutableDictionary<NSString *, NSArray *> *_eventParameters;
 }
 
-/* _transform may be modified in mutiple threads. DO NOT use "_transform = XXX" directly.
+/* DO NOT use "_transform = XXX" directly.
  Ivar access in ObjC is compiled to code with additional release or retain. So use Ivar in mutiple
  thread may lead to crash. Use an ATOMIC property is well enough. */
 @property (atomic, strong) WXTransform *transform;
+
+/**
+ DO NOT use "_backgroundColor" directly. The same reason as '_transform'.
+ */
+@property (atomic, strong) UIColor* styleBackgroundColor;
+@property (atomic, strong) UIColor* darkSchemeBackgroundColor;
+@property (atomic, strong) UIColor* lightSchemeBackgroundColor;
 
 ///--------------------------------------
 /// @name Package Internal Methods
@@ -295,5 +316,7 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 - (void)_adjustForRTL;
 
 - (BOOL)_isAffineTypeAs:(NSString *)type;
+
+- (WXBoxShadow*)_chooseBoxShadow;
 
 @end

@@ -21,8 +21,14 @@
 #import "WXSDKInstance.h"
 #import "WXPageEventNotifyEvent.h"
 #import "WXSDKEngine.h"
+#import "WXUtility.h"
+#import "WXBridgeManager.h"
 
 @interface WXRootView()
+{
+    BOOL _hasFirstTraitCollectionChange;
+    BOOL _allowFirstTraitCollectionChange;
+}
 
 @property (nonatomic, assign) BOOL mHasEvent;
 
@@ -57,6 +63,52 @@
 - (BOOL)isHasEvent
 {
     return _mHasEvent;
+}
+
+- (void)checkUpdateEnvironment:(NSInteger)currentStyle
+{
+    if (@available(iOS 13.0, *)) {
+        if (([WXUtility isEnvironmentUsingDarkScheme] && (UIUserInterfaceStyle)currentStyle == UIUserInterfaceStyleLight) ||
+            (![WXUtility isEnvironmentUsingDarkScheme] && (UIUserInterfaceStyle)currentStyle == UIUserInterfaceStyleDark)) {
+            // Update scheme value in JS environment.
+            [WXUtility getEnvironmentForJSContext]; // Update gIsEnvironmentUsingDarkScheme
+            [[WXBridgeManager sharedManager] resetEnvironment];
+        }
+    }
+}
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection
+{
+    [super traitCollectionDidChange:previousTraitCollection];
+    
+    if (@available(iOS 13.0, *)) {
+        // When entering background system may call back change twice.. We ignore the first one.
+        UIUserInterfaceStyle currentStyle = self.traitCollection.userInterfaceStyle;
+        if (currentStyle != previousTraitCollection.userInterfaceStyle) {
+            if (_hasFirstTraitCollectionChange) {
+                _allowFirstTraitCollectionChange = NO;
+                [self checkUpdateEnvironment:(NSInteger)currentStyle];
+                [self.instance setCurrentSchemeName:currentStyle == UIUserInterfaceStyleDark ? @"dark" : @"light"];
+            }
+            else {
+                __weak WXRootView* weakSelf = self;
+                _hasFirstTraitCollectionChange = YES;
+                _allowFirstTraitCollectionChange = YES;
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    __strong WXRootView* strongSelf = weakSelf;
+                    if (strongSelf) {
+                        if (strongSelf->_allowFirstTraitCollectionChange) {
+                            if (strongSelf.instance) {
+                                [self checkUpdateEnvironment:(NSInteger)currentStyle];
+                                [strongSelf.instance setCurrentSchemeName:currentStyle == UIUserInterfaceStyleDark ? @"dark" : @"light"];
+                            }
+                        }
+                        strongSelf->_hasFirstTraitCollectionChange = NO;
+                    }
+                });
+            }
+        }
+    }
 }
 
 @end

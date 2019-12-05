@@ -50,6 +50,7 @@ android/sdk/.externalNativeBuild/ndkBuild/
 android/HeronAndroid/.externalNativeBuild/
 
 # release
+apache-weex-incubating-*
 apache_release_temp
 RELEASE_NOTE.md
 RELEASE_AUDIT.LOG

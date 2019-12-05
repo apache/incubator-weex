@@ -44,7 +44,6 @@ typedef enum : NSUInteger {
 
 @interface WXToastManager : NSObject
 
-@property (strong, nonatomic) NSMutableArray<WXToastInfo *> *toastQueue;
 @property (strong, nonatomic) UIView *toastingView;
 
 + (WXToastManager *)sharedManager;
@@ -58,7 +57,6 @@ typedef enum : NSUInteger {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         shareInstance = [[WXToastManager alloc] init];
-        shareInstance.toastQueue = [NSMutableArray new];
     });
     return shareInstance;
 }
@@ -122,16 +120,13 @@ static const CGFloat WXToastDefaultPadding = 30.0;
         superView =  self.weexInstance.rootView;
     }
     UIView *toastView = [self toastViewForMessage:message superView:superView];
-    WXToastInfo *info = [WXToastInfo new];
-    info.instance = self.weexInstance;
-    info.toastView = toastView;
-    info.superView = superView;
-    info.duration = duration;
-    [[WXToastManager sharedManager].toastQueue addObject:info];
     
-    if (![WXToastManager sharedManager].toastingView) {
-        [self showToast:toastView superView:superView duration:duration];
+    UIView* toastingView = [WXToastManager sharedManager].toastingView;
+    if (toastingView) {
+        [toastingView removeFromSuperview];
+        [WXToastManager sharedManager].toastingView = nil;
     }
+    [self showToast:toastView superView:superView duration:duration];
 }
 
 - (UIView *)toastViewForMessage:(NSString *)message superView:(UIView *)superView
@@ -156,7 +151,10 @@ static const CGFloat WXToastDefaultPadding = 30.0;
                                     )];
     
     CGPoint point = CGPointZero;
-    UIWindow *window = [[[UIApplication sharedApplication] windows] objectAtIndex:0];
+    UIWindow* window = [UIApplication sharedApplication].delegate.window;
+    if (window == NULL) {
+        window = [[[UIApplication sharedApplication] windows] firstObject];
+    }
     
     // adjust to screen orientation
     UIInterfaceOrientation orientation = (UIInterfaceOrientation)[[UIApplication sharedApplication] statusBarOrientation];
@@ -191,7 +189,7 @@ static const CGFloat WXToastDefaultPadding = 30.0;
     
     [toastView addSubview:messageLabel];
     toastView.layer.cornerRadius = 7;
-    toastView.backgroundColor=[UIColor colorWithWhite:0 alpha:0.7];
+    toastView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.7];
     
     return toastView;
 }
@@ -204,7 +202,6 @@ static const CGFloat WXToastDefaultPadding = 30.0;
     
     [WXToastManager sharedManager].toastingView = toastView;
     [superView addSubview:toastView];
-    __weak typeof(self) weakSelf = self;
     [UIView animateWithDuration:0.2 delay:duration options:UIViewAnimationOptionCurveEaseInOut animations:^{
         toastView.transform = CGAffineTransformConcat(toastView.transform, CGAffineTransformMakeScale(0.8, 0.8)) ;
     } completion:^(BOOL finished) {
@@ -212,24 +209,8 @@ static const CGFloat WXToastDefaultPadding = 30.0;
             toastView.alpha = 0;
         } completion:^(BOOL finished){
             [toastView removeFromSuperview];
-            [WXToastManager sharedManager].toastingView = nil;
-            
-            NSMutableArray *queue = [WXToastManager sharedManager].toastQueue;
-            if (queue.count > 0) {
-                [queue removeObjectAtIndex:0];
-                
-                // remove invalid toasts
-                for (NSInteger i = [queue count] - 1; i >= 0; i --) {
-                    WXToastInfo *info = queue[i];
-                    if (info.instance == nil) {
-                        [queue removeObjectAtIndex:i];
-                    }
-                }
-                
-                if (queue.count > 0) {
-                    WXToastInfo *info = [queue firstObject];
-                    [weakSelf showToast:info.toastView superView:info.superView duration:info.duration];
-                }
+            if ([WXToastManager sharedManager].toastingView == toastView) {
+                [WXToastManager sharedManager].toastingView = nil;
             }
         }];
     }];

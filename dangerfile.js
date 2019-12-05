@@ -292,6 +292,7 @@ const ignoreCopyrightVerifyPath = [
   'test/js\-framework/case',
   'android/playground/app/src/main/assets',
   'android/sdk/assets',
+  'android/sdk/src/main/java/org/apache/weex/utils/WXDataStructureUtil.java',
   'ios/playground/bundlejs',
   'ios/sdk/WeexSDK/Resources',
   'ios/sdk/WeexSDK/Sources/Layout',
@@ -525,7 +526,6 @@ function findBlameReviewers(fileToDeletedLinesMap, fileToNormalLinesMap, fileToB
     message("According to the blame info, we recommended " + names.join(' , ') + " to be the reviewers.")
   }
 }
-message('danger test finished.')
 /*
  * find reviewer end
  */

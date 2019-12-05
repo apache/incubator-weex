@@ -119,7 +119,10 @@ static NSString *const WXTextTruncationToken = @"\u2026";
 static CGFloat WXTextDefaultLineThroughWidth = 1.2;
 
 @interface WXTextComponent()
-@property (nonatomic, strong) NSString *useCoreTextAttr;
+@property (atomic, strong) NSString *fontFamily;
+@property (atomic, strong) UIColor *textColor;
+@property (atomic, strong) UIColor *darkSchemeTextColor;
+@property (atomic, strong) UIColor *lightSchemeTextColor;
 @end
 
 @implementation WXTextComponent
@@ -128,8 +131,6 @@ static CGFloat WXTextDefaultLineThroughWidth = 1.2;
     UIEdgeInsets _padding;
     NSTextStorage *_textStorage;
     float _textStorageWidth;
-    float _color[4];
-    NSString *_fontFamily;
     float _fontSize;
     float _fontWeight;
     WXTextStyle _fontStyle;
@@ -150,6 +151,8 @@ static CGFloat WXTextDefaultLineThroughWidth = 1.2;
     pthread_mutexattr_t _propertMutexAttr;
     BOOL _observerIconfont;
     BOOL _enableCopy;
+    
+    BOOL _useCoreText;
 }
 
 - (instancetype)initWithRef:(NSString *)ref
@@ -169,12 +172,10 @@ static CGFloat WXTextDefaultLineThroughWidth = 1.2;
         _textAlign = NSTextAlignmentNatural;
         
         if ([attributes objectForKey:@"coretext"]) {
-            _useCoreTextAttr = [WXConvert NSString:attributes[@"coretext"]];
+            _useCoreText = [WXConvert BOOL:attributes[@"coretext"]];
         } else {
-            _useCoreTextAttr = nil;
+            _useCoreText = YES;
         }
-        
-        _color[0] = -1.0;
 
         [self fillCSSStyles:styles];
         [self fillAttributes:attributes];
@@ -185,18 +186,12 @@ static CGFloat WXTextDefaultLineThroughWidth = 1.2;
 
 - (BOOL)useCoreText
 {
-    if ([_useCoreTextAttr isEqualToString:@"true"]) {
-        return YES;
-    }
-    if ([_useCoreTextAttr isEqualToString:@"false"]) {
-        return NO;
-    }
-    return YES;
+    return _useCoreText;
 }
 
 - (void)dealloc
 {
-    if (_fontFamily && _observerIconfont) {
+    if (self.fontFamily && _observerIconfont) {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
     }
     pthread_mutex_destroy(&_ctAttributedStringMutex);
@@ -246,7 +241,15 @@ do {\
 
 - (void)fillCSSStyles:(NSDictionary *)styles
 {
-    WX_STYLE_FILL_TEXT(fontFamily, fontFamily, NSString, YES) //!OCLint
+    do {
+        id value = styles[@"fontFamily"];
+        if (value) {
+            self.fontFamily = [WXConvert NSString:value];
+            [self setNeedsRepaint];
+            [self setNeedsLayout];
+        }
+    } while(0);
+    
     WX_STYLE_FILL_TEXT_PIXEL(fontSize, fontSize, YES) //!OCLint
     WX_STYLE_FILL_TEXT(fontWeight, fontWeight, WXTextWeight, YES) //!OCLint
     WX_STYLE_FILL_TEXT(fontStyle, fontStyle, WXTextStyle, YES) //!OCLint
@@ -258,26 +261,58 @@ do {\
     WX_STYLE_FILL_TEXT_PIXEL(letterSpacing, letterSpacing, YES) //!OCLint
     WX_STYLE_FILL_TEXT(wordWrap, wordWrap, NSString, YES); //!OCLint
 
-    UIColor* color = nil;
-    id value = styles[@"color"];
-    if (value) {
-        if([WXUtility isBlankString:value]){
-            color = [UIColor blackColor];
-        } else {
-            color = [WXConvert UIColor:value];
+    do {
+        UIColor* color = nil;
+        id value = styles[@"color"];
+        if (value) {
+            if([WXUtility isBlankString:value]){
+                color = [UIColor blackColor];
+            } else {
+                color = [WXConvert UIColor:value];
+            }
+            if (color) {
+                self.textColor = color;
+                [self setNeedsRepaint];
+            }
         }
-        if (color) {
-            [self setNeedsRepaint];
-            CGFloat red, green, blue, alpha;
-            [color getRed:&red green:&green blue:&blue alpha:&alpha];
-            _color[0] = red;
-            _color[1] = green;
-            _color[2] = blue;
-            _color[3] = alpha;
+        if (self.textColor == nil) {
+            self.textColor = [UIColor blackColor];
         }
-    }
+    } while (0);
 
-    if (_fontFamily && !_observerIconfont) {
+    do {
+        UIColor* color = nil;
+        id value = styles[@"weexDarkSchemeColor"];
+        if (value) {
+            if([WXUtility isBlankString:value]){
+                color = [UIColor blackColor];
+            } else {
+                color = [WXConvert UIColor:value];
+            }
+            if (color) {
+                self.darkSchemeTextColor = color;
+                [self setNeedsRepaint];
+            }
+        }
+    } while (0);
+    
+    do {
+        UIColor* color = nil;
+        id value = styles[@"weexLightSchemeColor"];
+        if (value) {
+            if([WXUtility isBlankString:value]){
+                color = [UIColor blackColor];
+            } else {
+                color = [WXConvert UIColor:value];
+            }
+            if (color) {
+                self.lightSchemeTextColor = color;
+                [self setNeedsRepaint];
+            }
+        }
+    } while (0);
+    
+    if (self.fontFamily && !_observerIconfont) {
         // notification received when custom icon font file download finish
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
         _observerIconfont = YES;
@@ -366,6 +401,20 @@ do {\
 
 - (void)layoutDirectionDidChanged:(BOOL)isRTL {
     [self setNeedsRepaint];
+}
+
+- (void)schemeDidChange:(NSString*)scheme
+{
+    [self setNeedsRepaint];
+    [super schemeDidChange:scheme];
+    if (_view) {
+        [self setNeedsDisplay];
+    }
+}
+
+- (WXColorScene)colorSceneType
+{
+    return WXColorSceneText;
 }
 
 - (BOOL)needsDrawRect
@@ -473,7 +522,7 @@ do {\
 
 - (void)repaintText:(NSNotification *)notification
 {
-    if (![_fontFamily isEqualToString:notification.userInfo[@"fontFamily"]]) {
+    if (![self.fontFamily isEqualToString:notification.userInfo[@"fontFamily"]]) {
         return;
     }
     [self setNeedsRepaint];
@@ -494,19 +543,20 @@ do {\
         string = @"";
     }
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: string];
-    if (_color[0] >= 0) {
-        [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:_color[0] green:_color[1] blue:_color[2] alpha:_color[3]] range:NSMakeRange(0, string.length)];
+    UIColor* textColor = [self.weexInstance chooseColor:self.textColor lightSchemeColor:self.lightSchemeTextColor darkSchemeColor:self.darkSchemeTextColor invert:self.invertForDarkScheme scene:[self colorSceneType]];
+    if (textColor) {
+        [attributedString addAttribute:NSForegroundColorAttributeName value:textColor range:NSMakeRange(0, string.length)];
     }
     
     // set font
-    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:WXTextStyleNormal fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor useCoreText:[self useCoreText]];
+    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:WXTextStyleNormal fontFamily:self.fontFamily scaleFactor:self.weexInstance.pixelScaleFactor useCoreText:[self useCoreText]];
     CTFontRef ctFont;
     
     if (_fontStyle == WXTextStyleItalic) {
         CGAffineTransform matrix = CGAffineTransformMake(1, 0, tanf(16 * (CGFloat)M_PI / 180), 1, 0, 0);
-        ctFont = CTFontCreateWithName((__bridge CFStringRef)font.fontName, font.pointSize, &matrix);
+        ctFont = CTFontCreateWithFontDescriptor((__bridge CTFontDescriptorRef)font.fontDescriptor, font.pointSize, &matrix);
     }else {
-        ctFont = CTFontCreateWithName((__bridge CFStringRef)font.fontName, font.pointSize, NULL);
+        ctFont = CTFontCreateWithFontDescriptor((__bridge CTFontDescriptorRef)font.fontDescriptor, font.pointSize, NULL);
     }
     
     _fontAscender = font.ascender;
@@ -582,12 +632,13 @@ do {\
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
     
     // set textColor
-    if (_color[0] >= 0) {
-        [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:_color[0] green:_color[1] blue:_color[2] alpha:_color[3]] range:NSMakeRange(0, string.length)];
+    UIColor* textColor = [self.weexInstance chooseColor:self.textColor lightSchemeColor:self.lightSchemeTextColor darkSchemeColor:self.darkSchemeTextColor invert:self.invertForDarkScheme scene:[self colorSceneType]];
+    if (textColor) {
+        [attributedString addAttribute:NSForegroundColorAttributeName value:textColor range:NSMakeRange(0, string.length)];
     }
     
     // set font
-    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor];
+    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:self.fontFamily scaleFactor:self.weexInstance.pixelScaleFactor];
     if (font) {
         [attributedString addAttribute:NSFontAttributeName value:font range:NSMakeRange(0, string.length)];
     }
@@ -898,7 +949,7 @@ do {\
         CGFloat fontSize = font ? CTFontGetSize(font):32 * self.weexInstance.pixelScaleFactor;
         UIFont * uiFont = [UIFont systemFontOfSize:fontSize];
         if (uiFont) {
-            font = CTFontCreateWithName((__bridge CFStringRef)uiFont.fontName, uiFont.pointSize, NULL);
+            font = CTFontCreateWithFontDescriptor((__bridge CTFontDescriptorRef)uiFont.fontDescriptor, uiFont.pointSize, NULL);
         }
         if (font) {
             attrs[(id)kCTFontAttributeName] = (__bridge id)(font);
@@ -1109,10 +1160,15 @@ NS_INLINE NSRange WXNSRangeFromCFRange(CFRange range) {
 {
     [super _resetCSSNodeStyles:styles];
     if ([styles containsObject:@"color"]) {
-        _color[0] = 0;
-        _color[1] = 0;
-        _color[2] = 0;
-        _color[3] = 1.0;
+        self.textColor = [UIColor blackColor];
+        [self setNeedsRepaint];
+    }
+    if ([styles containsObject:@"weexDarkSchemeColor"]) {
+        self.darkSchemeTextColor = nil;
+        [self setNeedsRepaint];
+    }
+    if ([styles containsObject:@"weexLightSchemeColor"]) {
+        self.lightSchemeTextColor = nil;
         [self setNeedsRepaint];
     }
     if ([styles containsObject:@"fontSize"]) {
