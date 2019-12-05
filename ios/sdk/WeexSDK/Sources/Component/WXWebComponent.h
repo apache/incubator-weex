@@ -18,8 +18,9 @@
  */
 
 #import "WXComponent.h"
+#import <WebKit/WebKit.h>
 
-@interface WXWebComponent : WXComponent<UIWebViewDelegate>
+@interface WXWebComponent : WXComponent<WKNavigationDelegate>
 
 - (void)notifyWebview:(NSDictionary *) data;
 
