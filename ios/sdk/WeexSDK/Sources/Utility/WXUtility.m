@@ -422,7 +422,6 @@ static BOOL gIsEnvironmentUsingDarkScheme = NO;
         return true;
     }
     if (![string isKindOfClass:[NSString class]]) {
-        WXLogError(@"%@ is not a string", string);
         return true;
     }
     if ([[string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length] == 0) {
