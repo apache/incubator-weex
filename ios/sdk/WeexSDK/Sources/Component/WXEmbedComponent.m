@@ -135,6 +135,13 @@
     _embedInstance.pageObject = self.weexInstance.viewController;
     _embedInstance.viewController = self.weexInstance.viewController;
     
+    if (self.invertForDarkScheme) {
+        [_embedInstance setAutoInvertingBehavior:WXAutoInvertingBehaviorAlways];
+    }
+    else {
+        [_embedInstance setAutoInvertingBehavior:WXAutoInvertingBehaviorNever];
+    }
+    
     NSString *newURL = nil;
     
     if ([sourceURL.absoluteString rangeOfString:@"?"].location != NSNotFound) {
