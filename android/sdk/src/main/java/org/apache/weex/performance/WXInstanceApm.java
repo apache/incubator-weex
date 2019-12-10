@@ -341,8 +341,10 @@ public class WXInstanceApm {
         }
 
         addProperty("wxUseRuntimeApi",WXEnvironment.sUseRunTimeApi);
-        if (instance != null && (instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER
-                || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY)) {
+        if (instance != null && (instance.isUsingEaglePlugin()
+            || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY //todo only for compat.
+            || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER
+        )) {
             addProperty(KEY_PAGE_PROPERTIES_RENDER_TYPE, WXEnvironment.EAGLE);
         }
         if (null != instance) {

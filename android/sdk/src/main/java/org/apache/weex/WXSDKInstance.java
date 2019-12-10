@@ -34,12 +34,13 @@ import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.support.annotation.WorkerThread;
 import android.support.v4.util.ArrayMap;
+import android.support.v4.util.Pair;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
+
 import com.alibaba.fastjson.JSONObject;
 import org.apache.weex.adapter.IDrawableLoader;
 import org.apache.weex.adapter.IWXConfigAdapter;
@@ -106,6 +107,9 @@ import java.util.PriorityQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.weex.bridge.WXBridgeManager.BundType;
 
+import static com.taobao.weex.common.WXErrorCode.WX_ERR_RELOAD_PAGE;
+import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
+
 
 /**
  * Each instance of WXSDKInstance represents an running weex instance.
@@ -164,7 +168,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   /**
    * bundle type
    */
-  public BundType bundleType;
+  public WXBridgeManager.BundType bundleType;
   public long mRenderStartNanos;
   public int mExecJSTraceId = WXTracing.nextId();
 
@@ -183,6 +187,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
    * Render strategy.
    */
   private WXRenderStrategy mRenderStrategy = WXRenderStrategy.APPEND_ASYNC;
+  private String mEaglePluginName;
 
   private boolean mDisableSkipFrameworkInit = false;
 
@@ -221,6 +226,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
    * when screen width change, we adjust viewport to adapter screen change
    * */
   private boolean mAutoAdjustDeviceWidth = WXEnvironment.AUTO_ADJUST_ENV_DEVICE_WIDTH;
+
+  private volatile WXEaglePlugin mEaglePlugin;
 
   public  List<JSONObject> getComponentsExceedGPULimit(){return componentsInfoExceedGPULimit;}
   @RestrictTo(Scope.LIBRARY)
@@ -834,7 +841,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
                       String jsonInitData,
                       WXRenderStrategy flag){
     isPreInit = true;
-    mRenderStrategy = flag;
+    setRenderStrategy(flag);
     Map<String, Object> renderOptions = options;
     if (renderOptions == null) {
       renderOptions = new HashMap<>();
@@ -844,12 +851,22 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     WXSDKManager.getInstance().createInstance(this, new Script(script), renderOptions, jsonInitData);
   }
 
+  private void setRenderStrategy(WXRenderStrategy flag) {
+    mRenderStrategy = flag;
+    setEaglePlugin(WXEaglePluginManager.getPluginName(mRenderStrategy));
+  }
+
+  private void setEaglePlugin(String plugin){
+    mEaglePluginName = plugin;
+    mEaglePlugin = WXEaglePluginManager.getInstance().getPlugin(mEaglePluginName);
+  }
+
   public void preDownLoad(String url,
                           Map<String, Object> options,
                           String jsonInitData,
                           WXRenderStrategy flag){
     this.isPreDownLoad =true;
-    mRenderStrategy = flag;
+    setRenderStrategy(flag);
     mApmForInstance.isReady = false;
     renderByUrl(url,url,options,jsonInitData,flag);
   }
@@ -865,7 +882,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
 
     LogDetail logDetail = mTimeCalculator.createLogDetail("renderInternal");
-    mRenderStrategy = flag;
+    setRenderStrategy(flag);
 
     //some case ,from render(template),but not render (url)
     if (!mApmForInstance.hasInit()){
@@ -961,7 +978,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
           if(containerView instanceof ViewGroup) {
             if(0 == ((ViewGroup) containerView).getChildCount()) {
               if(wxJscProcessManager.withException(WXSDKInstance.this)) {
-                onJSException(String.valueOf(WXErrorCode.WX_ERR_RELOAD_PAGE),"jsc reboot","jsc reboot");
+                onJSException(String.valueOf(WX_ERR_RELOAD_PAGE),"jsc reboot","jsc reboot");
               }
               if(!createInstanceHeartBeat) {
                   WXBridgeManager.getInstance().callReportCrashReloadPage(mInstanceId, null);
@@ -1001,11 +1018,11 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
 
   public boolean skipFrameworkInit(){
-    return isDataRender() && !mDisableSkipFrameworkInit;
+    return isDataRender() && getEaglePlugin().isSkipFrameworkInit(getInstanceId()) && !mDisableSkipFrameworkInit;
   }
 
   private boolean isDataRender() {
-    return getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY || getRenderStrategy() == WXRenderStrategy.DATA_RENDER;
+    return getEaglePlugin() != null;
   }
 
   private void renderByUrlInternal(String pageName,
@@ -1020,7 +1037,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     ensureRenderArchor();
     pageName = wrapPageName(pageName, url);
     mBundleUrl = url;
-    mRenderStrategy = flag;
+    setRenderStrategy(flag);
     if(WXSDKManager.getInstance().getValidateProcessor()!=null) {
       mNeedValidate = WXSDKManager.getInstance().getValidateProcessor().needValidate(mBundleUrl);
     }
@@ -1047,14 +1064,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       return;
     }
 
-    boolean is_wlasm = false;
-    if (uri != null && uri.getPath()!=null) {
-      if(uri.getPath().endsWith(".wlasm")){
-        is_wlasm =  true;
-      }
-    }
-    if (is_wlasm){
-      flag = WXRenderStrategy.DATA_RENDER_BINARY;
+    //process eagle, overwrite plugin & renderStrategy.
+    Pair<String, WXEaglePlugin> eaglePluginPair = WXEaglePluginManager.getInstance().filterUrl(url);
+    if (eaglePluginPair != null){
+      mEaglePluginName = eaglePluginPair.first;
+      mEaglePlugin = eaglePluginPair.second;
+      mRenderStrategy = WXEaglePluginManager.getRenderStrategyByPlugin(mEaglePluginName);
+      flag = mRenderStrategy;
     }
 
     IWXHttpAdapter adapter = WXSDKManager.getInstance().getIWXHttpAdapter();
@@ -2499,5 +2515,17 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void setPageDirty(boolean mPageDirty) {
     this.mPageDirty = mPageDirty;
+  }
+
+  public WXEaglePlugin getEaglePlugin() {
+    return mEaglePlugin;
+  }
+
+  public String getEaglePluginName() {
+    return mEaglePluginName;
+  }
+
+  public boolean isUsingEaglePlugin() {
+    return mEaglePlugin != null;
   }
 }

@@ -76,7 +76,7 @@ public class WXComponentRegistry {
     if (holder == null || TextUtils.isEmpty(type)) {
       return false;
     }
-
+    WXEaglePluginManager.getInstance().registerComponent(type, holder, componentInfo);
     if(RegisterCache.getInstance().cacheComponent(type,holder,componentInfo)) {
       return true;
     }
@@ -106,7 +106,7 @@ public class WXComponentRegistry {
     return true;
   }
 
-  private static boolean registerNativeComponent(String type, IFComponentHolder holder) throws WXException {
+  static boolean registerNativeComponent(String type, IFComponentHolder holder) throws WXException {
     try {
       holder.loadIfNonLazy();
       sTypeComponentMap.put(type, holder);

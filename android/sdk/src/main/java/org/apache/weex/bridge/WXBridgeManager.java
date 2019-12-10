@@ -530,7 +530,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   /**
    * Set current Instance
    *
-   * @param instanceId {@link WXSDKInstance#mInstanceId}
+   * @param instanceId {@link WXSDKInstance#getInstanceId()}
    */
   public synchronized void setStackTopInstance(final String instanceId) {
     post(new Runnable() {
@@ -726,7 +726,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   /**
    * Dispatch the native task to be executed.
    *
-   * @param instanceId {@link WXSDKInstance#mInstanceId}
+   * @param instanceId {@link WXSDKInstance#getInstanceId()}
    * @param tasks      tasks to be executed
    * @param callback   next tick id
    */
@@ -1291,36 +1291,40 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               "fireEvent must be called by main thread");
     }
     WXSDKInstance instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
-    if (instance != null && (instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER ||
-            instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY)) {
-      fireEventOnDataRenderNode(instanceId, ref, type, data, domChanges);
-    } else {
-      if(callback == null) {
-        addJSEventTask(METHOD_FIRE_EVENT, instanceId, params, ref, type, data, domChanges);
-        sendMessage(instanceId, WXJSBridgeMsgType.CALL_JS_BATCH);
-      }else{
-        asyncCallJSEventWithResult(callback, METHD_FIRE_EVENT_SYNC, instanceId, params, ref, type, data, domChanges);
+    if (instance != null && instance.isUsingEaglePlugin()) {
+      int mode = instance.getEaglePlugin().isSupportFireEvent(instanceId);
+      if (mode == WXEaglePlugin.NOT_SUPPORT){
+        return;
       }
+      fireEventOnDataRenderNode(instance.getEaglePlugin(), instanceId, ref, type, data, domChanges);
+      if (mode == WXEaglePlugin.EAGLE_ONLY){
+        return;
+      }
+      //assert mode == WXEaglePlugin.EAGLE_AND_SCRIPT
+    }
+
+    if (callback == null) {
+      addJSEventTask(METHOD_FIRE_EVENT, instanceId, params, ref, type, data, domChanges);
+      sendMessage(instanceId, WXJSBridgeMsgType.CALL_JS_BATCH);
+    } else {
+      asyncCallJSEventWithResult(callback, METHD_FIRE_EVENT_SYNC, instanceId, params, ref, type, data, domChanges);
     }
   }
 
-  private void fireEventOnDataRenderNode(final String instanceId, final String ref,
+  private void fireEventOnDataRenderNode(final WXEaglePlugin eaglePlugin, final String instanceId, final String ref,
                                          final String type, final Map<String, Object> data, final Map<String, Object> domChanges) {
     mJSHandler.postDelayed(WXThread.secure(new Runnable() {
       @Override
       public void run() {
         try {
-          WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
           long start = System.currentTimeMillis();
           if (WXEnvironment.isApkDebugable()) {
             WXLogUtils.d("fireEventOnDataRenderNode >>>> instanceId:" + instanceId
                 + ", data:" + data);
           }
-          if (mWXBridge instanceof WXBridge) {
-            ((WXBridge) mWXBridge).fireEventOnDataRenderNode(instanceId, ref, type,
-                (data == null || data.isEmpty()) ? "{}" : JSON.toJSONString(data),
-                (domChanges == null || domChanges.isEmpty()) ? "{}" : JSON.toJSONString(domChanges));
-          }
+          eaglePlugin.fireEvent(instanceId, ref, type,
+              (data == null || data.isEmpty()) ? "{}" : JSON.toJSONString(data),
+              (domChanges == null || domChanges.isEmpty()) ? "{}" : JSON.toJSONString(domChanges));
           WXLogUtils.renderPerformanceLog("fireEventOnDataRenderNode", System.currentTimeMillis() - start);
         } catch (Throwable e) {
           String err = "[WXBridgeManager] fireEventOnDataRenderNode " + WXLogUtils.getStackTrace(e);
@@ -1382,20 +1386,29 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   void callbackJavascript(final String instanceId, final String callback,
                           final Object data, boolean keepAlive) {
     if (TextUtils.isEmpty(instanceId) || TextUtils.isEmpty(callback)
-            || mJSHandler == null) {
+        || mJSHandler == null) {
       return;
     }
 
     WXSDKInstance instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
-    if (instance != null && (instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY)) {
-      callbackJavascriptOnDataRender(instanceId, callback, data, keepAlive);
-    } else {
-      addJSTask(METHOD_CALLBACK, instanceId, callback, data, keepAlive);
-      sendMessage(instanceId, WXJSBridgeMsgType.CALL_JS_BATCH);
+    if (instance != null && instance.isUsingEaglePlugin()) {
+      int mode = instance.getEaglePlugin().isSupportJSCallback(instanceId);
+      if (mode == WXEaglePlugin.NOT_SUPPORT) {
+        return;
+      }
+      callbackJavascriptOnDataRender(instance.getEaglePlugin(), instanceId, callback, data, keepAlive);
+      if (mode == WXEaglePlugin.EAGLE_ONLY) {
+        return;
+      }
+      //assert mode == WXEaglePlugin.EAGLE_AND_SCRIPT
     }
+
+
+    addJSTask(METHOD_CALLBACK, instanceId, callback, data, keepAlive);
+    sendMessage(instanceId, WXJSBridgeMsgType.CALL_JS_BATCH);
   }
 
-  void callbackJavascriptOnDataRender(final String instanceId, final String callback, final Object data, final boolean keepAlive){
+  void callbackJavascriptOnDataRender(final WXEaglePlugin eaglePlugin, final String instanceId, final String callback, final Object data, final boolean keepAlive){
     mJSHandler.postDelayed(WXThread.secure(new Runnable() {
       @Override
       public void run() {
@@ -1406,9 +1419,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             WXLogUtils.d("callbackJavascriptOnDataRender >>>> instanceId:" + instanceId
                 + ", data:" + data_str);
           }
-          if (mWXBridge instanceof WXBridge) {
-            ((WXBridge) mWXBridge).invokeCallbackOnDataRender(instanceId, callback,data_str ,keepAlive);
-          }
+          eaglePlugin.invokeJSCallback(instanceId, callback, data_str, keepAlive);
           WXLogUtils.renderPerformanceLog("callbackJavascriptOnDataRender", System.currentTimeMillis() - start);
         } catch (Throwable e) {
           String err = "[WXBridgeManager] callbackJavascriptOnDataRender " + WXLogUtils.getStackTrace(e);
@@ -1655,8 +1666,20 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         }
         WXJSObject instanceIdObj = new WXJSObject(WXJSObject.String,
                 instance.getInstanceId());
-        WXJSObject instanceObj = new WXJSObject(WXJSObject.String,
-                template.getContent());
+        WXJSObject instanceObj;
+        WXJSObject scriptType;
+        if (TextUtils.isEmpty(template.getContent())){
+          //byte[]
+          instanceObj = new WXJSObject(WXJSObject.String,
+              template.getBinary());
+          scriptType = new WXJSObject(WXJSObject.String, "binary");
+        } else {
+          //String
+          instanceObj = new WXJSObject(WXJSObject.String,
+              template.getContent());
+          scriptType = new WXJSObject(WXJSObject.NUMBER, "string");
+        }
+
 
         Object extraOption = null;
         if(options != null && options.containsKey("extraOption")) {
@@ -1697,14 +1720,15 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
         // When render strategy is data_render, put it into options. Others keep null.
         WXJSObject renderStrategy = null;
-        if (instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER) {
-          renderStrategy = new WXJSObject(WXJSObject.String, WXRenderStrategy.DATA_RENDER.getFlag());
-        } else if (instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY) {
-          renderStrategy = new WXJSObject(WXJSObject.String, WXRenderStrategy.DATA_RENDER_BINARY.getFlag());
-          // In DATA_RENDER_BINARY strategy script is binary
-          instanceObj.data = template.getBinary();
-        }else if (instance.getRenderStrategy() == WXRenderStrategy.JSON_RENDER) {
-             renderStrategy = new WXJSObject(WXJSObject.String, WXRenderStrategy.JSON_RENDER.getFlag());
+        if (instance.isUsingEaglePlugin()) {
+          //Eagle use plugin name as renderStrategy
+          renderStrategy = new WXJSObject(WXJSObject.String, instance.getEaglePluginName());
+        } else if (instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER) {
+          //todo just for compat
+          //using eagle mode without eagle plugin, will report exception in c if no plugin was found.
+          renderStrategy = new WXJSObject(WXJSObject.String, "DATA_RENDER");
+        } else if (instance.getRenderStrategy() == WXRenderStrategy.JSON_RENDER) {
+          renderStrategy = new WXJSObject(WXJSObject.String, WXRenderStrategy.JSON_RENDER.getFlag());
         }
 
         WXJSObject[] args = {instanceIdObj, instanceObj, optionsObj,
@@ -1723,13 +1747,17 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           return;
         }
         if (type == BundType.Vue || type == BundType.Rax
+                || instance.isUsingEaglePlugin()
+                || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY //Todo only for compat when plugin not registered
                 || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER
-                || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY
                 || instance.getRenderStrategy() == WXRenderStrategy.JSON_RENDER) {
           instance.getApmForInstance().onStage("wxBeforeInvokeCreateInstanceContext");
 
           WXLogUtils.d("Instance " + instance.getInstanceId() + " Render in SandBox Mode And Render Type is "
                   + type + " Render Strategy is " + instance.getRenderStrategy());
+          //extra args for create instance.
+          args = Arrays.copyOf(args,args.length+1);
+          args[args.length -1 ] = scriptType;
 
           int ret = invokeCreateInstanceContext(instance.getInstanceId(), null, "createInstanceContext", args, false);
           instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_END);
@@ -1947,24 +1975,31 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
     final long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-    if (instance != null && (instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY)) {
-      Pair<Pair<String,Object>, Boolean> data = null;
-      if(args.length!=2 || !(args[0].data instanceof String)
-          || !(args[1].data instanceof String)
-          || (data = extractCallbackArgs((String) args[1].data))==null){
-        WXLogUtils.w("invokeExecJS on data render that is not a callback call");
+
+    if (instance != null && instance.isUsingEaglePlugin()) {
+      final WXEaglePlugin eaglePlugin = instance.getEaglePlugin();
+      int mode = eaglePlugin.isSupportInvokeExecJS(instanceId);
+      if (mode == WXEaglePlugin.NOT_SUPPORT){
         return;
       }
-      callbackJavascriptOnDataRender(instanceId, (String) data.first.first, data.first.second, data.second);
-    } else {
-
       WXThread.secure(new Runnable() {
         @Override
         public void run() {
-          mWXBridge.execJS(instanceId, namespace, function, args);
+          eaglePlugin.invokeExecJS(instanceId, namespace, function,args );
         }
-      }, instance, "ExecJs").run();
+      }, instance, "ExecJsEagle").run();
+      if (mode == WXEaglePlugin.EAGLE_ONLY){
+        return;
+      }
+      //assert mode == WXEaglePlugin.EAGLE_AND_SCRIPT
     }
+
+    WXThread.secure(new Runnable() {
+      @Override
+      public void run() {
+        mWXBridge.execJS(instanceId, namespace, function, args);
+      }
+    }, instance, "ExecJs").run();
     if (null != instance){
       long diff = System.currentTimeMillis()-start;
       instance.getApmForInstance().updateFSDiffStats(WXInstanceApm.KEY_PAGE_STATS_FS_CALL_JS_NUM,1);
@@ -2449,14 +2484,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     WXJSObject[] args = {WXWsonJSONSwitch.toWsonOrJsonWXJSObject(modules)};
     String errorMsg = null;
-    try{
-      // TODO use a better way
-      if (mWXBridge instanceof WXBridge) {
-        ((WXBridge) mWXBridge).registerModuleOnDataRenderNode(WXJsonUtils.fromObjectToJSONString(modules));
-      }
-    } catch (Throwable e){
-      WXLogUtils.e("Weex [data_render register err]", e);
-    }
     try {
         if(0 == mWXBridge.execJS("", null, METHOD_REGISTER_MODULES, args)) {
             errorMsg = "execJS error";
@@ -2501,15 +2528,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
     if (components == null) {
       return;
-    }
-
-    try{
-      // TODO use a better way
-      if (mWXBridge instanceof WXBridge) {
-        ((WXBridge) mWXBridge).registerComponentOnDataRenderNode(WXJsonUtils.fromObjectToJSONString(components));
-      }
-    } catch (Throwable e){
-      WXLogUtils.e("Weex [data_render register err]", e);
     }
 
     WXJSObject[] args = {WXWsonJSONSwitch.toWsonOrJsonWXJSObject(components)};
