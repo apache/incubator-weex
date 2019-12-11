@@ -1042,9 +1042,14 @@ do {\
     }
     aWidth = [attributedStringCpy boundingRectWithSize:CGSizeMake(aWidth, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading context:nil].size.width;
     
+    /* If font style is italic, we add a little extra width to text.
+     About textSize * tanf(16deg) / 2
+     */
+    CGFloat italicFix = _fontStyle == WXTextStyleItalic ? _fontSize * tanf(16 * (CGFloat)M_PI / 180) / 2.0f : 0.f;
+    
     /* Must get ceil of aWidth. Or core text may not return correct bounds.
      Maybe aWidth without ceiling triggered some critical conditions. */
-    aWidth = ceil(aWidth);
+    aWidth = ceil(aWidth + italicFix);
     CTFramesetterRef ctframesetterRef = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(attributedStringCpy));
     suggestSize = CTFramesetterSuggestFrameSizeWithConstraints(ctframesetterRef, CFRangeMake(0, 0), NULL, CGSizeMake(aWidth, MAXFLOAT), NULL);
     
