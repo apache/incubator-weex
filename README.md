@@ -18,12 +18,12 @@ A framework for building Mobile cross-platform UI.
 | iOS | [![Pod version](https://badge.fury.io/co/WeexSDK.svg)](https://cocoapods.org/pods/WeexSDK) [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage) |
 | [Mobile Web](https://github.com/weexteam/vue-render-for-apache-weex) | [![npm version](https://badge.fury.io/js/weex-vue-render.svg)](https://www.npmjs.com/package/weex-vue-render) |
 
-Support Android 4.1 (API 16), iOS 8.0+ and WebKit 534.30+.
+Support Android 4.1 (API 16), iOS 9.0+ and WebKit 534.30+.
 
 **FYI: The [mobile web render](https://github.com/weexteam/vue-render-for-apache-weex) is not supported by Apache Weex officially**
 
 ## For Windows
-First of all, compiling or building Weex from Windows is not support officially.
+First of all, compiling or building Weex from Windows is not supported officially.
 
 You could install [Git for Windows](https://git-scm.com/download/win) and run all the following commands in git-bash.
 
