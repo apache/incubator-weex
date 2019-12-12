@@ -391,9 +391,14 @@ JSFUNCTION functionGCanvasLinkNative(ExecState *state) {
     JSValue arg_js = state->argument(2);
     String arg_str = arg_js.toWTFString(state);
 
-    auto result = globalObject->js_bridge()->core_side()->CallGCanvasLinkNative(id_str.utf8().data(),
+    const char * resultChar = globalObject->js_bridge()->core_side()->CallGCanvasLinkNative(id_str.utf8().data(),
                                                                                 type, arg_str.utf8().data());
-    return JSValue::encode(String2JSValue(state, result));
+    auto result = resultChar;
+    auto ret = JSValue::encode(String2JSValue(state, result));
+    if (strlen(resultChar) > 0) {
+        delete resultChar;
+    }
+    return ret;
 }
 
 JSFUNCTION functionT3DLinkNative(ExecState *state) {

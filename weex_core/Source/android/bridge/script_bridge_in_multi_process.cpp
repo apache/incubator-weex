@@ -239,14 +239,17 @@ static std::unique_ptr<IPCResult> HandleCallGCanvasLinkNative(
 //    retVal = WeexCoreManager::Instance()->script_bridge()->core_side()->CallGCanvasLinkNative(pageId, type,
 //                                                                                     args);
 
-      std::unique_ptr<IPCResult> ret = createVoidResult();
-      if (retVal) {
-    jstring jDataStr = env->NewStringUTF(retVal);
-    ret = std::unique_ptr<IPCResult>(
-        new IPCStringResult(jstring2WeexString(env, jDataStr)));
-    env->DeleteLocalRef(jDataStr);
-    retVal = NULL;
+  std::unique_ptr<IPCResult> ret = createVoidResult();
+  if (retVal) {
+      jstring jDataStr = env->NewStringUTF(retVal);
+      ret = std::unique_ptr<IPCResult>(
+              new IPCStringResult(jstring2WeexString(env, jDataStr)));
+      env->DeleteLocalRef(jDataStr);
+      if (strlen(retVal) > 0) {
+        delete retVal;
       }
+    retVal = NULL;
+  }
 //      env->DeleteLocalRef(jPageId);
 //      env->DeleteLocalRef(val);
       return ret;
