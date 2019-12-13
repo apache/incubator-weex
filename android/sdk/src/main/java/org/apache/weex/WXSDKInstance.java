@@ -1026,7 +1026,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   private void renderByUrlInternal(String pageName,
-                                   final String url,
+                                   String url,
                                    Map<String, Object> options,
                                    final String jsonInitData,
                                    WXRenderStrategy flag) {
@@ -1040,6 +1040,16 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     setRenderStrategy(flag);
     if(WXSDKManager.getInstance().getValidateProcessor()!=null) {
       mNeedValidate = WXSDKManager.getInstance().getValidateProcessor().needValidate(mBundleUrl);
+    }
+
+    //process eagle, overwrite plugin & renderStrategy.
+    Pair<String, WXEaglePlugin> eaglePluginPair = WXEaglePluginManager.getInstance().filterUrl(url);
+    if (eaglePluginPair != null){
+      url = eaglePluginPair.first;
+      mEaglePlugin = eaglePluginPair.second;
+      mEaglePluginName = mEaglePlugin.getPluginName();
+      mRenderStrategy = WXEaglePluginManager.getRenderStrategyByPlugin(mEaglePluginName);
+      flag = mRenderStrategy;
     }
 
     Map<String, Object> renderOptions = options;
@@ -1062,15 +1072,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_END);
       render(pageName,template , renderOptions, jsonInitData, flag);
       return;
-    }
-
-    //process eagle, overwrite plugin & renderStrategy.
-    Pair<String, WXEaglePlugin> eaglePluginPair = WXEaglePluginManager.getInstance().filterUrl(url);
-    if (eaglePluginPair != null){
-      mEaglePluginName = eaglePluginPair.first;
-      mEaglePlugin = eaglePluginPair.second;
-      mRenderStrategy = WXEaglePluginManager.getRenderStrategyByPlugin(mEaglePluginName);
-      flag = mRenderStrategy;
     }
 
     IWXHttpAdapter adapter = WXSDKManager.getInstance().getIWXHttpAdapter();
