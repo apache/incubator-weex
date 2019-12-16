@@ -100,6 +100,8 @@ namespace weex {
                 int UpdateInitFrameworkParams(const std::string& key, const std::string& value, const std::string& desc) override;
                 void SetLogType(const int logLevel, const bool isPerf) override;
 
+               int64_t JsAction(long ctxContainer, int32_t jsActionType, const char *arg) override ;
+
             private:
                 std::vector<std::string> usingBackThreadId;
 

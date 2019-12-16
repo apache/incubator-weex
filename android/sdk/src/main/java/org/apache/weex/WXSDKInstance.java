@@ -35,6 +35,7 @@ import android.support.annotation.RestrictTo.Scope;
 import android.support.annotation.WorkerThread;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,6 +69,8 @@ import org.apache.weex.common.WXRequest;
 import org.apache.weex.dom.WXEvent;
 import org.apache.weex.http.WXHttpUtil;
 import org.apache.weex.instance.InstanceOnFireEventInterceptor;
+import org.apache.weex.jsEngine.JSContext;
+import org.apache.weex.jsEngine.JSEngine;
 import org.apache.weex.layout.ContentBoxMeasurement;
 import org.apache.weex.performance.WXInstanceApm;
 import org.apache.weex.performance.WXStateRecord;
@@ -208,6 +211,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private WXSDKInstance mParentInstance;
 
   private String mRenderType = RenderTypes.RENDER_TYPE_NATIVE;
+
+  private boolean mPageDirty = true;
+  private boolean mFixMultiThreadBug = false;
 
   public TimeCalculator mTimeCalculator;
   /**
@@ -527,8 +533,17 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     mApmForInstance = new WXInstanceApm(mInstanceId);
     WXSDKManager.getInstance().getAllInstanceMap().put(mInstanceId,this);
     mTimeCalculator = new TimeCalculator(this);
+    initFixMultiThreadFlag();
   }
 
+
+  private void initFixMultiThreadFlag() {
+    IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
+    if (adapter != null) {
+      String config = adapter.getConfig("android_weex_ext_config", "fixMultiThreadBug", "true");
+      mFixMultiThreadBug = Boolean.parseBoolean(config);
+    }
+  }
 
   /**
    * For unittest only.
@@ -584,6 +599,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   public void init(Context context) {
+    initFixMultiThreadFlag();
     RegisterCache.getInstance().idle(true);
     mContext = context;
     mContainerInfo = new HashMap<>(4);
@@ -2397,15 +2413,32 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   public void OnVSync() {
-    boolean forceLayout = WXBridgeManager.getInstance().notifyLayout(getInstanceId());
-    if(forceLayout) {
+    if(mFixMultiThreadBug) {
+      if(!mPageDirty) {
+        return;
+      }
       WXBridgeManager.getInstance().post(new Runnable() {
         @Override
         public void run() {
-          WXBridgeManager.getInstance().forceLayout(getInstanceId());
+          boolean forceLayout = WXBridgeManager.getInstance().notifyLayout(getInstanceId());
+          if(forceLayout) {
+            WXBridgeManager.getInstance().forceLayout(getInstanceId());
+          }
         }
       });
+    } else  {
+      boolean forceLayout = WXBridgeManager.getInstance().notifyLayout(getInstanceId());
+      if(forceLayout) {
+        WXBridgeManager.getInstance().post(new Runnable() {
+          @Override
+          public void run() {
+            WXBridgeManager.getInstance().forceLayout(getInstanceId());
+          }
+        });
+      }
     }
+
+
   }
 
   public void addContentBoxMeasurement(long renderObjectPtr, ContentBoxMeasurement contentBoxMeasurement) {
@@ -2458,5 +2491,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
     String result = adapter.getConfig("wxeagle", "disable_skip_framework_init", "false");
     return "true".equals(result);
+  }
+
+  public boolean isPageDirty() {
+    return mPageDirty;
+  }
+
+  public void setPageDirty(boolean mPageDirty) {
+    this.mPageDirty = mPageDirty;
   }
 }

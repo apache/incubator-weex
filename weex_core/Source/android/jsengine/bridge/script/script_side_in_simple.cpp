@@ -146,8 +146,10 @@ int ScriptSideInSimple::UpdateInitFrameworkParams(const std::string& key, const 
 void ScriptSideInSimple::SetLogType(const int logLevel, const bool isPerf) {
   //do nothing
 }
+int64_t ScriptSideInSimple::JsAction(long ctxContainer, int32_t jsActionType, const char *arg) {
 
-
+  return 0;
+}
 
 }  // namespace js
 }  // namespace bridge

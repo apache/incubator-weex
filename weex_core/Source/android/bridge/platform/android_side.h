@@ -55,6 +55,7 @@ class AndroidSide : public PlatformBridge::PlatformSide {
                            const char* method, const char* arguments,
                            int arguments_length, const char* options,
                            int options_length) override;
+  void SetPageDirty(const char* page_id, bool dirty) override ;
   void SetTimeout(const char* callback_id, const char* time) override;
   void NativeLog(const char* str_array) override;
   int UpdateFinish(const char* page_id, const char* task, int taskLen,

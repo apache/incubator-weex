@@ -934,4 +934,13 @@ import java.util.Map;
     nativeSetDeviceDisplayOfPage(instanceId,width,height);
   }
 
+  @CalledByNative
+  @Override
+  public void setPageDirty(String instanceId, boolean dirty) {
+    WXSDKInstance sdkInstance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if(sdkInstance != null) {
+      sdkInstance.setPageDirty(dirty);
+    }
+  }
+
 }

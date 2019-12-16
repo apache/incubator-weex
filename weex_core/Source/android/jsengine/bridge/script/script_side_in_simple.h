@@ -77,6 +77,9 @@ class ScriptSideInSimple : public WeexCore::ScriptBridge::ScriptSide {
 
   void SetLogType(const int logLevel, const bool isPerf) override;
 
+  int64_t JsAction(long ctxContainer, int32_t jsActionType, const char *arg) override ;
+
+
   inline void set_runtime(WeexRuntime *runtime) { runtime_ = runtime; }
 
   ScriptSideInSimple() : runtime_(nullptr) {}

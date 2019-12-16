@@ -79,6 +79,8 @@ class ScriptBridgeInMultiSo : public WeexCore::ScriptBridge {
 
   static void SetLogType(const int logLevel, const bool isPerf);
 
+  static int64_t JsAction(long ctxContainer, int32_t jsActionType, const char *arg);
+
  private:
   static ScriptBridgeInMultiSo *g_instance;
   static ScriptBridgeInMultiSo *Instance() {

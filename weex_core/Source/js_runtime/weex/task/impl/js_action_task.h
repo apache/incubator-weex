@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -16,19 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-rootProject.name = 'weex-project'
 
-include ":playground"
-project(":playground").projectDir=new File("../weex-playground/android/playground")
+#ifndef WEEX_PROJECT_JS_ACTION_TASK_H
+#define WEEX_PROJECT_JS_ACTION_TASK_H
 
-include ":commons"
-project(":commons").projectDir=new File("../weex-playground/android/commons")
+#include "js_runtime/weex/task/weex_task.h"
 
-include ":weex_sdk"
-project(":weex_sdk").projectDir = new File("sdk")
+class JSActionTask : public WeexTask {
+ public:
+  explicit JSActionTask(long ctxContainer, const int32_t jsActionType, const std::string arg);
+  void run(WeexRuntime *runtime) override;
+
+  std::string taskName() {
+    return "JSActionTask";
+  };
 
 
-//include ":HeronAndroid"
-//project(":HeronAndroid").projectDir = new File("../../Heron/HeronAndroid")
+  ~JSActionTask() {
 
+  }
 
+ private:
+  long m_ctxContainer;
+  int32_t m_js_action_type;
+  std::string m_arg;
+
+};
+
+#endif //WEEX_PROJECT_JS_ACTION_TASK_H

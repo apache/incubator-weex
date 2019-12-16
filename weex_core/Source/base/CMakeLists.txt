@@ -91,6 +91,7 @@ if (ANDROID)
         android/jni/jbytearray_ref.cpp
         android/jni/scoped_java_ref.h
         android/jni/scoped_java_ref.cpp
+        android/jsengine_ptr_container.h
         android/ThreadLocker.h
         android/ThreadLocker.cpp
        )

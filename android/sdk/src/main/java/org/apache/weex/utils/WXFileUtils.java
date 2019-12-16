@@ -42,6 +42,8 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import org.apache.weex.WXEnvironment;
 
+import static org.apache.weex.utils.WXSoInstallMgrSdk._cpuType;
+
 public class WXFileUtils {
 
   /**
@@ -213,7 +215,7 @@ public class WXFileUtils {
       if(zipEntry.isDirectory()){
         continue;
       }
-      if(zipEntry.getName().contains("lib/armeabi/") &&
+      if(zipEntry.getName().contains("lib/" + _cpuType() + "/") &&
               (zipEntry.getName().contains("weex") || zipEntry.getName().equals(
                   String.format(Locale.ENGLISH, "lib%s.so", WXEnvironment.CORE_JSC_SO_NAME)))){
         String[] fileNames = zipEntry.getName().split("/");

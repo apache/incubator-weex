@@ -593,6 +593,26 @@ void ScriptSideInMultiProcess::SetLogType(const int logLevel, const bool isPerf)
   return;
 }
 
+int64_t ScriptSideInMultiProcess::JsAction(long ctxContainer, int32_t jsActionType, const char *arg) {
+  try {
+    if(sender_ == nullptr) {
+      LOGE("UpdateGlobalConfig sender is null");
+      return 0;
+    }
+    std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
+    serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::JSACTION));
+    serializer->add((int64_t) ctxContainer);
+    serializer->add(jsActionType);
+    serializer->add(arg, strlen(arg));
+    std::unique_ptr<IPCBuffer> buffer = serializer->finish();
+    std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
+    return result->get<int64_t>();
+  } catch (IPCException &e) {
+    LOGE("%s", e.msg());
+  }
+  return 0;
+}
+
 }  // namespace script
 }  // namespace bridge
 }  // namespace WeexCore

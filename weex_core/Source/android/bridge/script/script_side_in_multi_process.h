@@ -74,6 +74,8 @@ class ScriptSideInMultiProcess : public ScriptBridge::ScriptSide {
 
   void SetLogType(const int logLevel, const bool isPerf) override;
 
+  virtual int64_t JsAction(long ctxContainer, int32_t jsActionType, const char *arg) override;
+
     ScriptSideInMultiProcess();
 
   virtual ~ScriptSideInMultiProcess();

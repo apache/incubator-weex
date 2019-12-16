@@ -515,7 +515,7 @@ public class WXEnvironment {
     return application.getApplicationContext().getCacheDir().getPath();
   }
 
-  public static boolean extractSo() {
+  public static String extractSo() {
     File sourceFile = new File(getApplication().getApplicationContext().getApplicationInfo().sourceDir);
     final String soDesPath = copySoDesDir();
     if (sourceFile.exists() && !TextUtils.isEmpty(soDesPath)) {
@@ -524,11 +524,11 @@ public class WXEnvironment {
       } catch (IOException e) {
         WXLogUtils.e("extractSo error " + e.getMessage());
 //        e.printStackTrace();
-        return false;
+        return null;
       }
-      return true;
+      return soDesPath;
     }
-    return false;
+    return null;
   }
 
   private static String findIcuPath() {
@@ -593,9 +593,9 @@ public class WXEnvironment {
       return soPath;
     } else {
       //unzip from apk file
-      final boolean success = extractSo();
-      if (success) {
-        return new File(getCacheDir(), realName).getAbsolutePath();
+      final String extractSoPath = extractSo();
+      if (!TextUtils.isEmpty(extractSoPath)) {
+        return new File(extractSoPath, realName).getAbsolutePath();
       }
     }
     return soPath;

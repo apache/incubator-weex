@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -16,19 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-rootProject.name = 'weex-project'
+#ifndef _JSENGINE_PTR_CONTAINER_H_
+#define _JSENGINE_PTR_CONTAINER_H_
 
-include ":playground"
-project(":playground").projectDir=new File("../weex-playground/android/playground")
+namespace base {
+namespace android {
+class JSEnginePtrContainer {
+ public:
+  JSEnginePtrContainer(){
+    this->m_ptr_jss_js_action = 0;
+    this->m_ptr_weexcore_js_context = 0;
+  };
 
-include ":commons"
-project(":commons").projectDir=new File("../weex-playground/android/commons")
+  ~JSEnginePtrContainer() {
+    this->m_ptr_jss_js_action = 0;
+    this->m_ptr_weexcore_js_context = 0;
+  }
 
-include ":weex_sdk"
-project(":weex_sdk").projectDir = new File("sdk")
+  long m_ptr_jss_js_action;
+  long m_ptr_weexcore_js_context;
+};
+}  // namespace android
+}  // namespace base
 
-
-//include ":HeronAndroid"
-//project(":HeronAndroid").projectDir = new File("../../Heron/HeronAndroid")
-
-
+#endif  //_JSENGINE_PTR_CONTAINER_H_

@@ -140,6 +140,7 @@ class PlatformBridge {
     virtual int UpdateInitFrameworkParams(const std::string& key, const std::string& value, const std::string& desc) = 0;
 
     virtual void SetLogType(const int logType, const bool isPerf) = 0;
+    virtual int64_t JsAction(long ctxContainer, int32_t jsActionType, const char *arg) = 0;
 
     virtual double GetLayoutTime(const char* instanceId) const {return 0;}
 
@@ -191,6 +192,10 @@ class PlatformBridge {
     virtual std::unique_ptr<ValueWithType> RegisterPluginComponent(const char *name, const char *class_name, const char *version) = 0;
     virtual void PostTaskOnComponentThread(const weex::base::Closure closure) = 0;
 #endif
+#if OS_ANDROID
+    virtual void SetPageDirty(const char* page_id, bool dirty) = 0;
+#endif
+
     virtual void SetTimeout(const char* callback_id, const char* time) = 0;
     virtual void NativeLog(const char* str_array) = 0;
     virtual int UpdateFinish(const char* page_id, const char* task, int taskLen,
@@ -228,6 +233,8 @@ class PlatformBridge {
     virtual int Layout(const char* page_id, const char* ref, float top,
                        float bottom, float left, float right, float height,
                        float width, bool isRTL, int index) = 0;
+
+
 
     virtual int UpdateStyle(
         const char* pageId, const char* ref,

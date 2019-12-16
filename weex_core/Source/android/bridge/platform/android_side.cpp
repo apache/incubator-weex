@@ -523,4 +523,11 @@ jobject AndroidSide::getMeasureFunc(const char *pageId, jlong renderObjectPtr) {
 
   return wx_bridge_->GetMeasureFunc(env, pageId, renderObjectPtr).Release();
 }
+void AndroidSide::SetPageDirty(const char *page_id, bool dirty) {
+  JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return;
+
+  wx_bridge_->SetPageDirty(env, page_id, dirty);
+}
 }  // namespace WeexCore

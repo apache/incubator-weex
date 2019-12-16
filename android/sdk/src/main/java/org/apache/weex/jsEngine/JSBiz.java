@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -16,19 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-rootProject.name = 'weex-project'
+package org.apache.weex.jsEngine;
 
-include ":playground"
-project(":playground").projectDir=new File("../weex-playground/android/playground")
+public class JSBiz {
+    private String bizName;
+    private String bizId;
 
-include ":commons"
-project(":commons").projectDir=new File("../weex-playground/android/commons")
-
-include ":weex_sdk"
-project(":weex_sdk").projectDir = new File("sdk")
-
-
-//include ":HeronAndroid"
-//project(":HeronAndroid").projectDir = new File("../../Heron/HeronAndroid")
-
-
+    public JSBiz(String id, String name) {
+        this.bizId = id;
+        this.bizName = name;
+    }
+}

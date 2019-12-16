@@ -61,6 +61,7 @@ import org.apache.weex.common.WXRenderStrategy;
 import org.apache.weex.common.WXRuntimeException;
 import org.apache.weex.common.WXThread;
 import org.apache.weex.dom.CSSShorthand;
+import org.apache.weex.jsEngine.JSEngine;
 import org.apache.weex.layout.ContentBoxMeasurement;
 import org.apache.weex.performance.WXInstanceApm;
 import org.apache.weex.performance.WXStateRecord;
@@ -381,6 +382,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     WXStateRecord.getInstance().recoreJsfmInitHistory("setJsfmInitFlag:"+init);
     if (init == true) {
       onJsFrameWorkInitSuccees();
+      JSEngine.getInstance().engineInitFinished();
     }
   }
 
@@ -909,7 +911,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         WXStateRecord.getInstance().onJSEngineReload(TextUtils.isEmpty(instanceId)?"null":instanceId);
          commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE, WXErrorCode.WX_ERR_RELOAD_PAGE, "reboot jsc Engine", instanceId, url,extInfo);
       }
-
+      JSEngine.getInstance().engineCrashed();
       WXLogUtils.e("reInitCount:"+reInitCount);
 
       if (reInitCount > CRASHREINIT) {

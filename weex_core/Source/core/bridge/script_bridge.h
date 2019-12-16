@@ -160,6 +160,8 @@ class ScriptBridge {
 
     virtual void SetLogType(const int logLevel, const bool isPerf) = 0;
 
+    virtual int64_t JsAction(long ctxContainer, int32_t jsActionType, const char *arg) = 0;
+
     inline ScriptBridge *bridge() { return bridge_; }
 
 

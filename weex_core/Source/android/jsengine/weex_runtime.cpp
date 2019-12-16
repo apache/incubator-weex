@@ -20,6 +20,7 @@
 // Created by Darin on 28/04/2018.
 //
 
+#include <object/js_action.h>
 #include "android/jsengine/weex_runtime.h"
 
 #include "android/jsengine/bridge/script/script_bridge_in_multi_so.h"
@@ -607,15 +608,12 @@ int WeexRuntime::createInstance(const String &instanceId, const String &func, co
                                 const String &extendsApi,
                                 std::vector<INIT_FRAMEWORK_PARAMS*>& params) {
     LOG_TLOG("jsEngine","id --> %s CreateInstance start", instanceId.utf8().data());
-
     JSGlobalObject *impl_globalObject = weexObjectHolder->m_globalObject.get();
     JSGlobalObject *globalObject;
     if (instanceId == "") {
         globalObject = impl_globalObject;
     } else {
-
       WeexGlobalObject * temp_object = nullptr;
-
       auto iterator = weexObjectHolder->m_jsInstanceGlobalObjectMap.find(instanceId.utf8().data());
       if (iterator != weexObjectHolder->m_jsInstanceGlobalObjectMap.end()) {
           temp_object = weexObjectHolder->m_jsInstanceGlobalObjectMap[instanceId.utf8().data()];

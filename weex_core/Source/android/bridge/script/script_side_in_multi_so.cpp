@@ -190,7 +190,14 @@ void ScriptSideInMultiSo::SetLogType(const int logLevel, const bool isPerf) {
     return;
   }
   return script_side_functions_->funcSetLogType(logLevel, isPerf);
+}
 
+int64_t ScriptSideInMultiSo::JsAction(long ctxContainer, int32_t jsActionType, const char *arg) {
+  if(script_side_functions_ == nullptr) {
+    LOGE("ScriptSideInMultiSo::UpdateInitFrameworkParams script_side_functions_ is null");
+    return 0;
+  }
+  return script_side_functions_->funcJSAction(ctxContainer, jsActionType, arg);
 }
 
 }  // namespace script

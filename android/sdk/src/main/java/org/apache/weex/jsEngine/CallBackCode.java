@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -16,19 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-rootProject.name = 'weex-project'
+package org.apache.weex.jsEngine;
 
-include ":playground"
-project(":playground").projectDir=new File("../weex-playground/android/playground")
+public class CallBackCode {
 
-include ":commons"
-project(":commons").projectDir=new File("../weex-playground/android/commons")
+    public static final CallBackCode ERROR_JSENGINE_CRASHED = new CallBackCode(-1, "js engine Crashed");
+    public static final CallBackCode JSENGINE_INIT_FINISH = new CallBackCode(1, "js Engine init finished");
+    public int code;
+    public String msg;
 
-include ":weex_sdk"
-project(":weex_sdk").projectDir = new File("sdk")
-
-
-//include ":HeronAndroid"
-//project(":HeronAndroid").projectDir = new File("../../Heron/HeronAndroid")
-
-
+    private CallBackCode(int code, String msg) {
+        this.code = code;
+        this.msg = msg;
+    }
+}

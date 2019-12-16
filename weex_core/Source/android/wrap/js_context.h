@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -16,19 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-rootProject.name = 'weex-project'
 
-include ":playground"
-project(":playground").projectDir=new File("../weex-playground/android/playground")
+#ifndef WEEX_PROJECT_JS_CONTEXT_H
+#define WEEX_PROJECT_JS_CONTEXT_H
+#include <jni.h>
+#include <base/android/jni/jni_object_wrap.h>
+#include "android/jsengine_ptr_container.h"
+namespace WeexCore {
+class JSContext : public JNIObjectWrap {
+ public:
+  explicit JSContext() {
+  };
 
-include ":commons"
-project(":commons").projectDir=new File("../weex-playground/android/commons")
+  ~JSContext() {
+  }
 
-include ":weex_sdk"
-project(":weex_sdk").projectDir = new File("sdk")
-
-
-//include ":HeronAndroid"
-//project(":HeronAndroid").projectDir = new File("../../Heron/HeronAndroid")
-
-
+  char *JsActionCallBack(const char *method, const char *args);
+  void JsActionException(const char *exception);
+  static bool RegisterJNIUtils(JNIEnv *env);
+};
+}
+#endif //WEEX_PROJECT_JS_CONTEXT_H

@@ -35,6 +35,8 @@
 #include "core/bridge/eagle_bridge.h"
 #include "third_party/json11/json11.hpp"
 #include "core/moniter/render_performance.h"
+#include "core_side_in_platform.h"
+
 #ifdef OS_ANDROID
 #include <android/utils/params_utils.h>
 #include <wson/wson.h>
@@ -645,5 +647,11 @@ double CoreSideInPlatform::GetLayoutTime(const char* instanceId) const {
     return page->getPerformance()->cssLayoutTime;
 }
 
+int64_t CoreSideInPlatform::JsAction(long ctxContainer, int32_t jsActionType, const char *arg) {
+  return WeexCoreManager::Instance()
+      ->script_bridge()
+      ->script_side()
+      ->JsAction(ctxContainer, jsActionType, arg);
+}
 
 }  // namespace WeexCore

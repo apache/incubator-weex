@@ -168,6 +168,8 @@ set(${WEEXJSSERVER_NAME}_SOURCES
         ${WEEX_CORE_SOURCE_DIR}/android/jsengine/object/args.cpp
         ${WEEX_CORE_SOURCE_DIR}/android/jsengine/object/weex_env.h
         ${WEEX_CORE_SOURCE_DIR}/android/jsengine/object/weex_env.cpp
+        ${WEEX_CORE_SOURCE_DIR}/android/jsengine/object/js_action.h
+        ${WEEX_CORE_SOURCE_DIR}/android/jsengine/object/js_action.cpp
 
         weex/task/impl/init_framework_task.cpp
         weex/task/impl/create_app_context_task.cpp
@@ -181,6 +183,7 @@ set(${WEEXJSSERVER_NAME}_SOURCES
         weex/task/impl/exe_js_services_task.cpp
         weex/task/impl/exe_js_on_instance_task.cpp
         weex/task/impl/exe_js_task.cpp
+        weex/task/impl/js_action_task.cpp
         weex/task/impl/take_heap_snapshot.cpp
         weex/task/impl/native_timer_task.cpp
         weex/task/impl/update_init_framework_params_task.cpp

@@ -224,6 +224,9 @@ namespace weex {
 
                 handler->registerHandler(static_cast<uint32_t>(IPCJSMsg::SETLOGLEVEL),
                                          setLogType);
+
+                handler->registerHandler(static_cast<uint32_t>(IPCJSMsg::JSACTION),
+                                         JsAction);
             }
 
             std::unique_ptr<IPCResult> ScriptBridgeInMultiProcess::InitFramework(
@@ -529,6 +532,27 @@ namespace weex {
             Instance()->script_side()->SetLogType(type, perf == 1);
 
             return createVoidResult();
+        }
+
+        std::unique_ptr<IPCResult> ScriptBridgeInMultiProcess::JsAction(
+            IPCArguments *arguments) {
+            LOGD("ScriptBridgeInMultiProcess::JsAction");
+            const long ctxContainer = (long) (arguments->get<int64_t>(0));
+            const int32_t jsActionType = arguments->get<int32_t>(1);
+            
+            if(jsActionType == static_cast<int32_t>(JSACTION::CREATE)) {
+                LOGE_TAG("dyyLog","JSACTION::CREATE")
+                auto jsActionCtx = WeexEnv::getEnv()->createJSAction(ctxContainer);
+                return createInt64Result((long)(jsActionCtx));
+            } else if(jsActionType == static_cast<int32_t>(JSACTION::DESTROY)) {
+                LOGE_TAG("dyyLog", "adelete JSActionTask");
+                WeexEnv::getEnv()->destroyJSAction(ctxContainer);
+                return createInt32Result(static_cast<int32_t>(true));
+            }
+
+            const char *args = GetUTF8StringFromIPCArg(arguments, 2);
+            Instance()->script_side()->JsAction(ctxContainer, jsActionType, args);
+            return createInt32Result(static_cast<int32_t>(true));
         }
 
 
