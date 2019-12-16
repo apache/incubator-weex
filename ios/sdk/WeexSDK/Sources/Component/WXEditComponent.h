@@ -25,7 +25,9 @@
 @interface WXEditComponent : WXComponent<WXDatePickerManagerDelegate,UITextViewDelegate,UITextFieldDelegate>
 
 //attribute
-@property (nonatomic, strong) UIColor *placeholderColor;
+@property (atomic, strong) UIColor *placeholderColor;
+@property (atomic, strong) UIColor *darkSchemePlaceholderColor;
+@property (atomic, strong) UIColor *lightSchemePlaceholderColor;
 @property (nonatomic, strong) NSString *placeholderString;
 @property (nonatomic, strong) UILabel *placeHolderLabel;
 

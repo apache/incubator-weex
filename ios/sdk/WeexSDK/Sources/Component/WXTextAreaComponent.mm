@@ -192,10 +192,10 @@ typedef UITextView WXTextAreaView;
 
 -(void)setAttributedPlaceholder:(NSMutableAttributedString *)attributedString font:(UIFont *)font
 {
-    if (self.placeholderColor) {
-        [attributedString addAttribute:NSForegroundColorAttributeName value:self.placeholderColor range:NSMakeRange(0, self.placeholderString.length)];
-        [attributedString addAttribute:NSFontAttributeName value:font range:NSMakeRange(0, self.placeholderString.length)];
-    }
+    UIColor* placeholderColor = [self.weexInstance chooseColor:self.placeholderColor lightSchemeColor:self.lightSchemePlaceholderColor darkSchemeColor:self.darkSchemePlaceholderColor invert:self.invertForDarkScheme scene:WXColorSceneText];
+    [attributedString addAttribute:NSForegroundColorAttributeName value:placeholderColor range:NSMakeRange(0, self.placeholderString.length)];
+    [attributedString addAttribute:NSFontAttributeName value:font range:NSMakeRange(0, self.placeholderString.length)];
+    
     self.placeHolderLabel.backgroundColor = [UIColor clearColor];
     CGRect expectedLabelSize = [attributedString boundingRectWithSize:(CGSize){self.view.frame.size.width, CGFLOAT_MAX}
                                                               options:NSStringDrawingUsesLineFragmentOrigin
