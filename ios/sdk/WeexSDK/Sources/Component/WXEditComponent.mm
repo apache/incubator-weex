@@ -28,6 +28,7 @@
 #import "WXComponent+PseudoClassManagement.h"
 #import "WXTextInputComponent.h"
 #import "WXComponent+Layout.h"
+#import "WXComponent_internal.h"
 
 @interface WXEditComponent()
 {
@@ -52,7 +53,9 @@
 @property (nonatomic) WXTextStyle fontStyle;
 @property (nonatomic) CGFloat fontWeight;
 @property (nonatomic, strong) NSString *fontFamily;
-@property (nonatomic, strong) UIColor *colorForStyle;
+@property (atomic, strong) UIColor *colorForStyle;
+@property (atomic, strong) UIColor *darkSchemeColorForStyle;
+@property (atomic, strong) UIColor *lightSchemeColorForStyle;
 @property (nonatomic)NSTextAlignment textAlignForStyle;
 
 //event
@@ -142,7 +145,16 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         
         // handle styles
         if (styles[@"color"]) {
-            _colorForStyle = [WXConvert UIColor:styles[@"color"]];
+            self.colorForStyle = [WXConvert UIColor:styles[@"color"]];
+        }
+        else {
+            self.colorForStyle = [UIColor blackColor];
+        }
+        if (styles[@"weexDarkSchemeColor"]) {
+            self.darkSchemeColorForStyle = [WXConvert UIColor:styles[@"weexDarkSchemeColor"]];
+        }
+        if (styles[@"weexLightSchemeColor"]) {
+            self.lightSchemeColorForStyle = [WXConvert UIColor:styles[@"weexLightSchemeColor"]];
         }
         if (styles[@"fontSize"]) {
             _fontSize = [WXConvert WXPixelType:styles[@"fontSize"] scaleFactor:self.weexInstance.pixelScaleFactor];
@@ -160,9 +172,15 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
             _textAlignForStyle = [WXConvert NSTextAlignment:styles[@"textAlign"]];
         }
         if (styles[@"placeholderColor"]) {
-            _placeholderColor = [WXConvert UIColor:styles[@"placeholderColor"]];
+            self.placeholderColor = [WXConvert UIColor:styles[@"placeholderColor"]];
         }else {
-            _placeholderColor = [UIColor colorWithRed:0x99/255.0 green:0x99/255.0 blue:0x99/255.0 alpha:1.0];
+            self.placeholderColor = [UIColor colorWithRed:0x99/255.0 green:0x99/255.0 blue:0x99/255.0 alpha:1.0];
+        }
+        if (styles[@"weexDarkSchemePlaceholderColor"]) {
+            self.darkSchemePlaceholderColor = [WXConvert UIColor:styles[@"weexDarkSchemePlaceholderColor"]];
+        }
+        if (styles[@"weexLightSchemePlaceholderColor"]) {
+            self.lightSchemePlaceholderColor = [WXConvert UIColor:styles[@"weexLightSchemePlaceholderColor"]];
         }
     }
     
@@ -187,7 +205,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     [self setTextFont];
     [self setPlaceholderAttributedString];
     [self setTextAlignment];
-    [self setTextColor:_colorForStyle];
+    [self setTextColor:[self.weexInstance chooseColor:self.colorForStyle lightSchemeColor:self.lightSchemeColorForStyle darkSchemeColor:self.darkSchemeColorForStyle invert:self.invertForDarkScheme scene:WXColorSceneText]];
     [self setText:_value];
     [self setEnabled:!_disabled];
     [self setRows:_rows];
@@ -298,6 +316,11 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
 
 - (void)setText:(NSString *)text
 {
+}
+
+- (void)_setTextColor
+{
+    [self setTextColor:[self.weexInstance chooseColor:self.colorForStyle lightSchemeColor:self.lightSchemeColorForStyle darkSchemeColor:self.darkSchemeColorForStyle invert:self.invertForDarkScheme scene:WXColorSceneText]];
 }
 
 -(void)setTextColor:(UIColor *)color
@@ -479,10 +502,23 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
 
 - (void)updateStyles:(NSDictionary *)styles
 {
+    BOOL colorChanged = NO;
     if (styles[@"color"]) {
-        _colorForStyle = [WXConvert UIColor:styles[@"color"]];
-        [self setTextColor:_colorForStyle];
+        self.colorForStyle = [WXConvert UIColor:styles[@"color"]];
+        colorChanged = YES;
     }
+    if (styles[@"weexDarkSchemeColor"]) {
+        self.darkSchemeColorForStyle = [WXConvert UIColor:styles[@"weexDarkSchemeColor"]];
+        colorChanged = YES;
+    }
+    if (styles[@"weexLightSchemeColor"]) {
+        self.lightSchemeColorForStyle = [WXConvert UIColor:styles[@"weexLightSchemeColor"]];
+        colorChanged = YES;
+    }
+    if (colorChanged) {
+        [self _setTextColor];
+    }
+    
     if (styles[@"fontSize"]) {
         _fontSize = [WXConvert WXPixelType:styles[@"fontSize"] scaleFactor:self.weexInstance.pixelScaleFactor];
     }
@@ -501,12 +537,26 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         _textAlignForStyle = [WXConvert NSTextAlignment:styles[@"textAlign"]];
         [self setTextAlignment:_textAlignForStyle] ;
     }
+    
+    BOOL placeholderColorChanged = NO;
     if (styles[@"placeholderColor"]) {
-        _placeholderColor = [WXConvert UIColor:styles[@"placeholderColor"]];
+        self.placeholderColor = [WXConvert UIColor:styles[@"placeholderColor"]];
+        placeholderColorChanged = YES;
     }else {
-        _placeholderColor = [UIColor colorWithRed:0x99/255.0 green:0x99/255.0 blue:0x99/255.0 alpha:1.0];
+        self.placeholderColor = [UIColor colorWithRed:0x99/255.0 green:0x99/255.0 blue:0x99/255.0 alpha:1.0];
     }
-    [self setPlaceholderAttributedString];
+    if (styles[@"weexDarkSchemePlaceholderColor"]) {
+        self.darkSchemePlaceholderColor = [WXConvert UIColor:styles[@"weexDarkSchemePlaceholderColor"]];
+        placeholderColorChanged = YES;
+    }
+    if (styles[@"weexLightSchemePlaceholderColor"]) {
+        self.lightSchemePlaceholderColor = [WXConvert UIColor:styles[@"weexLightSchemePlaceholderColor"]];
+        placeholderColorChanged = YES;
+    }
+    if (placeholderColorChanged && [self.placeHolderLabel.text length] > 0) {
+        [self setPlaceholderAttributedString];
+    }
+    
     [self updatePattern];
 }
 
@@ -825,8 +875,9 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
 
 - (void)setPlaceholderAttributedString
 {
+    UIColor* placeholderColor = [self.weexInstance chooseColor:self.placeholderColor lightSchemeColor:self.lightSchemePlaceholderColor darkSchemeColor:self.darkSchemePlaceholderColor invert:self.invertForDarkScheme scene:WXColorSceneText];
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:_placeholderString];
-    [attributedString addAttribute:NSForegroundColorAttributeName value:_placeholderColor range:NSMakeRange(0, _placeholderString.length)];
+    [attributedString addAttribute:NSForegroundColorAttributeName value:placeholderColor range:NSMakeRange(0, _placeholderString.length)];
     UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor];
     [self setAttributedPlaceholder:attributedString font:font];
 }
@@ -986,13 +1037,39 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
 #pragma mark -reset color
 - (void)resetStyles:(NSArray *)styles
 {
+    BOOL colorChanged = NO;
     if ([styles containsObject:@"color"]) {
-        [self setTextColor:[UIColor blackColor]];
+        self.colorForStyle = [UIColor blackColor];
+        colorChanged = YES;
     }
+    if ([styles containsObject:@"weexDarkSchemeColor"]) {
+        self.darkSchemeColorForStyle = nil;
+        colorChanged = YES;
+    }
+    if ([styles containsObject:@"weexLightSchemeColor"]) {
+        self.lightSchemeColorForStyle = nil;
+        colorChanged = YES;
+    }
+    if (colorChanged) {
+        [self _setTextColor];
+    }
+    
     if ([styles containsObject:@"fontSize"]) {
         _fontSize = WX_TEXT_FONT_SIZE;
         [self setTextFont];
     }
 }
+
+- (void)schemeDidChange:(NSString*)scheme
+{
+    [super schemeDidChange:scheme];
+    if (_view) {
+        [self _setTextColor];
+        if ([self.placeHolderLabel.text length] > 0) {
+            [self setPlaceholderAttributedString];
+        }
+    }
+}
+
 @end
 
