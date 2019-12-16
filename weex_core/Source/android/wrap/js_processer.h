@@ -16,9 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-//
-// Created by 董亚运 on 2019-10-23.
-//
 
 #ifndef WEEX_PROJECT_JS_PROCESSER_H
 #define WEEX_PROJECT_JS_PROCESSER_H

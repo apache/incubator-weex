@@ -16,9 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-//
-// Created by 董亚运 on 2019-08-18.
-//
 
 #include "android/jsengine/object/weex_env.h"
 #include "js_action_task.h"

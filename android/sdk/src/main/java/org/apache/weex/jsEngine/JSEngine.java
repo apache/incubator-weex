@@ -18,19 +18,17 @@
  */
 package org.apache.weex.jsEngine;
 
+import static org.apache.weex.jsEngine.CallBackCode.ERROR_JSENGINE_CRASHED;
+import static org.apache.weex.jsEngine.CallBackCode.JSENGINE_INIT_FINISH;
+
+import android.annotation.SuppressLint;
 import android.support.annotation.Nullable;
-import android.util.Log;
-
-import org.apache.weex.WXSDKEngine;
-import org.apache.weex.utils.WXLogUtils;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static org.apache.weex.jsEngine.CallBackCode.ERROR_JSENGINE_CRASHED;
-import static org.apache.weex.jsEngine.CallBackCode.JSENGINE_INIT_FINISH;
+import org.apache.weex.WXSDKEngine;
+import org.apache.weex.utils.WXLogUtils;
 
 public class JSEngine implements Serializable {
     private static JSEngine mJsEngine = null;
@@ -83,6 +81,7 @@ public class JSEngine implements Serializable {
         }
     }
 
+    @SuppressLint("UseSparseArrays")
     public void engineCrashed() {
         for (Map.Entry<JSBiz, EnvCallback> next : mEnvCallbacks.entrySet()) {
             next.getValue().error(ERROR_JSENGINE_CRASHED);

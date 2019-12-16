@@ -16,9 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-//
-// Created by 董亚运 on 2019-08-18.
-//
 
 #include <android/base/string/scoped_jstring_utf8.h>
 #include <android/base/string/string_utils.h>

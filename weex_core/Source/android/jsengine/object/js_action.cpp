@@ -16,9 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-//
-// Created by 董亚运 on 2019-08-10.
-//
+
 #include "js_action.h"
 #include "weex_env.h"
 

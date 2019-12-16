@@ -16,9 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-//
-// Created by 董亚运 on 2019-08-10.
-//
 
 #ifndef WEEX_PROJECT_RUN_JS_NOT_FOR_WEEX_H
 #define WEEX_PROJECT_RUN_JS_NOT_FOR_WEEX_H

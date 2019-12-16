@@ -16,9 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-//
-// Created by 董亚运 on 2019-10-23.
-//
 
 #include "js_processer.h"
 namespace android {
