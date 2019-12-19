@@ -27,5 +27,5 @@
 #include "../../base/log_defines.h"
 
 #define IPC_LOGE(format, ...) LOGE(format, ##__VA_ARGS__)
-#define IPC_LOGD(format, ...) ((void)0) //disable ipc logD
+#define IPC_LOGD(format, ...) LOGD(format, ##__VA_ARGS__)
 #endif /* IPCLOG_H */

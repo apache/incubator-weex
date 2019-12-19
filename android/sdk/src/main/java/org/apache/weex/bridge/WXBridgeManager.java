@@ -1989,6 +1989,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         }
       }, instance, "ExecJsEagle").run();
       if (mode == WXEaglePlugin.EAGLE_ONLY){
+        if (null != instance){
+          long diff = System.currentTimeMillis()-start;
+          instance.getApmForInstance().updateFSDiffStats(WXInstanceApm.KEY_PAGE_STATS_FS_CALL_JS_NUM,1);
+          instance.getApmForInstance().updateFSDiffStats(WXInstanceApm.KEY_PAGE_STATS_FS_CALL_JS_TIME,diff);
+          instance.callJsTime(diff);
+        }
         return;
       }
       //assert mode == WXEaglePlugin.EAGLE_AND_SCRIPT

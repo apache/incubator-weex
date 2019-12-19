@@ -29,46 +29,49 @@ import org.apache.weex.utils.WXLogUtils;
 import org.apache.weex.utils.WXSoInstallMgrSdk;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class WXEaglePluginManager {
   private static final String LOG_TAG = "WXEaglePluginManager";
+
   private static class InstHolder {
+
     private static final WXEaglePluginManager INST = new WXEaglePluginManager();
   }
+
   private Map<String, WXEaglePlugin> mPluginMap = new ConcurrentHashMap<>();
-  private Map<String, Pair<IFComponentHolder, Map<String, Object>>> mCompCache = new ConcurrentHashMap<>();
-  private Map<String, Pair<ModuleFactory, Boolean>> mModuleCache = new ConcurrentHashMap<>();
+
   public static WXEaglePluginManager getInstance() {
     return InstHolder.INST;
   }
+
   private WXEaglePluginManager() {
   }
+
   public void register(WXEaglePlugin plugin) {
     if (plugin == null || TextUtils.isEmpty(plugin.getPluginName())) {
       return;
     }
     WXEaglePlugin old = mPluginMap.put(plugin.getPluginName(), plugin);
-    //If plugin register is delayed.
-    for (Map.Entry<String, Pair<IFComponentHolder, Map<String, Object>>> entry : mCompCache.entrySet()) {
-      plugin.registerComponent(entry.getKey(),entry.getValue().first, entry.getValue().second);
-    }
-    for (Map.Entry<String, Pair<ModuleFactory, Boolean>> entry : mModuleCache.entrySet()) {
-      plugin.registerModules(entry.getKey(),entry.getValue().first, entry.getValue().second);
-    }
     if (old != null) {
       WXLogUtils.w(LOG_TAG, "Register plugin already exist: " + plugin.getPluginName());
     }
   }
+
   void initSo(@SuppressWarnings("SameParameterValue") int version, IWXUserTrackAdapter userTrackAdapter) {
     for (WXEaglePlugin plugin : mPluginMap.values()) {
       WXSoInstallMgrSdk.initSo(plugin.getSoLibName(), version, userTrackAdapter);
     }
   }
+
   public WXEaglePlugin getPlugin(String type) {
     if (type == null) {
       return null;
     }
     return mPluginMap.get(type);
   }
+
   public Pair<String, WXEaglePlugin> filterUrl(String url) {
     for (Map.Entry<String, WXEaglePlugin> entry : mPluginMap.entrySet()) {
       String result = entry.getValue().isSupportedUrl(url);
@@ -79,18 +82,19 @@ public class WXEaglePluginManager {
     }
     return null;
   }
+
   public void registerComponent(String type, IFComponentHolder holder, Map<String, Object> componentInfo) {
-    mCompCache.put(type, Pair.create(holder, componentInfo));
     for (WXEaglePlugin plugin : mPluginMap.values()) {
       plugin.registerComponent(type, holder, componentInfo);
     }
   }
+
   public void registerModule(String moduleName, ModuleFactory factory, boolean global) {
-    mModuleCache.put(moduleName, Pair.create(factory, global));
     for (WXEaglePlugin plugin : mPluginMap.values()) {
       plugin.registerModules(moduleName, factory, global);
     }
   }
+
   public boolean callEagleTaskFromWeex(String type, String task, JSONObject option) {
     boolean support = false;
     if (TextUtils.isEmpty(type)) {
@@ -105,6 +109,7 @@ public class WXEaglePluginManager {
     }
     return support;
   }
+
   //TODO(Eagle) remove later
   static String getPluginName(WXRenderStrategy strategy) {
     if (strategy == WXRenderStrategy.DATA_RENDER) {
@@ -115,6 +120,7 @@ public class WXEaglePluginManager {
       return null;
     }
   }
+
   //TODO(Eagle) remove later
   static WXRenderStrategy getRenderStrategyByPlugin(String name) {
     switch (name) {
@@ -125,4 +131,5 @@ public class WXEaglePluginManager {
     }
     return null;
   }
+
 }

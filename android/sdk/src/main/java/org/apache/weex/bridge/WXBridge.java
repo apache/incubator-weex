@@ -74,14 +74,6 @@ import java.util.Map;
 
   public native String nativeExecJSOnInstance(String instanceId, String script, int type);
 
-  public native void nativeFireEventOnDataRenderNode(String instanceId, String ref, String type, String data, String domChanges);
-
-  public native void nativeInvokeCallbackOnDataRender(String instanceId, String callbackId, String data, boolean keepAlive);
-
-  public native void nativeRegisterModuleOnDataRenderNode( String data);
-
-  public native void nativeRegisterComponentOnDataRenderNode( String data);
-
   private native void nativeTakeHeapSnapshot(String filename);
 
   private native void nativeBindMeasurementToRenderObject(long ptr);
@@ -911,21 +903,6 @@ import java.util.Map;
     }
   }
 
-  public void fireEventOnDataRenderNode(String instanceId, String ref, String type, String data, String domChanges) {
-    nativeFireEventOnDataRenderNode(instanceId,ref,type,data, domChanges);
-  }
-
-  public void invokeCallbackOnDataRender(String instanceId, String callbackId, String data, boolean keepAlive) {
-    nativeInvokeCallbackOnDataRender(instanceId,callbackId,data, keepAlive);
-  }
-
-  public void registerModuleOnDataRenderNode(String data) {
-    nativeRegisterModuleOnDataRenderNode(data);
-  }
-
-  public void registerComponentOnDataRenderNode(String data) {
-    nativeRegisterComponentOnDataRenderNode(data);
-  }
   public void reloadPageLayout(String instanceId){
     nativeReloadPageLayout(instanceId);
   }

@@ -34,7 +34,7 @@ import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.support.annotation.WorkerThread;
 import android.support.v4.util.ArrayMap;
-import android.support.v4.util.Pair;
+import android.util.Pair;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.View;
@@ -1018,11 +1018,23 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
 
   public boolean skipFrameworkInit(){
-    return isDataRender() && getEaglePlugin().isSkipFrameworkInit(getInstanceId()) && !mDisableSkipFrameworkInit;
+    return getEaglePlugin() != null && getEaglePlugin().isSkipFrameworkInit(getInstanceId()) && !mDisableSkipFrameworkInit;
   }
 
   private boolean isDataRender() {
     return getEaglePlugin() != null;
+  }
+
+  private String  filterUrlByEaglePlugin(String url){
+    Pair<String, WXEaglePlugin> eaglePluginPair = WXEaglePluginManager.getInstance().filterUrl(url);
+    if (eaglePluginPair != null){
+      url = eaglePluginPair.first;
+      mEaglePlugin = eaglePluginPair.second;
+      mEaglePluginName = mEaglePlugin.getPluginName();
+      mRenderStrategy = WXEaglePluginManager.getRenderStrategyByPlugin(mEaglePluginName);
+      return url;
+    }
+    return null;
   }
 
   private void renderByUrlInternal(String pageName,
@@ -1043,12 +1055,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
 
     //process eagle, overwrite plugin & renderStrategy.
-    Pair<String, WXEaglePlugin> eaglePluginPair = WXEaglePluginManager.getInstance().filterUrl(url);
-    if (eaglePluginPair != null){
-      url = eaglePluginPair.first;
-      mEaglePlugin = eaglePluginPair.second;
-      mEaglePluginName = mEaglePlugin.getPluginName();
-      mRenderStrategy = WXEaglePluginManager.getRenderStrategyByPlugin(mEaglePluginName);
+    String eagleUrl = filterUrlByEaglePlugin(url);
+    if (eagleUrl != null){
+      url = eagleUrl;
       flag = mRenderStrategy;
     }
 
