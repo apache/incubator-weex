@@ -168,14 +168,15 @@ CGFloat WXFloorPixelValue(CGFloat value)
 + (BOOL)isSystemInDarkScheme
 {
     if (@available(iOS 13.0, *)) {
-        id<WXDarkSchemeProtocol> darkSchemeHandler = [WXSDKInstance darkSchemeColorHandler];
-        if ([darkSchemeHandler respondsToSelector:@selector(isApplicationUsingDarkScheme)]) {
-            return [darkSchemeHandler isApplicationUsingDarkScheme];
-        }
-        
         __block BOOL result = NO;
         WXPerformBlockSyncOnMainThread(^{
 #ifdef __IPHONE_13_0
+            id<WXDarkSchemeProtocol> darkSchemeHandler = [WXSDKInstance darkSchemeColorHandler];
+            if ([darkSchemeHandler respondsToSelector:@selector(isApplicationUsingDarkScheme)]) {
+                result = [darkSchemeHandler isApplicationUsingDarkScheme];
+                return;
+            }
+            
             if ([UITraitCollection currentTraitCollection].userInterfaceStyle == UIUserInterfaceStyleDark) {
                 result = YES;
             }
