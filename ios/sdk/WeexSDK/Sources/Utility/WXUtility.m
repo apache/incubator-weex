@@ -38,6 +38,7 @@
 #import "WXConfigCenterProtocol.h"
 #import "WXTextComponent.h"
 #import "WXAssert.h"
+#import "WXDarkSchemeProtocol.h"
 
 #define KEY_PASSWORD  @"com.taobao.Weex.123456"
 #define KEY_USERNAME_PASSWORD  @"com.taobao.Weex.weex123456"
@@ -167,6 +168,11 @@ CGFloat WXFloorPixelValue(CGFloat value)
 + (BOOL)isSystemInDarkScheme
 {
     if (@available(iOS 13.0, *)) {
+        id<WXDarkSchemeProtocol> darkSchemeHandler = [WXSDKInstance darkSchemeColorHandler];
+        if ([darkSchemeHandler respondsToSelector:@selector(isApplicationUsingDarkScheme)]) {
+            return [darkSchemeHandler isApplicationUsingDarkScheme];
+        }
+        
         __block BOOL result = NO;
         WXPerformBlockSyncOnMainThread(^{
 #ifdef __IPHONE_13_0

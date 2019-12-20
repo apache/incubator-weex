@@ -23,6 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol WXDarkSchemeProtocol <WXModuleProtocol>
 
+@required
+
 /**
  Return YES so that Weex root component will be enabled for 'invertForDarkScheme' property.
 */
@@ -43,6 +45,15 @@ After any view of Weex component is created. Callback dark scheme handler to pro
  @return Inverted color.
  */
 - (UIColor *_Nullable)getInvertedColorFor:(UIColor *_Nonnull)color ofScene:(WXColorScene)scene withDefault:(UIColor *_Nullable)defaultColor;
+
+@optional
+
+/**
+ Using [UITraitCollection currentTraitCollection] will only get system value of
+ dark mode. But application itself might also switch off or on dark mode ignoring
+ setting of system.
+ */
+- (BOOL)isApplicationUsingDarkScheme;
 
 @end
 
