@@ -1200,12 +1200,7 @@ typedef enum : NSUInteger {
 
 + (id<WXDarkSchemeProtocol>)darkSchemeColorHandler
 {
-    static id<WXDarkSchemeProtocol> colorHandler;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        colorHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDarkSchemeProtocol)];
-    });
-    return colorHandler;
+    return [WXHandlerFactory handlerForProtocol:@protocol(WXDarkSchemeProtocol)];
 }
 
 - (NSString*)currentSchemeName
