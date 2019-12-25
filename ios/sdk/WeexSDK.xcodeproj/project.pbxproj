@@ -339,6 +339,13 @@
 		841CD1051F974DFA0081196D /* WXExceptionUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 841CD1041F97399C0081196D /* WXExceptionUtils.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		841CD1061F974DFA0081196D /* WXExceptionUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 841CD1041F97399C0081196D /* WXExceptionUtils.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		841CD1071F974E000081196D /* WXExceptionUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 841CD1021F9739890081196D /* WXExceptionUtils.m */; };
+		980341F323B36830000533A6 /* eagle_bridge_ext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 980341F123B3682F000533A6 /* eagle_bridge_ext.cpp */; };
+		980341F423B36830000533A6 /* eagle_bridge_ext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 980341F123B3682F000533A6 /* eagle_bridge_ext.cpp */; };
+		980341F523B36830000533A6 /* eagle_bridge_ext.h in Headers */ = {isa = PBXBuildFile; fileRef = 980341F223B36830000533A6 /* eagle_bridge_ext.h */; };
+		980341F623B36830000533A6 /* eagle_bridge_ext.h in Headers */ = {isa = PBXBuildFile; fileRef = 980341F223B36830000533A6 /* eagle_bridge_ext.h */; };
+		986CEAA723B230C2004166E0 /* WXEaglePlugin.h in Headers */ = {isa = PBXBuildFile; fileRef = 986CEAA423B230C2004166E0 /* WXEaglePlugin.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		986CEAA823B230C2004166E0 /* WXEaglePluginManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 986CEAA523B230C2004166E0 /* WXEaglePluginManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		986CEAA923B230C2004166E0 /* WXEaglePluginManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 986CEAA623B230C2004166E0 /* WXEaglePluginManager.mm */; };
 		9B9E74791FA2DB5800DAAEA9 /* WXTestBridgeMethodDummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B9E74781FA2DB5800DAAEA9 /* WXTestBridgeMethodDummy.m */; };
 		B82A159820F8556F0098A509 /* WXSDKInstance_performance.m in Sources */ = {isa = PBXBuildFile; fileRef = 17B1221F2090AA9300387E33 /* WXSDKInstance_performance.m */; };
 		B82A159920F857200098A509 /* WXSDKError.m in Sources */ = {isa = PBXBuildFile; fileRef = 17B122242090AAB000387E33 /* WXSDKError.m */; };
@@ -566,7 +573,6 @@
 		BD88C14A22F02128004467AA /* render_action_update_richtext_child_style.h in Headers */ = {isa = PBXBuildFile; fileRef = BD88C14722F02128004467AA /* render_action_update_richtext_child_style.h */; };
 		BD88C14B22F02128004467AA /* render_action_update_richtext_child_style.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD88C14822F02128004467AA /* render_action_update_richtext_child_style.cpp */; };
 		BD88C14C22F02128004467AA /* render_action_update_richtext_child_style.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD88C14822F02128004467AA /* render_action_update_richtext_child_style.cpp */; };
-		BD9205F82236518700EDF93D /* WXDataRenderHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = BD9205F72236518700EDF93D /* WXDataRenderHandler.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BD9205FB223651D900EDF93D /* eagle_bridge.h in Headers */ = {isa = PBXBuildFile; fileRef = BD9205F9223651D800EDF93D /* eagle_bridge.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BD9205FC223651D900EDF93D /* eagle_bridge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD9205FA223651D800EDF93D /* eagle_bridge.cpp */; };
 		BDEEADBA22F2902E0099F1D7 /* time_calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDEEADB822F2902D0099F1D7 /* time_calculator.cpp */; };
@@ -1206,6 +1212,11 @@
 		77E65A181C155F25008B8775 /* WXScrollerComponent.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WXScrollerComponent.mm; sourceTree = "<group>"; };
 		841CD1021F9739890081196D /* WXExceptionUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXExceptionUtils.m; sourceTree = "<group>"; };
 		841CD1041F97399C0081196D /* WXExceptionUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXExceptionUtils.h; sourceTree = "<group>"; };
+		980341F123B3682F000533A6 /* eagle_bridge_ext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = eagle_bridge_ext.cpp; sourceTree = "<group>"; };
+		980341F223B36830000533A6 /* eagle_bridge_ext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = eagle_bridge_ext.h; sourceTree = "<group>"; };
+		986CEAA423B230C2004166E0 /* WXEaglePlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXEaglePlugin.h; sourceTree = "<group>"; };
+		986CEAA523B230C2004166E0 /* WXEaglePluginManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXEaglePluginManager.h; sourceTree = "<group>"; };
+		986CEAA623B230C2004166E0 /* WXEaglePluginManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WXEaglePluginManager.mm; sourceTree = "<group>"; };
 		9B9E74771FA2DB5800DAAEA9 /* WXTestBridgeMethodDummy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXTestBridgeMethodDummy.h; sourceTree = "<group>"; };
 		9B9E74781FA2DB5800DAAEA9 /* WXTestBridgeMethodDummy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTestBridgeMethodDummy.m; sourceTree = "<group>"; };
 		B8394F3521468AF100CA1EFF /* render_action_trigger_vsync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_action_trigger_vsync.h; sourceTree = "<group>"; };
@@ -1318,7 +1329,6 @@
 		BD88C14222F02120004467AA /* render_action_update_richtext_child_attr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_action_update_richtext_child_attr.cpp; sourceTree = "<group>"; };
 		BD88C14722F02128004467AA /* render_action_update_richtext_child_style.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_action_update_richtext_child_style.h; sourceTree = "<group>"; };
 		BD88C14822F02128004467AA /* render_action_update_richtext_child_style.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_action_update_richtext_child_style.cpp; sourceTree = "<group>"; };
-		BD9205F72236518700EDF93D /* WXDataRenderHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXDataRenderHandler.h; sourceTree = "<group>"; };
 		BD9205F9223651D800EDF93D /* eagle_bridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = eagle_bridge.h; sourceTree = "<group>"; };
 		BD9205FA223651D800EDF93D /* eagle_bridge.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = eagle_bridge.cpp; sourceTree = "<group>"; };
 		BDEEADB822F2902D0099F1D7 /* time_calculator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = time_calculator.cpp; sourceTree = "<group>"; };
@@ -1772,6 +1782,7 @@
 		77D161181C02DCB90010B15B /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				986CEAA323B230C2004166E0 /* Plugin */,
 				17036A4B20FDE7090029AE3D /* Performance */,
 				DCA446261EFA5DAF00D0CFA8 /* WeexSDK.h */,
 				2AF626C61C191E2200E71A38 /* Layout */,
@@ -1785,7 +1796,6 @@
 				59A583031CF5B2FD0081FD3E /* Handler */,
 				77E659D71C07F585008B8775 /* Module */,
 				77D161481C02E3670010B15B /* Utility */,
-				BD9205F62236518700EDF93D /* Eagle */,
 				77D1611D1C02DDA40010B15B /* Engine */,
 				77D161191C02DD3C0010B15B /* Bridge */,
 				77D1611A1C02DD3C0010B15B /* Manager */,
@@ -2066,6 +2076,16 @@
 			path = Component;
 			sourceTree = "<group>";
 		};
+		986CEAA323B230C2004166E0 /* Plugin */ = {
+			isa = PBXGroup;
+			children = (
+				986CEAA423B230C2004166E0 /* WXEaglePlugin.h */,
+				986CEAA523B230C2004166E0 /* WXEaglePluginManager.h */,
+				986CEAA623B230C2004166E0 /* WXEaglePluginManager.mm */,
+			);
+			path = Plugin;
+			sourceTree = "<group>";
+		};
 		A5818E244F9E235722E3B938 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -2147,6 +2167,8 @@
 		B8D66B242125572F003960BD /* bridge */ = {
 			isa = PBXGroup;
 			children = (
+				980341F123B3682F000533A6 /* eagle_bridge_ext.cpp */,
+				980341F223B36830000533A6 /* eagle_bridge_ext.h */,
 				BD9205FA223651D800EDF93D /* eagle_bridge.cpp */,
 				BD9205F9223651D800EDF93D /* eagle_bridge.h */,
 				B8D66B252125572F003960BD /* platform_bridge.h */,
@@ -2382,14 +2404,6 @@
 			path = ../../../../weex_core/Source/base;
 			sourceTree = "<group>";
 		};
-		BD9205F62236518700EDF93D /* Eagle */ = {
-			isa = PBXGroup;
-			children = (
-				BD9205F72236518700EDF93D /* WXDataRenderHandler.h */,
-			);
-			path = Eagle;
-			sourceTree = "<group>";
-		};
 		C4F012711E1502A6003378D0 /* WebSocket */ = {
 			isa = PBXGroup;
 			children = (
@@ -2435,6 +2449,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				F75C591C2313C1FC002FFF94 /* WXStreamModule.h in Headers */,
+				986CEAA723B230C2004166E0 /* WXEaglePlugin.h in Headers */,
+				986CEAA823B230C2004166E0 /* WXEaglePluginManager.h in Headers */,
 				74A4BA9E1CB3C0A100195969 /* WXHandlerFactory.h in Headers */,
 				59A583081CF5B2FD0081FD3E /* WXNavigationDefaultImpl.h in Headers */,
 				2A837AB61CD9DE9200AEDF03 /* WXRefreshComponent.h in Headers */,
@@ -2653,6 +2669,7 @@
 				744D610C1E49978200B624B3 /* WXHeaderComponent.h in Headers */,
 				B8D66C1521255730003960BD /* wx_type_define.h in Headers */,
 				B8D66C7921255730003960BD /* render_list.h in Headers */,
+				980341F523B36830000533A6 /* eagle_bridge_ext.h in Headers */,
 				B8D66C3321255730003960BD /* render_action_update_attr.h in Headers */,
 				77D1613C1C02DEA60010B15B /* WXJSCoreBridge.h in Headers */,
 				74D205201E091B8000128F44 /* WXCallJSMethod.h in Headers */,
@@ -2903,6 +2920,7 @@
 				B8D66C1021255730003960BD /* core_side_in_platform.h in Headers */,
 				DCA445D41EFA594E00D0CFA8 /* UIBezierPath+Weex.h in Headers */,
 				DCA446031EFA5A5200D0CFA8 /* WXCanvasModule.h in Headers */,
+				980341F623B36830000533A6 /* eagle_bridge_ext.h in Headers */,
 				B8D66C4221255730003960BD /* render_action_add_event.h in Headers */,
 				DCA445EF1EFA5A1800D0CFA8 /* WXSwitchComponent.h in Headers */,
 				B8D66CB421255730003960BD /* make_copyable.h in Headers */,
@@ -3211,10 +3229,12 @@
 				33CE19102153443000CF9670 /* WXJSFrameworkLoadDefaultImpl.m in Sources */,
 				B8D66C7321255730003960BD /* render_list.cpp in Sources */,
 				740451EB1E14BB26004157CB /* WXServiceFactory.m in Sources */,
+				980341F323B36830000533A6 /* eagle_bridge_ext.cpp in Sources */,
 				B8D66C6521255730003960BD /* render_mask.cpp in Sources */,
 				77E659DB1C07F594008B8775 /* WXDomModule.m in Sources */,
 				D3FC0DF81C508B2A002B9E31 /* WXTimerModule.m in Sources */,
 				594C28921CF9E61A009793A4 /* WXAnimationModule.m in Sources */,
+				986CEAA923B230C2004166E0 /* WXEaglePluginManager.mm in Sources */,
 				B8D66C6F21255730003960BD /* render_object.cpp in Sources */,
 				BD88C13D22F02111004467AA /* render_action_remove_child_from_richtext.cpp in Sources */,
 				59A5961D1CB630F10012CD52 /* WXComponent+Navigation.m in Sources */,
@@ -3424,6 +3444,7 @@
 				DCA445491EFA55B300D0CFA8 /* WXRefreshComponent.mm in Sources */,
 				B8D66CA021255730003960BD /* json11.cc in Sources */,
 				DCA4454A1EFA55B300D0CFA8 /* WXEmbedComponent.m in Sources */,
+				980341F423B36830000533A6 /* eagle_bridge_ext.cpp in Sources */,
 				74B81AE81F73C3E900D3A61D /* WXRecycleListTemplateManager.m in Sources */,
 				DCA4454B1EFA55B300D0CFA8 /* WXVideoComponent.m in Sources */,
 				74B81AE61F73C3E900D3A61D /* WXRecycleListDataManager.m in Sources */,

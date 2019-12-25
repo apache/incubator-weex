@@ -70,6 +70,8 @@ FOUNDATION_EXPORT const unsigned char WeexSDKVersionString[];
 #import <WeexSDK/WXExceptionUtils.h>
 #import <WeexSDK/WXEventModuleProtocol.h>
 #import <WeexSDK/WXErrorView.h>
+#import <WeexSDK/WXEaglePluginManager.h>
+#import <WeexSDK/WXEaglePlugin.h>
 #import <WeexSDK/WXDefine.h>
 #import <WeexSDK/WXDebugTool.h>
 #import <WeexSDK/WXDataRenderHandler.h>

@@ -29,7 +29,7 @@
 #include <mutex>
 
 namespace WeexCore {
-namespace EagleExt{
+namespace EagleExt {
 
 //this must stay in weex because weex_core_manager.h has inline static which can't be compiled into Eagle so.
 

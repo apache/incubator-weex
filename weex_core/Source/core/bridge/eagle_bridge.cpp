@@ -38,11 +38,11 @@ void EagleBridge::CreatePage(const char* plugin_type,
                              int script_length,
                              const char* opts,
                              const char* initData,
-                             const char* extendsApi) {
+                             const char* extendsApi, std::function<void(const char*, const char*)> callback) {
   const auto& it = pages_.find(instanceId);
   if (it == pages_.end()){
     DataRenderHandler* plugin = get_data_render_handler(plugin_type);
-    if (!plugin){
+    if (!plugin) {
       std::string err = std::string("EagleBridge plugin not exist: ") + plugin_type;
       weex_core_handler()->ReportException(instanceId, "CreateInstance", err.c_str());
       LOGE("%s", err.c_str());
@@ -50,7 +50,7 @@ void EagleBridge::CreatePage(const char* plugin_type,
     }
 
     pages_[instanceId] = plugin;
-    plugin->CreatePage(instanceId, func, script, script_length, opts, initData, extendsApi);
+    plugin->CreatePage(instanceId, func, script, script_length, opts, initData, extendsApi, callback);
   } else {
     LOGE("ReCreate Page of InstanceId: %s", instanceId);
   }
@@ -313,9 +313,9 @@ static std::string ParsePlatformResultToString(const std::unique_ptr<ValueWithTy
         if (result->value.string->length > 0) {
           const auto& basic_string = weex::base::to_utf8(result->value.string->content,
                                                          result->value.string->length);
-          ret = std::move(json11::Json(basic_string).dump());
+          ret = json11::Json(basic_string).dump();
         } else {
-          ret = std::move(json11::Json("").dump());
+          ret = json11::Json("").dump();
         }
         free(result->value.string);
         return ret;
@@ -327,9 +327,9 @@ static std::string ParsePlatformResultToString(const std::unique_ptr<ValueWithTy
       } else {
         std::string ret;
         if (result->value.byteArray->length > 0) {
-          ret = std::move(json11::Json(result->value.byteArray->content).dump());
+          ret = json11::Json(result->value.byteArray->content).dump();
         } else {
-          ret = std::move(json11::Json("").dump());
+          ret = json11::Json("").dump();
         }
         free(result->value.byteArray);
         return ret;
@@ -348,7 +348,7 @@ static std::string ParsePlatformResultToString(const std::unique_ptr<ValueWithTy
           const json11::Json& json = json11::Json::parse(raw_str, err);
           if (err.empty()) {
             //succ
-            ret = std::move(json.dump());
+            ret = json.dump();
           } else {
             LOGE("VnodeManager CallNative return value to object err, %s", err.c_str());
           }
@@ -367,7 +367,7 @@ static std::string ParsePlatformResultToString(const std::unique_ptr<ValueWithTy
           const json11::Json& json = json11::Json::parse(result->value.byteArray->content, err);
           if (err.empty()) {
             //succ
-            ret = std::move(json.dump());
+            ret = json.dump();
           } else {
             LOGE("VnodeManager CallNative return value to object err, %s", err.c_str());
           }

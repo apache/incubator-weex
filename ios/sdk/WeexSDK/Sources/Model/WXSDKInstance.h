@@ -197,16 +197,6 @@ typedef enum : NSUInteger {
  * bundleType is the DSL type
  */
 @property (nonatomic, strong) NSString * bundleType;
-
-/**
- *  Which decide whether to use data render,default value is false
- */
-@property (nonatomic, assign, readonly) BOOL dataRender;
-
-/**
- *  Which decide whether to use binary code render, default value is false
- */
-@property (nonatomic, assign, readonly) BOOL wlasmRender;
     
 /**
  *  The callback triggered when the instance fails to render.
@@ -401,6 +391,8 @@ typedef enum : NSUInteger {
  * jsbundle str ,may be nil (weak)
  */
 - (NSString* _Nullable) bundleTemplate;
+
+- (void)setAutoInvertingBehavior:(NSInteger)index;
 
 /**
  * application performance statistics

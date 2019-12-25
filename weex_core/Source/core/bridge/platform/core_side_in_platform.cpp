@@ -470,7 +470,7 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
       return true;
     }
 
-    EagleBridge::GetInstance()->CreatePage(render_strategy, instanceId, func, script, script_length, opts, initData ,extendsApi);
+    EagleBridge::GetInstance()->CreatePage(render_strategy, instanceId, func, script, script_length, opts, initData ,extendsApi, 0);
     return true;
   }
 

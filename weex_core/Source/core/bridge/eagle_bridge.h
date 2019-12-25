@@ -169,7 +169,7 @@ class EagleBridge {
                             int script_length,
                             const char* opts,
                             const char* initData,
-                            const char* extendsApi) = 0;
+                            const char* extendsApi, std::function<void(const char*, const char*)> function) = 0;
 
     virtual EagleModeReturn RefreshPage(const char*  page_id,
                                         const char*  init_data) = 0;
@@ -203,7 +203,7 @@ class EagleBridge {
                   const char* script, int script_length,
                   const char* opts,
                   const char* initData,
-                  const char* extendsApi);
+                  const char* extendsApi, std::function<void(const char*, const char*)> function);
 
   //Call In JSThread
   EagleModeReturn DestroyPage(const char* instanceId);

@@ -51,7 +51,7 @@
 #import "WXJSFrameworkLoadDefaultImpl.h"
 #import "WXHandlerFactory.h"
 #import "WXExtendCallNativeManager.h"
-#import "WXDataRenderHandler.h"
+#import "WXEaglePluginManager.h"
 
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
@@ -77,14 +77,10 @@ _Pragma("clang diagnostic pop") \
 // store service
 @property (nonatomic, strong) NSMutableArray *jsServiceQueue;
 
-@property (nonatomic, readonly) id<WXDataRenderHandler> dataRenderHandler;
-
 @end
 
 @implementation WXBridgeContext
     
-@synthesize dataRenderHandler = _dataRenderHandler;
-
 - (instancetype) init
 {
     self = [super init];
@@ -92,14 +88,6 @@ _Pragma("clang diagnostic pop") \
         _methodQueue = [NSMutableArray new];
         _frameworkLoadFinished = NO;
         _jsServiceQueue = [NSMutableArray new];
-        _dataRenderHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDataRenderHandler)];
-        if (!_dataRenderHandler) {
-            Class handlerClass = NSClassFromString(@"WXEagleHandler");
-            if (handlerClass) {
-                _dataRenderHandler = [[handlerClass alloc] init];
-                [WXSDKEngine registerHandler:_dataRenderHandler withProtocol:@protocol(WXDataRenderHandler)];
-            }
-        }
     }
     return self;
 }
@@ -145,12 +133,13 @@ _Pragma("clang diagnostic pop") \
     }];
     
     [_jsBridge registerCallUpdateComponentData:^NSInteger(NSString *instanceId, NSString *componentId, NSString *jsonData) {
-        if (weakSelf.dataRenderHandler) {
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+        if (instance.renderPlugin) {
             WXPerformBlockOnComponentThread(^{
                 long start = [WXUtility getUnixFixTimeMillis];
                 WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
                 [instance.apmInstance addUpdateComponentDataTimestamp:start];
-                [weakSelf.dataRenderHandler callUpdateComponentData:instanceId componentId:componentId jsonData:jsonData];
+                [instance.renderPlugin updateInstance:instanceId component:componentId jsonData:jsonData];
                 [instance.apmInstance addUpdateComponentDataTime:[WXUtility getUnixFixTimeMillis] - start];
             });
         }
@@ -490,10 +479,10 @@ _Pragma("clang diagnostic pop") \
     NSMutableArray *sendQueue = [NSMutableArray array];
     [self.sendQueue setValue:sendQueue forKey:instanceIdString];
 
-    if (sdkInstance.dataRender && ![options[@"EXEC_JS"] boolValue]) {
-        if (_dataRenderHandler) {
+    if (sdkInstance.renderPlugin && ![options[@"EXEC_JS"] boolValue]) {
+        if (sdkInstance.renderPlugin) {
             WXPerformBlockOnComponentThread(^{
-                [_dataRenderHandler createPage:instanceIdString template:jsBundleString options:options data:data];
+                [sdkInstance.renderPlugin createPage:instanceIdString contents:jsBundleString options:options data:data];
             });
         }
         else {
@@ -666,23 +655,19 @@ _Pragma("clang diagnostic pop") \
     NSMutableArray *sendQueue = [NSMutableArray array];
     [self.sendQueue setValue:sendQueue forKey:instanceIdString];
 
-    if (sdkInstance.dataRender) {
-        if (_dataRenderHandler) {
+    if (sdkInstance.renderPlugin) {
+        WXPerformBlockOnComponentThread(^{
+            [sdkInstance.renderPlugin createPage:instanceIdString contents:contents options:options data:data];
+        });
+    } else {
+        WXComponentManager *manager = sdkInstance.componentManager;
+        if (manager.isValid) {
+            WXSDKErrCode errorCode = WX_KEY_EXCEPTION_DEGRADE_EAGLE_RENDER_ERROR;
+            NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
             WXPerformBlockOnComponentThread(^{
-                [_dataRenderHandler createPage:instanceIdString contents:contents options:options data:data];
+                [manager renderFailed:error];
             });
         }
-        else {
-            WXComponentManager *manager = sdkInstance.componentManager;
-            if (manager.isValid) {
-                WXSDKErrCode errorCode = WX_KEY_EXCEPTION_DEGRADE_EAGLE_RENDER_ERROR;
-                NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
-                WXPerformBlockOnComponentThread(^{
-                    [manager renderFailed:error];
-                });
-            }
-        }
-        return;
     }
 }
 
@@ -799,7 +784,7 @@ _Pragma("clang diagnostic pop") \
     }
     
     WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instance];
-    if (!sdkInstance.wlasmRender) {
+    if (!sdkInstance.renderPlugin || sdkInstance.renderPlugin.isSupportExecScript) {
         [self callJSMethod:@"destroyInstance" args:@[instance]];
     }
 }
@@ -820,24 +805,9 @@ _Pragma("clang diagnostic pop") \
     if (!data) return;
     
     WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instance];
-    if (sdkInstance.dataRender) {
-        if (!_dataRenderHandler) {
-            WXComponentManager *manager = sdkInstance.componentManager;
-            if (manager.isValid) {
-                WXSDKErrCode errorCode = WX_KEY_EXCEPTION_DEGRADE_EAGLE_RENDER_ERROR;
-                NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
-                WXPerformBlockOnComponentThread(^{
-                    [manager renderFailed:error];
-                });
-            }
-            return;
-        }
+    if (sdkInstance.renderPlugin) {
         WXPerformBlockOnComponentThread(^{
-            if ([data isKindOfClass:[NSDictionary class]]) {
-                [_dataRenderHandler refreshDataRenderInstance:instance data:[WXUtility JSONString:data]];
-            } else if ([data isKindOfClass:[NSString class]]) {
-                [_dataRenderHandler refreshDataRenderInstance:instance data:data];
-            }
+            [sdkInstance.renderPlugin refreshInstance:instance data:[WXUtility JSONString:data]];
         });
         [[WXSDKManager bridgeMgr] callJSMethod:@"callJS" args:@[instance, @[@{@"method":@"fireEvent", @"args":@[@"", @"refresh", [WXUtility objectFromJSON:@"[]"], @"", @{@"params":@[@{@"data":data}]}]}]]];
     } else {
@@ -995,11 +965,7 @@ _Pragma("clang diagnostic pop") \
     if(!modules) return;
     
     [self callJSMethod:@"registerModules" args:@[modules]];
-    if (_dataRenderHandler) {
-        WXPerformBlockOnComponentThread(^{
-            [_dataRenderHandler registerModules:modules];
-        });
-    }
+    [WXEaglePluginManager registerModules:modules];
 }
 
 - (void)registerComponents:(NSArray *)components
@@ -1009,11 +975,7 @@ _Pragma("clang diagnostic pop") \
     if(!components) return;
     
     [self callJSMethod:@"registerComponents" args:@[components]];
-    if (_dataRenderHandler) {
-        WXPerformBlockOnComponentThread(^{
-            [_dataRenderHandler registerComponents:components];
-        });
-    }
+    [WXEaglePluginManager registerComponents:components];
 }
 
 - (void)callJSMethod:(NSString *)method args:(NSArray *)args
