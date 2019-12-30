@@ -1689,6 +1689,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if (!isNewFsEnd){
       getApmForInstance().arriveNewFsRenderTime();
     }
+    //record interactive time here if render_container is wrap_content
     if (!getApmForInstance().stageMap.containsKey(WXInstanceApm.KEY_PAGE_STAGES_INTERACTION)){
       getApmForInstance().arriveInteraction(getRootComponent());
     }
