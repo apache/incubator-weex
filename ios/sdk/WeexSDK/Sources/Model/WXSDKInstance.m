@@ -489,7 +489,12 @@ typedef enum : NSUInteger {
     });
     // ensure default modules/components/handlers are ready before create instance
     [WXSDKEngine registerDefaults];
+    id darkSchemeHandler = [WXSDKInstance darkSchemeColorHandler];
     [[NSNotificationCenter defaultCenter] postNotificationName:WX_SDKINSTANCE_WILL_RENDER object:self];
+    if ([WXSDKInstance darkSchemeColorHandler] != darkSchemeHandler) {
+        // After notification, handler for WXDarkSchemeProtocol might change.
+        self.schemeName = [WXUtility isSystemInDarkScheme] ? @"dark" : @"light";
+    }
 
     if ([self _handleConfigCenter]) {
         int wxErrorCode = 9999;
@@ -587,7 +592,12 @@ typedef enum : NSUInteger {
     });
     // ensure default modules/components/handlers are ready before create instance
     [WXSDKEngine registerDefaults];
+    id darkSchemeHandler = [WXSDKInstance darkSchemeColorHandler];
     [[NSNotificationCenter defaultCenter] postNotificationName:WX_SDKINSTANCE_WILL_RENDER object:self];
+    if ([WXSDKInstance darkSchemeColorHandler] != darkSchemeHandler) {
+        // After notification, handler for WXDarkSchemeProtocol might change.
+        self.schemeName = [WXUtility isSystemInDarkScheme] ? @"dark" : @"light";
+    }
     
     _mainBundleString = mainBundleString;
     if ([self _handleConfigCenter]) {
@@ -1200,12 +1210,7 @@ typedef enum : NSUInteger {
 
 + (id<WXDarkSchemeProtocol>)darkSchemeColorHandler
 {
-    static id<WXDarkSchemeProtocol> colorHandler;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        colorHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDarkSchemeProtocol)];
-    });
-    return colorHandler;
+    return [WXHandlerFactory handlerForProtocol:@protocol(WXDarkSchemeProtocol)];
 }
 
 - (NSString*)currentSchemeName
