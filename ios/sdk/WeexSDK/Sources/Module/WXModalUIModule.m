@@ -155,29 +155,33 @@ static const CGFloat WXToastDefaultPadding = 30.0;
     if (window == NULL) {
         window = [[[UIApplication sharedApplication] windows] firstObject];
     }
+    CGSize windowSize = window.frame.size;
+    if ([WXUtility deviceIsiPad]) {
+        windowSize = self.weexInstance.viewController.view.frame.size;
+    }
     
     // adjust to screen orientation
     UIInterfaceOrientation orientation = (UIInterfaceOrientation)[[UIApplication sharedApplication] statusBarOrientation];
     switch (orientation) {
         case UIDeviceOrientationPortrait: {
-            point = CGPointMake(window.frame.size.width/2, window.frame.size.height/2);
+            point = CGPointMake(windowSize.width/2, windowSize.height/2);
             break;
         }
         case UIDeviceOrientationPortraitUpsideDown: {
             toastView.transform = CGAffineTransformMakeRotation(M_PI);
-            float width = window.frame.size.width;
-            float height = window.frame.size.height;
+            float width = windowSize.width;
+            float height = windowSize.height;
             point = CGPointMake(width/2, height/2);
             break;
         }
         case UIDeviceOrientationLandscapeLeft: {
             toastView.transform = CGAffineTransformMakeRotation(M_PI/2); //rotation in radians
-            point = CGPointMake(window.frame.size.width/2, window.frame.size.height/2);
+            point = CGPointMake(windowSize.width/2, windowSize.height/2);
             break;
         }
         case UIDeviceOrientationLandscapeRight: {
             toastView.transform = CGAffineTransformMakeRotation(-M_PI/2);
-            point = CGPointMake(window.frame.size.width/2, window.frame.size.height/2);
+            point = CGPointMake(windowSize.width/2, windowSize.height/2);
             break;
         }
         default:
