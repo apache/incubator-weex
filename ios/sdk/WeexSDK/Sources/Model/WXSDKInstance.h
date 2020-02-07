@@ -32,6 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 extern NSString *const bundleUrlOptionKey;
 
+typedef BOOL (^WXModuleInterceptCallback)(NSString *moduleName, NSString *methodName, NSArray *arguments, NSDictionary *options);
+
 @interface WXSDKInstance : NSObject
 
 /**
@@ -489,6 +491,17 @@ typedef enum : NSUInteger {
  */
 - (NSString*)currentSchemeName;
 - (void)setCurrentSchemeName:(NSString*)name;
+
+/**
+ register/unRegister module intercept
+ */
+- (void)registerModuleIntercept:(NSString*)moduleName callBack:(WXModuleInterceptCallback)callback;
+- (void)unRegisterModuleIntercept:(NSString*)moduleName;
+
+/**
+ call module intercept
+ */
+- (BOOL)moduleInterceptWithModuleName:(NSString*)moduleName methodName:(NSString*)methodName arguments:(NSArray*)arguments options:(NSDictionary*)options;
 
 /**
  Choose final color between original color and dark-mode one.

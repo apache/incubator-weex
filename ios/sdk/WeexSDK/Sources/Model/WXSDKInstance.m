@@ -87,6 +87,7 @@ typedef enum : NSUInteger {
     BOOL _debugJS;
     id<WXBridgeProtocol> _instanceJavaScriptContext; // sandbox javaScript context
     BOOL _defaultDataRender;
+    NSMutableDictionary *_moduleIntercepts;
 }
 
 - (void)dealloc
@@ -157,6 +158,7 @@ typedef enum : NSUInteger {
         _styleConfigs = [NSMutableDictionary new];
         _attrConfigs = [NSMutableDictionary new];
         _moduleEventObservers = [WXThreadSafeMutableDictionary new];
+        _moduleIntercepts = [NSMutableDictionary new];
         _trackComponent = NO;
         _performanceCommit = NO;
         
@@ -1221,6 +1223,44 @@ typedef enum : NSUInteger {
 - (BOOL)isDarkScheme
 {
     return [self.schemeName isEqualToString:@"dark"];
+}
+
+- (void)registerModuleIntercept:(NSString*)moduleName callBack:(WXModuleInterceptCallback)callback {
+    __weak WXSDKInstance* weakSelf = self;
+    WXPerformBlockOnBridgeThread(^{
+        __strong WXSDKInstance* strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
+        }
+        if (![WXUtility isBlankString:moduleName] && callback) {
+            [strongSelf->_moduleIntercepts setObject:callback forKey:moduleName];
+         }
+    });
+}
+
+- (void)unRegisterModuleIntercept:(NSString*)moduleName {
+    __weak WXSDKInstance* weakSelf = self;
+    WXPerformBlockOnBridgeThread(^{
+        __strong WXSDKInstance* strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
+        }
+        if (![WXUtility isBlankString:moduleName]) {
+            [strongSelf->_moduleIntercepts removeObjectForKey:moduleName];
+        }
+    });
+}
+
+- (BOOL)moduleInterceptWithModuleName:(NSString*)moduleName methodName:(NSString*)methodName arguments:(NSArray*)arguments options:(NSDictionary*)options {
+    WXAssertBridgeThread();
+    if ([WXUtility isBlankString:moduleName]) {
+        return NO;
+    }
+    WXModuleInterceptCallback callBack = [_moduleIntercepts objectForKey:moduleName];
+    if (callBack) {
+        return callBack(moduleName, methodName, arguments, options);
+    }
+    return NO;
 }
 
 - (void)setCurrentSchemeName:(NSString*)name

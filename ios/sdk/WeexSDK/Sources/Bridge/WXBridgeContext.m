@@ -336,6 +336,7 @@ _Pragma("clang diagnostic pop") \
             WXLogInfo(@"instance not found for callNativeModule:%@.%@, maybe already destroyed", moduleName, methodName);
             return nil;
         }
+
 #ifdef DEBUG
         WXLogDebug(@"flexLayout -> action: callNativeModule : %@ . %@",moduleName,methodName);
 #endif
@@ -361,6 +362,11 @@ _Pragma("clang diagnostic pop") \
         WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:[newArguments copy] options:[newOptions copy] instance:instance];
         if(![moduleName isEqualToString:@"dom"] && instance.needPrerender){
             [WXPrerenderManager storePrerenderModuleTasks:method forUrl:instance.scriptURL.absoluteString];
+            return nil;
+        }
+
+        BOOL intercepted = [instance moduleInterceptWithModuleName:moduleName methodName:methodName arguments:[newArguments copy] options:[newOptions copy]];
+        if (intercepted) {
             return nil;
         }
         return [method invoke];
