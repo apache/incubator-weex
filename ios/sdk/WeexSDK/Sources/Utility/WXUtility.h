@@ -291,6 +291,11 @@ _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
  */
 + (CGFloat)defaultPixelScaleFactor;
 
+/**
+ * @return true if the device is iPad
+ */
++ (BOOL)deviceIsiPad;
+
 #if defined __cplusplus
 extern "C" {
 #endif

@@ -824,6 +824,10 @@ static BOOL gIsEnvironmentUsingDarkScheme = NO;
     return defaultScaleFactor;
 }
 
++ (BOOL)deviceIsiPad {
+    return [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad;
+}
+
 #pragma mark - RTL
 
 + (void)setEnableRTLLayoutDirection:(BOOL)value
