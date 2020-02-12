@@ -3597,6 +3597,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				VALID_ARCHS = "$(ARCHS_STANDARD)";
 			};
 			name = Debug;
 		};
@@ -3609,6 +3610,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				VALID_ARCHS = "$(ARCHS_STANDARD)";
 			};
 			name = Release;
 		};
@@ -3948,6 +3950,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.taobao.WeexSDK-Dynamic";
 				PRODUCT_NAME = WeexSDK;
 				SKIP_INSTALL = YES;
+				VALID_ARCHS = "$(ARCHS_STANDARD)";
 				WARNING_CFLAGS = "-Wno-documentation";
 			};
 			name = Debug;
@@ -3995,6 +3998,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.taobao.WeexSDK-Dynamic";
 				PRODUCT_NAME = WeexSDK;
 				SKIP_INSTALL = YES;
+				VALID_ARCHS = "$(ARCHS_STANDARD)";
 				WARNING_CFLAGS = "-Wno-documentation";
 			};
 			name = Release;
