@@ -325,7 +325,7 @@
 		77E349F8229FE67900B1CDAB /* log_defines.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 77E349F6229FE67900B1CDAB /* log_defines.cpp */; };
 		77E659DA1C07F594008B8775 /* WXDomModule.h in Headers */ = {isa = PBXBuildFile; fileRef = 77E659D81C07F594008B8775 /* WXDomModule.h */; };
 		77E659DB1C07F594008B8775 /* WXDomModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E659D91C07F594008B8775 /* WXDomModule.m */; };
-		77E659F11C0C3612008B8775 /* WXModuleFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 77E659EF1C0C3612008B8775 /* WXModuleFactory.h */; };
+		77E659F11C0C3612008B8775 /* WXModuleFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 77E659EF1C0C3612008B8775 /* WXModuleFactory.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		77E659F21C0C3612008B8775 /* WXModuleFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E659F01C0C3612008B8775 /* WXModuleFactory.m */; };
 		77E65A0D1C155E99008B8775 /* WXDivComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 77E65A0B1C155E99008B8775 /* WXDivComponent.h */; };
 		77E65A0E1C155E99008B8775 /* WXDivComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E65A0C1C155E99008B8775 /* WXDivComponent.m */; };
@@ -2448,6 +2448,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				77E659F11C0C3612008B8775 /* WXModuleFactory.h in Headers */,
 				F75C591C2313C1FC002FFF94 /* WXStreamModule.h in Headers */,
 				986CEAA723B230C2004166E0 /* WXEaglePlugin.h in Headers */,
 				986CEAA823B230C2004166E0 /* WXEaglePluginManager.h in Headers */,
@@ -2622,7 +2623,6 @@
 				B8D66C2921255730003960BD /* render_page.h in Headers */,
 				DCC77C141D770AE300CE7288 /* WXSliderNeighborComponent.h in Headers */,
 				747DF6821E31AEE4005C53A8 /* WXLength.h in Headers */,
-				77E659F11C0C3612008B8775 /* WXModuleFactory.h in Headers */,
 				77D161431C02DEE40010B15B /* WXBridgeProtocol.h in Headers */,
 				B8D66C1721255730003960BD /* script_bridge.h in Headers */,
 				59A582D41CF481110081FD3E /* WXAppMonitorProtocol.h in Headers */,

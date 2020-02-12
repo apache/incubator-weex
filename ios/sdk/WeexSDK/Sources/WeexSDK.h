@@ -56,6 +56,7 @@ FOUNDATION_EXPORT const unsigned char WeexSDKVersionString[];
 #import <WeexSDK/WXNavigationDefaultImpl.h>
 #import <WeexSDK/WXMonitor.h>
 #import <WeexSDK/WXModuleProtocol.h>
+#import <WeexSDK/WXModuleFactory.h>
 #import <WeexSDK/WXModalUIModule.h>
 #import <WeexSDK/WXLog.h>
 #import <WeexSDK/WXListComponent.h>
