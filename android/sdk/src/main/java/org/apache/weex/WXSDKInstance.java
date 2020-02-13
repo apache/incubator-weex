@@ -54,6 +54,7 @@ import org.apache.weex.bridge.EventResult;
 import org.apache.weex.bridge.NativeInvokeHelper;
 import org.apache.weex.bridge.SimpleJSCallback;
 import org.apache.weex.bridge.WXBridgeManager;
+import org.apache.weex.bridge.WXEaglePlugin;
 import org.apache.weex.bridge.WXModuleManager;
 import org.apache.weex.bridge.WXParams;
 import org.apache.weex.common.Constants;
@@ -107,8 +108,8 @@ import java.util.PriorityQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.weex.bridge.WXBridgeManager.BundType;
 
-import static com.taobao.weex.common.WXErrorCode.WX_ERR_RELOAD_PAGE;
-import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
+import static org.apache.weex.common.WXErrorCode.WX_ERR_RELOAD_PAGE;
+import static org.apache.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
 
 /**

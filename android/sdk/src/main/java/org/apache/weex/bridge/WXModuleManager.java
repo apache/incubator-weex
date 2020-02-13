@@ -24,6 +24,8 @@ import android.text.TextUtils;
 import android.view.Menu;
 
 import com.alibaba.fastjson.JSONArray;
+
+import org.apache.weex.WXEaglePluginManager;
 import org.apache.weex.WXSDKInstance;
 import org.apache.weex.WXSDKManager;
 import org.apache.weex.WXSDKEngine;

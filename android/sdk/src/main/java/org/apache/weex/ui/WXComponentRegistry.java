@@ -20,6 +20,7 @@ package org.apache.weex.ui;
 
 import android.text.TextUtils;
 
+import org.apache.weex.WXEaglePluginManager;
 import org.apache.weex.WXSDKManager;
 import org.apache.weex.bridge.WXBridgeManager;
 import org.apache.weex.common.WXException;
