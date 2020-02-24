@@ -392,8 +392,6 @@ typedef enum : NSUInteger {
  */
 - (NSString* _Nullable) bundleTemplate;
 
-- (void)setAutoInvertingBehavior:(NSInteger)index;
-
 /**
  * application performance statistics
  */

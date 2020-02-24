@@ -51,7 +51,6 @@
 #import "WXPageEventNotifyEvent.h"
 #import "WXConvertUtility.h"
 #import "WXCoreBridge.h"
-#import "WXDataRenderHandler.h"
 #import "WXDarkSchemeProtocol.h"
 #import "WXDarkSchemeModule.h"
 #import <WeexSDK/WXEaglePluginManager.h>
@@ -493,10 +492,6 @@ typedef enum : NSUInteger {
 
     // WX_MONITOR_PERF_SET(WXPTBundleSize, [data length], self);
     _isRendered = YES;
-}
-
-- (void)setAutoInvertingBehavior:(NSInteger)index {
-    
 }
 
 - (void)_renderWithMainBundleString:(NSString *)mainBundleString
