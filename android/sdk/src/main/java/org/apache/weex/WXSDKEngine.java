@@ -228,6 +228,10 @@ public class WXSDKEngine implements Serializable {
             WXSoInstallMgrSdk.initSo(libraryName, version, userTrackAdapter);
           }
         }
+
+        // Init so for each eagle plugin, which will register DataRenderHandler to EagleBridge in JNI_OnLoad
+        WXEaglePluginManager.getInstance().initSo(version, userTrackAdapter);
+
         if (!mIsSoInit) {
           WXExceptionUtils.commitCriticalExceptionRT(null,
                   WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT,

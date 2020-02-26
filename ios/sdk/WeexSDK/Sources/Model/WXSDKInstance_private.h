@@ -22,6 +22,7 @@
 #import "WXModuleMethod.h"
 #import "WXThreadSafeMutableDictionary.h"
 #import <JavaScriptCore/JavaScriptCore.h>
+#import <WeexSDK/WXEaglePlugin.h>
 
 @interface WXSDKInstance ()
 
@@ -33,6 +34,7 @@
 @property (nonatomic, strong) NSMutableDictionary *styleConfigs;
 @property (nonatomic, strong) NSMutableDictionary *attrConfigs;
 @property (nonatomic, strong) NSString *mainBundleString;
+@property (nonatomic, weak) id <WXEaglePlugin> renderPlugin;
 
 // add monitor information
 @property (nonatomic, strong) NSString *callCreateInstanceContext;

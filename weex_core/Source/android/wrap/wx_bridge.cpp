@@ -617,6 +617,11 @@ static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
   auto extraOptionString = base::android::ScopedLocalJavaRef<jstring>(
           env, getJsonData(env, args, 6));
 
+  auto script_type = std::unique_ptr<WXJSObject>(
+      new WXJSObject(env, base::android::ScopedLocalJavaRef<jobject>(
+          env, env->GetObjectArrayElement(args, 7))
+          .Get()));
+
 
   ScopedJStringUTF8 scoped_id(env, instanceId);
   ScopedJStringUTF8 scoped_func(env, function);
@@ -625,6 +630,8 @@ static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
   ScopedJStringUTF8 scoped_api(env, static_cast<jstring>(japi.Get()));
   ScopedJStringUTF8 scoped_render_strategy(
       env, static_cast<jstring>(render_strategy->GetData(env).Release()));
+  ScopedJStringUTF8 scoped_script_type(
+      env, static_cast<jstring>(script_type->GetData(env).Release()));
 
   ScopedJStringUTF8 scoped_extra_option(env, extraOptionString.Get());
   const std::string input = scoped_extra_option.getChars();
@@ -645,13 +652,12 @@ static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
     }
   }
 
-  // If strategy is DATA_RENDER_BINARY, jscript is a jbyteArray, otherwise jstring
-  // TODO use better way
   if (!WXBridge::Instance()->jni_object()) {
     WXBridge::Instance()->Reset(env, jcaller);
   }
-  if (scoped_render_strategy.getChars() != nullptr
-      && strcmp(scoped_render_strategy.getChars(), "DATA_RENDER_BINARY") == 0) {
+
+  if (scoped_script_type.getChars() != nullptr
+      && strcmp(scoped_script_type.getChars(), "binary") == 0) {
     JByteArrayRef byte_array(env, static_cast<jbyteArray>(jscript.Get()));
     return WeexCoreManager::Instance()
         ->getPlatformBridge()
@@ -738,69 +744,6 @@ static void onInteractionTimeUpdate(JNIEnv* env, jobject jcaller, jstring instan
   jobject jni_map_performance =
           performance_map.get() != nullptr ? performance_map->jni_object() : nullptr;
   Java_WXBridge_onNativePerformanceDataUpdate(env,jcaller,instanceId,jni_map_performance);
-}
-
-static void FireEventOnDataRenderNode(JNIEnv* env, jobject jcaller,
-                                      jstring instanceId, jstring ref,
-                                      jstring type, jstring data,
-                                      jstring domChanges) {
-  if (instanceId == NULL || ref == NULL || type == NULL || data == NULL) {
-    return;
-  }
-
-  ScopedJStringUTF8 idChar(env, instanceId);
-  ScopedJStringUTF8 refChar(env, ref);
-  ScopedJStringUTF8 typeChar(env, type);
-  ScopedJStringUTF8 dataChar(env, data);
-  ScopedJStringUTF8 domChangesChar(env, domChanges);
-
-  WeexCore::EagleBridge::GetInstance()->data_render_handler()->FireEvent(
-      idChar.getChars(), refChar.getChars(), typeChar.getChars(),
-      dataChar.getChars(), domChangesChar.getChars()
-  );
-}
-
-static void InvokeCallbackOnDataRender(JNIEnv* env, jobject jcaller,
-                                       jstring instanceId, jstring callbackId,
-                                       jstring data, jboolean keepAlive) {
-  if (instanceId == NULL || callbackId == NULL || data == NULL) {
-    return;
-  }
-
-  ScopedJStringUTF8 idChar(env, instanceId);
-  ScopedJStringUTF8 callbackChar(env, callbackId);
-  ScopedJStringUTF8 dataChar(env, data);
-
-  WeexCore::EagleBridge::GetInstance()->data_render_handler()->InvokeCallback(
-      idChar.getChars(), callbackChar.getChars(), dataChar.getChars(),keepAlive);
-}
-
-static void RegisterModuleOnDataRenderNode(JNIEnv* env, jobject jcaller,
-                                      jstring data) {
-  if (data == NULL) {
-    return;
-  }
-
-  ScopedJStringUTF8 dataChar(env, data);
-
-  auto data_render_handler = WeexCore::EagleBridge::GetInstance()->data_render_handler();
-  if(data_render_handler){
-    data_render_handler->RegisterModules(
-        dataChar.getChars());
-  }
-}
-
-static void RegisterComponentOnDataRenderNode(JNIEnv* env, jobject jcaller,
-                                              jstring data) {
-  if (data == NULL) {
-    return;
-  }
-
-  ScopedJStringUTF8 dataChar(env, data);
-  auto data_render_handler = WeexCore::EagleBridge::GetInstance()->data_render_handler();
-  if(data_render_handler) {
-    data_render_handler->RegisterComponent(dataChar.getChars());
-  }
 }
 
 namespace WeexCore {

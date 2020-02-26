@@ -165,6 +165,7 @@ if(ANDROID)
     ./android/multiprocess/weex_js_connection.cpp
     ./android/utils/jni_load.cc
     ./core/bridge/eagle_bridge.cpp
+    ./core/bridge/eagle_bridge_ext.cpp
     ./core/network/android/default_request_handler.cc
   )
   SET(FINAL_ADD_LIBRARY
