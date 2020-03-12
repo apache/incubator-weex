@@ -17,7 +17,7 @@
  * under the License.
  */
 
-#import "WXModuleProtocol.h"
+#import <WeexSDK/WXModuleProtocol.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

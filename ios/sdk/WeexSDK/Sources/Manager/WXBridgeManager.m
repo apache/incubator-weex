@@ -34,7 +34,6 @@
 #import "WXThreadSafeMutableArray.h"
 #import "WXComponentManager.h"
 #import "WXCoreBridge.h"
-#import "WXDataRenderHandler.h"
 #import "WXHandlerFactory.h"
 #import "WXUtility.h"
 #import "WXExceptionUtils.h"
@@ -632,23 +631,10 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
 - (void)fireEvent:(NSString *)instanceId ref:(NSString *)ref type:(NSString *)type params:(NSDictionary *)params domChanges:(NSDictionary *)domChanges handlerArguments:(NSArray *)handlerArguments
 {
     WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
-    if (instance.dataRender) {
-        id<WXDataRenderHandler> dataRenderHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDataRenderHandler)];
-        if (dataRenderHandler) {
-            WXPerformBlockOnComponentThread(^{
-                [dataRenderHandler fireEvent:instanceId ref:ref event:type args:params?:@{} domChanges:domChanges?:@{}];
-            });
-        }
-        else {
-            WXComponentManager *manager = instance.componentManager;
-            if (manager.isValid) {
-                WXSDKErrCode errorCode = WX_KEY_EXCEPTION_DEGRADE_EAGLE_RENDER_ERROR;
-                NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
-                WXPerformBlockOnComponentThread(^{
-                    [manager renderFailed:error];
-                });
-            }
-        }
+    if (instance.renderPlugin.isSupportFireEvent) {
+        WXPerformBlockOnComponentThread(^{
+            [instance.renderPlugin fireEvent:instanceId ref:ref event:type args:params?:@{} domChanges:domChanges?:@{}];
+        });
         return;
     }
 
@@ -714,24 +700,11 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
         args = @[[funcId copy], params? [params copy]:@"\"{}\""];
     }
     WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
-    if (instance.wlasmRender) {
-        id<WXDataRenderHandler> dataRenderHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDataRenderHandler)];
-        if (dataRenderHandler) {
-            id strongArgs = params ? [params copy]:@"\"{}\"";
-            WXPerformBlockOnComponentThread(^{
-                [dataRenderHandler invokeCallBack:instanceId function:funcId args:strongArgs keepAlive:keepAlive];
-            });
-        }
-        else {
-            WXComponentManager *manager = instance.componentManager;
-            if (manager.isValid) {
-                WXSDKErrCode errorCode = WX_KEY_EXCEPTION_DEGRADE_EAGLE_RENDER_ERROR;
-                NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
-                WXPerformBlockOnComponentThread(^{
-                    [manager renderFailed:error];
-                });
-            }
-        }
+    if (instance.renderPlugin.isSupportInvokeJSCallBack) {
+        id strongArgs = params ? [params copy]:@"\"{}\"";
+        WXPerformBlockOnComponentThread(^{
+            [instance.renderPlugin invokeCallBack:instanceId function:funcId args:strongArgs keepAlive:keepAlive];
+        });
     }
     else {
         WXCallJSMethod *method = [[WXCallJSMethod alloc] initWithModuleName:@"jsBridge" methodName:@"callback" arguments:args instance:instance];

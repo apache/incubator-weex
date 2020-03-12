@@ -24,6 +24,8 @@ import android.text.TextUtils;
 import android.view.Menu;
 
 import com.alibaba.fastjson.JSONArray;
+
+import org.apache.weex.WXEaglePluginManager;
 import org.apache.weex.WXSDKInstance;
 import org.apache.weex.WXSDKManager;
 import org.apache.weex.WXSDKEngine;
@@ -68,11 +70,11 @@ public class WXModuleManager {
   private static Map<String, Map<String, WXModule>> sInstanceModuleMap = new ConcurrentHashMap<>();
 
 
-  public static boolean registerModule(Map<String, ModuleCache> moduleCacheMap) {
+  public static boolean registerModule(Map<String, RegisterCache.ModuleCache> moduleCacheMap) {
     if (moduleCacheMap.isEmpty())
       return true;
 
-    final Iterator<Entry<String, ModuleCache>> iterator = moduleCacheMap.entrySet().iterator();
+    final Iterator<Entry<String, RegisterCache.ModuleCache>> iterator = moduleCacheMap.entrySet().iterator();
     WXBridgeManager.getInstance()
             .postWithName(new Runnable() {
               @Override
@@ -80,8 +82,8 @@ public class WXModuleManager {
                 Map<String, Object> modules = new HashMap<>();
 
                 while (iterator.hasNext()) {
-                  Entry<String, ModuleCache> next = iterator.next();
-                  ModuleCache value = next.getValue();
+                  Entry<String, RegisterCache.ModuleCache> next = iterator.next();
+                  RegisterCache.ModuleCache value = next.getValue();
                   String moduleName = value.name;
                   if (TextUtils.equals(moduleName, WXDomModule.WXDOM)) {
                     WXLogUtils.e("Cannot registered module with name 'dom'.");
@@ -133,7 +135,7 @@ public class WXModuleManager {
       WXLogUtils.e("Cannot registered module with name 'dom'.");
       return false;
     }
-
+    WXEaglePluginManager.getInstance().registerModule(moduleName, factory, global);
     if(RegisterCache.getInstance().cacheModule(moduleName,factory,global)) {
       return true;
     }

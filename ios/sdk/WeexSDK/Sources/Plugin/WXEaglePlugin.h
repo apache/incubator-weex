@@ -21,17 +21,30 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol WXDataRenderHandler <NSObject>
-    
-- (void)createPage:(NSString *)pageId template:(NSString *)jsBundleString options:(NSDictionary * _Nullable)options  data:(id)data;
+@protocol WXEaglePlugin <NSObject>
 
-- (void)createPage:(NSString *)pageId contents:(NSData *)contents options:(NSDictionary * _Nullable)options data:(id)data;
+@required
 
-- (void)callUpdateComponentData:(NSString*)pageId componentId:(NSString*)componentId jsonData:(NSString*)jsonData;
+@property (nonatomic, readonly) NSString* pluginName;
+@property (nonatomic, readonly) BOOL isSkipFramework;
+@property (nonatomic, readonly) BOOL isSupportInvokeJSCallBack;
+@property (nonatomic, readonly) BOOL isSupportExecScript;
+@property (nonatomic, readonly) BOOL isSupportFireEvent;
+@property (nonatomic, readonly) BOOL isRegisterModules;
+@property (nonatomic, readonly) BOOL isRegisterComponents;
+@property (nonatomic, readonly) NSDictionary *options;
 
-- (void)destroyDataRenderInstance:(NSString *)pageId;
+- (BOOL)renderWithOption:(NSDictionary *)option;
 
-- (void)refreshDataRenderInstance:(NSString *)pageId data:(NSString *)data;
+- (NSURL *)renderWithURL:(NSURL *)url;
+
+- (void)refreshInstance:(NSString *)pageId data:(id)data;
+
+- (void)createPage:(NSString *)pageId contents:(id)contents options:(NSDictionary * _Nullable)options data:(id)data;
+
+- (BOOL)runPluginTask:(NSString *)pageId task:(NSString *)task options:(id)options;
+
+@optional
 
 - (void)fireEvent:(NSString *)pageId ref:(NSString *)ref event:(NSString *)event args:(NSDictionary * _Nullable)args domChanges:(NSDictionary * _Nullable)domChanges;
 
@@ -39,9 +52,11 @@ NS_ASSUME_NONNULL_BEGIN
     
 - (void)registerComponents:(NSArray *)components;
     
-- (void)invokeCallBack:(NSString *)pageId function:(NSString *)funcId args:(NSDictionary * _Nullable)args keepAlive:(BOOL)keepAlive;
+- (void)invokeCallBack:(NSString *)pageId function:(NSString *)functionId args:(NSDictionary * _Nullable)args keepAlive:(BOOL)keepAlive;
 
 - (void)DispatchPageLifecycle:(NSString *)pageId;
+
+- (void)updateInstance:(NSString *)pageId component:(NSString *)componentId jsonData:(id)jsonData;
 
 @end
 

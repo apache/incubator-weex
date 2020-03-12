@@ -51,11 +51,10 @@
 #import "WXPageEventNotifyEvent.h"
 #import "WXConvertUtility.h"
 #import "WXCoreBridge.h"
-#import "WXDataRenderHandler.h"
 #import "WXDarkSchemeProtocol.h"
 #import "WXDarkSchemeModule.h"
+#import <WeexSDK/WXEaglePluginManager.h>
 
-#define WEEX_LITE_URL_SUFFIX           @"wlasm"
 #define WEEX_RENDER_TYPE_PLATFORM       @"platform"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
@@ -86,7 +85,6 @@ typedef enum : NSUInteger {
     BOOL _performanceCommit;
     BOOL _debugJS;
     id<WXBridgeProtocol> _instanceJavaScriptContext; // sandbox javaScript context
-    BOOL _defaultDataRender;
     NSMutableDictionary *_moduleIntercepts;
 }
 
@@ -164,9 +162,7 @@ typedef enum : NSUInteger {
         
         _performance = [[WXPerformance alloc] init];
         _apmInstance = [[WXApmForInstance alloc] init];
-        
-        _defaultDataRender = NO;
-        
+                
         _useBackupJsThread = NO;
 
         [self addObservers];
@@ -339,12 +335,16 @@ typedef enum : NSUInteger {
     }
     WXLogInfo(@"pageid: %@ renderWithURL: %@", _instanceId, url.absoluteString);
     
+    _renderPlugin = [WXEaglePluginManager renderWithURL:&url];
+    if (!_renderPlugin) {
+        _renderPlugin = [WXEaglePluginManager renderWithOption:options];
+    }
     @synchronized (lastPageInfoLock) {
         lastPageInfo = @{@"pageId": [_instanceId copy], @"url": [url absoluteString] ?: @""};
     }
     
     [WXCoreBridge install];
-    if (_useBackupJsThread) {
+    if (_useBackupJsThread && !self.renderPlugin.isSkipFramework) {
         [[WXSDKManager bridgeMgr] executeJSTaskQueue];
     }
 
@@ -357,14 +357,19 @@ typedef enum : NSUInteger {
     WXResourceRequest *request = [WXResourceRequest requestWithURL:url resourceType:WXResourceTypeMainBundle referrer:@"" cachePolicy:NSURLRequestUseProtocolCachePolicy];
     [self _renderWithRequest:request options:options data:data];
 
-    NSURL* nsURL = [NSURL URLWithString:options[@"DATA_RENDER_JS"]];
-    [self _downloadAndExecScript:nsURL];
+    if (self.renderPlugin.isSupportExecScript) {
+        NSMutableDictionary *newOptions = [NSMutableDictionary dictionaryWithDictionary:options];
+        [newOptions setValue:_jsData forKey:@"jsData"];
+        [self.renderPlugin runPluginTask:_instanceId task:@"_downloadAndExecScript:options:" options:newOptions];
+    }
 }
 
 - (void)renderView:(id)source options:(NSDictionary *)options data:(id)data
 {
     _options = [options isKindOfClass:[NSDictionary class]] ? options : nil;
     _jsData = data;
+    _renderPlugin = [WXEaglePluginManager renderWithOption:_options];
+    
     WXLogInfo(@"pageid: %@ renderView pageNmae: %@  options: %@", _instanceId, _pageName, options);
     
     @synchronized (lastPageInfoLock) {
@@ -372,7 +377,7 @@ typedef enum : NSUInteger {
     }
 
     [WXCoreBridge install];
-    if (_useBackupJsThread) {
+    if (_useBackupJsThread && !self.renderPlugin.isSkipFramework) {
         [[WXSDKManager bridgeMgr] executeJSTaskQueue];
     }
 
@@ -384,37 +389,12 @@ typedef enum : NSUInteger {
     } else if ([source isKindOfClass:[NSData class]]) {
         [self _renderWithData:source];
     }
-    NSURL* nsURL = [NSURL URLWithString:options[@"DATA_RENDER_JS"]];
-    [self _downloadAndExecScript:nsURL];
-}
-
-- (void)_downloadAndExecScript:(NSURL *)url {
-    [[WXSDKManager bridgeMgr] DownloadJS:_instanceId url:url completion:^(NSString *script) {
-        if (!script) {
-            return;
-        }
-        if (self.dataRender) {
-            id<WXDataRenderHandler> dataRenderHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDataRenderHandler)];
-            if (dataRenderHandler) {
-                [[WXSDKManager bridgeMgr] createInstanceForJS:_instanceId template:script options:_options data:_jsData];
-
-                NSString* instanceId = self.instanceId;
-                WXPerformBlockOnComponentThread(^{
-                    [dataRenderHandler DispatchPageLifecycle:instanceId];
-                });
-            }
-            else {
-                if (self.componentManager.isValid) {
-                    WXSDKErrCode errorCode = WX_KEY_EXCEPTION_DEGRADE_EAGLE_RENDER_ERROR;
-                    NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
-                    WXPerformBlockOnComponentThread(^{
-                        [self.componentManager renderFailed:error];
-                    });
-                }
-            }
-            return;
-        }
-    }];
+    
+    if (self.renderPlugin.isSupportExecScript) {
+        NSMutableDictionary *newOptions = [NSMutableDictionary dictionaryWithDictionary:options];
+        [newOptions setValue:_jsData forKey:@"jsData"];
+        [self.renderPlugin runPluginTask:_instanceId task:@"_downloadAndExecScript:options:" options:newOptions];
+    }
 }
 
 - (NSString *) bundleTemplate
@@ -439,7 +419,7 @@ typedef enum : NSUInteger {
     self.apmInstance.isStartRender = YES;
     
     [_apmInstance setProperty:KEY_PAGE_PROPERTIES_UIKIT_TYPE withValue:_renderType?: WEEX_RENDER_TYPE_PLATFORM];
-    if (self.dataRender) {
+    if (self.renderPlugin) {
         [self.apmInstance setProperty:KEY_PAGE_PROPERTIES_RENDER_TYPE withValue:@"eagle"];
     }
 
@@ -532,7 +512,7 @@ typedef enum : NSUInteger {
     self.apmInstance.isStartRender = YES;
     
     [_apmInstance setProperty:KEY_PAGE_PROPERTIES_UIKIT_TYPE withValue:_renderType?: WEEX_RENDER_TYPE_PLATFORM];
-    if (self.dataRender) {
+    if (self.renderPlugin) {
         [self.apmInstance setProperty:KEY_PAGE_PROPERTIES_RENDER_TYPE withValue:@"eagle"];
     }
     
@@ -665,14 +645,6 @@ typedef enum : NSUInteger {
         newOptions[bundleUrlOptionKey] = url.absoluteString;
     }
 
-    if ( [url.absoluteString containsString:@"__data_render=true"]) {
-        newOptions[@"DATA_RENDER"] = @(YES);
-    }
-
-    if ([url.absoluteString hasSuffix:WEEX_LITE_URL_SUFFIX] || [url.absoluteString containsString:@"__eagle=true"]) {
-        newOptions[@"WLASM_RENDER"] = @(YES);
-    }
-
     // compatible with some wrong type, remove this hopefully in the future.
     if ([newOptions[bundleUrlOptionKey] isKindOfClass:[NSURL class]]) {
         WXLogWarning(@"Error type in options with key:bundleUrl, should be of type NSString, not NSURL!");
@@ -738,7 +710,7 @@ typedef enum : NSUInteger {
             return;
         }
         
-        if (([newOptions[@"DATA_RENDER"] boolValue] && [newOptions[@"RENDER_WITH_BINARY"] boolValue]) || [newOptions[@"WLASM_RENDER"] boolValue]) {
+        if (strongSelf.renderPlugin) {
             [strongSelf.apmInstance onStage:KEY_PAGE_STAGES_DOWN_BUNDLE_END];
             [strongSelf _renderWithData:data];
             return;
@@ -853,9 +825,7 @@ typedef enum : NSUInteger {
 
     [WXPrerenderManager removePrerenderTaskforUrl:[self.scriptURL absoluteString]];
     [WXPrerenderManager destroyTask:self.instanceId];
-    BOOL dataRender = self.dataRender;
-    BOOL wlasmRender = self.wlasmRender;
-    if (!dataRender) {
+    if (!self.renderPlugin) {
         [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
     }
     
@@ -875,7 +845,7 @@ typedef enum : NSUInteger {
         // Destroy weexcore c++ page and objects.
         [WXCoreBridge closePage:instanceId];
         
-        if (dataRender && !wlasmRender) {
+        if (self.renderPlugin.isSupportExecScript) {
             [[WXSDKManager bridgeMgr] destroyInstance:instanceId];
         }
 
@@ -991,21 +961,6 @@ typedef enum : NSUInteger {
     return usingScreenWidth / usingViewPort;
 }
     
-- (BOOL)wlasmRender {
-    if ([_options[@"WLASM_RENDER"] boolValue] || [_scriptURL.pathExtension isEqualToString:@"wlasm"] || [_scriptURL.pathExtension isEqualToString:@"wlm"]) {
-        return YES;
-    }
-    return NO;
-}
-
-- (BOOL)dataRender
-{
-    if ([_options[@"DATA_RENDER"] boolValue] || [_options[@"WLASM_RENDER"] boolValue]) {
-        return YES;
-    }
-    return _defaultDataRender;
-}
-
 - (NSURL *)completeURL:(NSString *)url
 {
     if (!_scriptURL) {

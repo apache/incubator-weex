@@ -356,54 +356,13 @@ int CoreSideInPlatform::RefreshInstance(
 
   std::string init_data = weex::base::to_utf8(params[1]->value.string->content,
                                               params[1]->value.string->length);
-  auto handler = EagleBridge::GetInstance()->data_render_handler();
-  if (handler && handler->RefreshPage(instanceId, init_data)) {
-    std::vector<VALUE_WITH_TYPE*> msg;
 
-    VALUE_WITH_TYPE* event = getValueWithTypePtr();
-    event->type = ParamsType::BYTEARRAY;
-    auto buffer = wson_buffer_new();
-    wson_push_type_uint8_string(
-        buffer, reinterpret_cast<const uint8_t*>(instanceId), strlen(instanceId));
-    event->value.byteArray = genWeexByteArray(
-        static_cast<const char*>(buffer->data), buffer->position);
-    wson_buffer_free(buffer);
-    msg.push_back(event);
-
-    // args -> { method: 'fireEvent', args: [ref, "nodeEvent", args , domChanges, {params: [ {"templateId": templateId, "componentId": id, "type": type, "params" : [...]} ]}] }
-    VALUE_WITH_TYPE* args = getValueWithTypePtr();
-    args->type = ParamsType::JSONSTRING;
-    json11::Json final_json = json11::Json::array{
-        json11::Json::object{
-            {"method", "fireEvent"},
-            {"args",
-             json11::Json::array{
-                 "", "refresh", json11::Json::array{}, "",
-                 json11::Json::object{
-                     {"params",
-                      json11::Json::array{
-                          json11::Json::object{
-                              {"data", init_data}
-                          }
-                      }}
-                 }
-             }}
-        }
-    };
-    std::string out = final_json.dump();
-    auto utf16_key = weex::base::to_utf16(const_cast<char*>(out.c_str()),
-                                          out.length());
-    args->value.string = genWeexString(
-        reinterpret_cast<const uint16_t*>(utf16_key.c_str()), utf16_key.size());
-    msg.push_back(args);
-    ScriptBridge* bridge = WeexCore::WeexCoreManager::Instance()->script_bridge();
-    if (!bridge){
-      return false;
-    }
-    bridge->script_side()->ExecJS(
-        instanceId, "", "callJS", msg);
-    freeParams(msg);
+  EagleModeReturn mode = EagleBridge::GetInstance()->RefreshPage(instanceId, init_data.c_str());
+  if (mode == EagleModeReturn::EAGLE_ONLY){
     return true;
+  } else {
+    //mode == EagleModeReturn::EAGLE_AND_SCRIPT || mode == EagleModeReturn::NOT_EAGLE
+    //continue;
   }
   return ExecJS(instanceId, nameSpace, func, params);
 #else
@@ -505,86 +464,14 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
                                        const char *initData,
                                        const char *extendsApi, std::vector<INIT_FRAMEWORK_PARAMS*>& params,
                                        const char *render_strategy) {
-
-  // First check about DATA_RENDER mode
   if (render_strategy != nullptr) {
-    std::function<void(const char *, const char *)> exec_js =
-        [instanceId = std::string(instanceId), func = std::string(func),
-         opts = std::string(opts), initData = std::string(initData),
-         extendsApi = std::string(extendsApi)](const char *result, const char *bundleType) {
-          std::string error;
-          auto opts_json = json11::Json::parse(opts, error);
-          std::map<std::string, json11::Json> &opts_map =
-              const_cast<std::map<std::string, json11::Json> &>(
-                  opts_json.object_items());
-          opts_map["bundleType"] = bundleType;
-          std::vector<INIT_FRAMEWORK_PARAMS*> params;
-          WeexCoreManager::Instance()
-              ->script_bridge()
-              ->script_side()
-              ->CreateInstance(instanceId.c_str(), func.c_str(), result,
-                               opts_json.dump().c_str(), initData.c_str(),
-                               strcmp("Rax", bundleType) ? "\0" : extendsApi.c_str(),
-                               params);
-        };
-    if (strcmp(render_strategy, "DATA_RENDER") == 0) {
-        auto handler = EagleBridge::GetInstance()->data_render_handler();
-        if(handler){
-          handler->CreatePage(script, instanceId, render_strategy, initData, exec_js);
-        }
-        else{
-          WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(
-            instanceId, "CreatePageWithContent", 
-            "There is no data_render_handler when createInstance with DATA_RENDER mode");
-        }
-
-      return true;
-    } else if (strcmp(render_strategy, "DATA_RENDER_BINARY") == 0) {
-      std::string error;
-      std::string env_str;
-      std::string option = "{}";
-      auto opts_json_value = json11::Json::parse(opts, error);
-      if (error.empty()) {
-        auto env_obj = opts_json_value["env"];
-        auto bundleUrl = opts_json_value["bundleUrl"];
-        env_str = "";
-        if (env_obj.is_object()) {
-          const json11::Json& options = env_obj["options"];
-          const json11::Json::object& options_obj = options.object_items();
-          json11::Json::object new_env{
-              env_obj.object_items()
-          };
-          for(auto &it :options_obj){
-            new_env[it.first] = it.second;
-          }
-          env_str = json11::Json(new_env).dump();
-        }
-
-        json11::Json::object new_option{
-            {"bundleUrl", bundleUrl},
-            {"weex", json11::Json::object{
-                {"config",opts_json_value}
-            }}
-        };
-        option = json11::Json(new_option).dump();
-      }
-      
-      auto handler = EagleBridge::GetInstance()->data_render_handler();
-      if(handler){
-        handler->CreatePage(script, static_cast<size_t>(script_length), instanceId, option, env_str, initData, exec_js);
-      }
-      else{
-        WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(
-          instanceId, "CreatePageWithContent", 
-          "There is no data_render_handler when createInstance with DATA_RENDER_BINARY mode");
-      }
-      return true;
-    }
-
     if(strcmp(render_strategy, "JSON_RENDER") == 0){
-       JsonRenderManager::GetInstance()->CreatePage(script, instanceId, render_strategy);
-       return true;
+      JsonRenderManager::GetInstance()->CreatePage(script, instanceId, render_strategy);
+      return true;
     }
+
+    EagleBridge::GetInstance()->CreatePage(render_strategy, instanceId, func, script, script_length, opts, initData ,extendsApi, 0);
+    return true;
   }
 
 
@@ -603,12 +490,15 @@ std::unique_ptr<WeexJSResult> CoreSideInPlatform::ExecJSOnInstance(const char *i
 }
 
 int CoreSideInPlatform::DestroyInstance(const char *instanceId) {
-    auto handler = EagleBridge::GetInstance()->data_render_handler();
-    if (handler != nullptr) {
-      handler->DestroyInstance(instanceId);
-    }
     if (JsonRenderManager::GetInstance()->ClosePage(instanceId)) {
       return true;
+    }
+    EagleModeReturn mode = EagleBridge::GetInstance()->DestroyPage(instanceId);
+    if (mode == EagleModeReturn::EAGLE_ONLY){
+      return true;
+    } else {
+      //mode == EagleModeReturn::EAGLE_AND_SCRIPT || mode == EagleModeReturn::NOT_EAGLE
+      //continue;
     }
     auto script_side = WeexCoreManager::Instance()->script_bridge()->script_side();
     if (script_side) {
