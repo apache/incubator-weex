@@ -35,9 +35,10 @@ When some commits of  playground rely on unpublished features of weex-sdk,a SNAP
 
 ```
 cd android
-./gradlew clean install ArtifactoryPublish -PgroupId="org.apache.weex" -PartifactName="sdk_legacy" -PapachePackageName="false" -PunbundlingJSC="true" -PbuildRuntimeApi=true -PweexVersion=$PUBLISH_VERSION -PbintrayUser=weex -PbintrayApiKey=$JCENTER_TOKEN 
+./gradlew clean install artifactoryPublish -PgroupId="org.apache.weex" -PartifactName="sdk_legacy"
+-PapachePackageName="false" -PunbundlingJSC="true" -PbuildRuntimeApi=true -PweexVersion=$PUBLISH_VERSION -PbintrayUser=weex -PbintrayApiKey=$JCENTER_TOKEN
 ```
 
 * Explanation for variable:  
 $PUBLISH_VERSION The version of snapshot, like 0.26.1.3-SNAPSHOT  
-$JCENTER_TOKEN The private key for JCenter (https://bintray.com/alibabaweex/maven/weex_sdk/), which is the distribution channel for Android
+$JCENTER_TOKEN The private key for JCenter (https://bintray.com/weex/Android/sdk), which is the distribution channel for Android
