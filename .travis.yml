@@ -34,6 +34,14 @@ matrix:
           components:
             - android-26
             - extra-android-m2repository 
+      - env: TEST_SUITE=android ABI=x86_64
+        language: android
+        dist: trusty
+        jdk: oraclejdk8
+        android:
+          components:
+            - android-26
+            - extra-android-m2repository 
       # static check
       - env: TEST_SUITE=static_code_analysis OCLINT=true
         os: osx
@@ -126,13 +134,16 @@ script:
       "android") 
         case $ABI in
           "armeabi-v7a" )
-            GRADLE_ABI="-PsupportArmeabi-v7a=true -PsupportArm64-v8a=false -PsupportX86=false"
+            GRADLE_ABI="-PsupportArmeabi-v7a=true -PsupportArm64-v8a=false -PsupportX86=false -PsupportX86_64=false"
             ;;
           "arm64-v8a" )
-            GRADLE_ABI="-PsupportArmeabi-v7a=false -PsupportArm64-v8a=true -PsupportX86=false" 
+            GRADLE_ABI="-PsupportArmeabi-v7a=false -PsupportArm64-v8a=true -PsupportX86=false -PsupportX86_64=false" 
             ;;
           "x86" )
-            GRADLE_ABI="-PsupportArmeabi-v7a=false -PsupportArm64-v8a=false -PsupportX86=true"
+            GRADLE_ABI="-PsupportArmeabi-v7a=false -PsupportArm64-v8a=false -PsupportX86=true -PsupportX86_64=false"
+            ;;
+          "x86_64" )
+            GRADLE_ABI="-PsupportArmeabi-v7a=false -PsupportArm64-v8a=false -PsupportX86=false -PsupportX86_64=true"
             ;;
           "*" )
             GRADLE_ABI=""
