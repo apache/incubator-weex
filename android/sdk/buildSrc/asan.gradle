@@ -58,6 +58,8 @@ task copyASanLib(type: Copy){
             renamedAbi = "aarch64"
         if (asanAbi == "x86")
             renamedAbi = "i686"
+        if (asanAbi == "x86_64")
+            renamedAbi = "x86_64"
         new File(dir).eachFileRecurse { file ->
             if (file.name == 'libclang_rt.asan-' + renamedAbi + '-android.so')
                 from file.absolutePath

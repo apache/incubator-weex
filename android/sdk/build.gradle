@@ -64,6 +64,7 @@ android {
             exclude 'lib/armeabi-v7a/libc++_shared.so'
             exclude 'lib/arm64-v8a/libc++_shared.so'
             exclude 'lib/x86/libc++_shared.so'
+            exclude 'lib/x86_64/libc++_shared.so'
         }
     }
     copy {
@@ -132,6 +133,9 @@ android {
 
             if(!project.hasProperty('supportX86') || "false" != project.getProperty('supportX86')){
                 abiFilters 'x86'
+            }
+            if(!project.hasProperty('supportX86_64') || "false" != project.getProperty('supportX86_64')){
+                abiFilters 'x86_64'
             }
         }
         externalNativeBuild {

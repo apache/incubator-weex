@@ -70,8 +70,7 @@ task copyJscToJniDir(type: Copy, dependsOn: unzipJSC) {
     into libsDir
     include 'jni/**/*.so'
     exclude '**/libweexcore.so', '**/libweexjsb.so', '**/libweexjss.so',
-            '**/libweexjssr.so', '**/libweexjst.so', '**/libc++_shared.so',
-            '**/x86_64/**'
+            '**/libweexjssr.so', '**/libweexjst.so', '**/libc++_shared.so'
     includeEmptyDirs false
     eachFile {
         def path_list = new LinkedList<>(it.relativePath.segments.toList())

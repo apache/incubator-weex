@@ -44,7 +44,7 @@ add_definitions(-DDEBUG=1)
 message("ANDROID_PROJECT_DIR:"${ANDROID_PROJECT_DIR})
 set(LOCAL_LIBRARIES_DIR ${ANDROID_PROJECT_DIR}/src/main/jniLibs/${ANDROID_ABI})
 
-if ("${ANDROID_ABI}" STREQUAL "x86")
+if ("${ANDROID_ABI}" STREQUAL "x86" OR "${ANDROID_ABI}" STREQUAL "x86_64")
     # todo
 else ()
     if ("${ENABLE_ASAN}" STREQUAL "true")
