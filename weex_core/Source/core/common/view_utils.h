@@ -116,7 +116,7 @@ namespace WeexCore {
     }
     float f = getFloat(temp.c_str());
     float density = getFloat(WXCoreEnvironment::getInstance()->GetOption(SCALE).c_str());
-    return density * f * viewport / device_width; WXCoreEnvironment::getInstance()->DeviceWidth();
+    return density * f * viewport / device_width;
   }
 
   inline static float getFloatByViewport(std::string src, const float &viewport,
@@ -139,14 +139,15 @@ namespace WeexCore {
     return ret;
   }
 
-  inline static float getWebPxByWidth(float pxValue, float customViewport) {
+  inline static float getWebPxByWidth(float pxValue, float customViewport, float deviceWidth) {
     if (isnan(pxValue))
       return NAN;
 
-    float realPx = (pxValue * customViewport / WXCoreEnvironment::getInstance()->DeviceWidth());
 #if OS_IOS
+    float realPx = (pxValue * customViewport / deviceWidth);
     return realPx;
 #else
+    float realPx = (pxValue * customViewport / WXCoreEnvironment::getInstance()->DeviceWidth());
     float result = realPx > 0.005 && realPx < 1 ? 1.0f : realPx;
     return result;
 #endif

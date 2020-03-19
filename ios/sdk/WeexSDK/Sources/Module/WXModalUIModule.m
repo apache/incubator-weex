@@ -156,7 +156,7 @@ static const CGFloat WXToastDefaultPadding = 30.0;
         window = [[[UIApplication sharedApplication] windows] firstObject];
     }
     CGSize windowSize = window.frame.size;
-    if ([WXUtility deviceIsiPad]) {
+    if ([WXUtility enableAdaptiveLayout]) {
         windowSize = self.weexInstance.viewController.view.frame.size;
     }
     

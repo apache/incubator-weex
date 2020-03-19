@@ -45,6 +45,7 @@
 
 static BOOL enableRTLLayoutDirection = YES;
 static BOOL isDarkSchemeSupportEnabled = YES;
+static BOOL enableAdaptiveLayout = NO;
 
 void WXPerformBlockOnMainThread(void (^ _Nonnull block)(void))
 {
@@ -850,6 +851,18 @@ static BOOL gIsEnvironmentUsingDarkScheme = NO;
 + (BOOL)isDarkSchemeSupportEnabled
 {
     return isDarkSchemeSupportEnabled;
+}
+
+#pragma mark - Adapt iPad
+
++ (void)setEnableAdaptiveLayout:(BOOL)value
+{
+    enableAdaptiveLayout = value;
+}
+
++ (BOOL)enableAdaptiveLayout
+{
+    return enableAdaptiveLayout;
 }
 
 #pragma mark - get deviceID

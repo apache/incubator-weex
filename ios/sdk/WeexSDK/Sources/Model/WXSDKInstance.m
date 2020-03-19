@@ -256,6 +256,7 @@ typedef enum : NSUInteger {
                 _rootView.frame = frame;
                 WXPerformBlockOnComponentThread(^{
                     [self.componentManager rootViewFrameDidChange:frame];
+                    [[WXSDKManager bridgeMgr] fireEvent:_instanceId ref:WX_SDK_ROOT_REF type:@"viewportchange" params:nil domChanges:nil];
                 });
             }
         });
@@ -301,8 +302,11 @@ typedef enum : NSUInteger {
     [WXCoreBridge setPageArgument:_instanceId key:@"url" value:[_scriptURL absoluteString]];
 }
 
-- (void)setPageRequiredWidth:(CGFloat)width height:(CGFloat)height
+- (BOOL)setPageRequiredWidth:(CGFloat)width height:(CGFloat)height
 {
+    if (CGSizeEqualToSize(_screenSize, CGSizeMake(width, height))) {
+        return NO;
+    }
     _screenSize = CGSizeMake(width, height);
     
     // notify weex core
@@ -310,6 +314,7 @@ typedef enum : NSUInteger {
     WXPerformBlockOnComponentThread(^{
         [WXCoreBridge setPageRequired:pageId width:width height:height];
     });
+    return YES;
 }
 
 - (void)renderWithURL:(NSURL *)url
