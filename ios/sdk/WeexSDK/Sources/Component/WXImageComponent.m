@@ -460,8 +460,10 @@ WX_EXPORT_METHOD(@selector(save:))
         }
         newURL = [choosedSrc copy];
         if ([newURL length] == 0) {
+            WXLogWarning(@"Image Url is null");
             return;
         }
+        WXLogInfo(@"Will download image: %@", newURL);
         WX_REWRITE_URL(choosedSrc, WXResourceTypeImage, self.weexInstance)
         NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp),  @"blurRadius":@(self.blurRadius), @"instanceId":[self _safeInstanceId], @"pageURL": self.weexInstance.scriptURL ?: @""};
         [[self imageLoader] setImageViewWithURL:(UIImageView*)self.view url:[NSURL URLWithString:newURL] placeholderImage:nil options:userInfo progress:^(NSInteger receivedSize, NSInteger expectedSize) {
