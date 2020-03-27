@@ -428,7 +428,7 @@ typedef enum : NSUInteger {
 /**
  * Set specific required page width and height to prevent this page using global values.
  */
-- (void)setPageRequiredWidth:(CGFloat)width height:(CGFloat)height;
+- (BOOL)setPageRequiredWidth:(CGFloat)width height:(CGFloat)height;
 
 /**
  * Set specific required view port width prevent this page using global value (750px).

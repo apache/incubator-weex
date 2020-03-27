@@ -531,6 +531,13 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
 + (void)setDarkSchemeSupportEnable:(BOOL)value;
 + (BOOL)isDarkSchemeSupportEnabled;
 
+/**
+*  @abstract Switch for adapt iPad.
+*
+*/
++ (void)setEnableAdaptiveLayout:(BOOL)value;
++ (BOOL)enableAdaptiveLayout;
+
 + (long) getUnixFixTimeMillis;
 
 + (NSArray<NSString *> *_Nullable)extractPropertyNamesOfJSValueObject:(JSValue *_Nullable)jsvalue;

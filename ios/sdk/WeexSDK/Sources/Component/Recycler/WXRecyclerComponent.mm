@@ -229,6 +229,15 @@ typedef enum : NSUInteger {
     }
 }
 
+- (void)updateStyles:(NSDictionary *)styles {
+    [super updateStyles:styles];
+
+    //Need layout if the attribute of columnWidth changed on iPad
+    if ([WXUtility enableAdaptiveLayout]) {
+        [self updateAttributes:self.attributes];
+    }
+}
+
 - (void)updateAttributes:(NSDictionary *)attributes
 {
     [super updateAttributes:attributes];
