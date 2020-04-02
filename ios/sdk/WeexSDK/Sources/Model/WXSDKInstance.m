@@ -715,7 +715,7 @@ typedef enum : NSUInteger {
             return;
         }
         
-        if (strongSelf.renderPlugin) {
+        if (strongSelf.renderPlugin && strongSelf.renderPlugin.isSkipFramework) {
             [strongSelf.apmInstance onStage:KEY_PAGE_STAGES_DOWN_BUNDLE_END];
             [strongSelf _renderWithData:data];
             return;
