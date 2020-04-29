@@ -49,6 +49,7 @@ FOUNDATION_EXPORT const unsigned char WeexSDKVersionString[];
 #import <WeexSDK/WXResourceLoader.h>
 #import <WeexSDK/WXRefreshComponent.h>
 #import <WeexSDK/WXRecyclerComponent.h>
+#import <WeexSDK/WXReactorProtocol.h>
 #import <WeexSDK/WXPrerenderManager.h>
 #import <WeexSDK/WXPageEventNotifyEvent.h>
 #import <WeexSDK/WXNetworkProtocol.h>

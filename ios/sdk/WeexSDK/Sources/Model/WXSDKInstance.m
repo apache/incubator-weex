@@ -54,6 +54,7 @@
 #import "WXDarkSchemeProtocol.h"
 #import "WXDarkSchemeModule.h"
 #import <WeexSDK/WXEaglePluginManager.h>
+#import "WXReactorProtocol.h"
 
 #define WEEX_RENDER_TYPE_PLATFORM       @"platform"
 
@@ -339,7 +340,7 @@ typedef enum : NSUInteger {
         return;
     }
     WXLogInfo(@"pageid: %@ renderWithURL: %@", _instanceId, url.absoluteString);
-    
+
     _renderPlugin = [WXEaglePluginManager renderWithURL:&url];
     if (!_renderPlugin) {
         _renderPlugin = [WXEaglePluginManager renderWithOption:options];
@@ -597,7 +598,15 @@ typedef enum : NSUInteger {
         return;
     }
     
-    [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:mainBundleString options:dictionary data:_jsData];
+    if ([dictionary[@"USE_REACTOR"] boolValue]) {
+        id reactorHandler = [WXHandlerFactory handlerForProtocol:NSProtocolFromString(@"WXReactorProtocol")];
+        if (reactorHandler) {
+            [reactorHandler registerJSContext:self.instanceId];
+            [reactorHandler render:self.instanceId source:mainBundleString];
+        }
+    } else {
+        [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:mainBundleString options:dictionary data:_jsData];
+    }
     
     WX_MONITOR_PERF_SET(WXPTBundleSize, [mainBundleString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], self);
     
@@ -830,7 +839,13 @@ typedef enum : NSUInteger {
 
     [WXPrerenderManager removePrerenderTaskforUrl:[self.scriptURL absoluteString]];
     [WXPrerenderManager destroyTask:self.instanceId];
-    if (!self.renderPlugin) {
+
+    if ([_options[@"USE_REACTOR"] boolValue]) {
+        id reactorHandler = [WXHandlerFactory handlerForProtocol:NSProtocolFromString(@"WXReactorProtocol")];
+        if (reactorHandler) {
+            [reactorHandler unregisterJSContext:self.instanceId];
+        }
+    } else if (!self.renderPlugin) {
         [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
     }
     
