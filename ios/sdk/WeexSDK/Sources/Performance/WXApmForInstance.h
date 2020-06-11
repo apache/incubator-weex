@@ -34,7 +34,7 @@ extern NSString* const KEY_PAGE_PROPERTIES_JSLIB_VERSION;
 extern NSString* const KEY_PAGE_PROPERTIES_WEEX_VERSION;
 extern NSString* const KEY_PAGE_PROPERTIES_REQUEST_TYPE;
 extern NSString* const KEY_PAGE_PROPERTIES_Z_CACHE_INFO;
-extern NSString* const KEY_PAGE_PROPERTIES_GREY_BUNDLE;
+extern NSString* const KEY_PAGE_PROPERTIES_AIR_TAG;
 extern NSString* const KEY_PAGE_PROPERTIES_JS_FM_INIT;
 extern NSString* const KEY_PAGE_PROPERTIES_BUNDLE_TYPE;
 extern NSString* const KEY_PAGE_PROPERTIES_CONTAINER_NAME;
@@ -125,6 +125,7 @@ extern NSString* const VALUE_ERROR_CODE_DEFAULT;
 @property (nonatomic, assign) BOOL isDownLoadFailed;
 @property (nonatomic, assign) BOOL forceStopRecordInteractionTime;
 @property (nonatomic,assign) double pageRatio;
+@property (nonatomic, copy) NSString* airInfo;
 @property (nonatomic,strong) NSMutableDictionary<NSString*,NSNumber*>* recordStatsMap;
 @property (nonatomic,strong) NSMutableDictionary<NSString*,NSNumber*>* recordStageMap;
 

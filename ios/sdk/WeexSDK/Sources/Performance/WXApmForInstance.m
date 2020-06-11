@@ -44,7 +44,7 @@ NSString* const KEY_PAGE_PROPERTIES_JSLIB_VERSION  = @"wxJSLibVersion";
 NSString* const KEY_PAGE_PROPERTIES_WEEX_VERSION  = @"wxSDKVersion";
 NSString* const KEY_PAGE_PROPERTIES_REQUEST_TYPE  = @"wxRequestType";
 NSString* const KEY_PAGE_PROPERTIES_Z_CACHE_INFO  = @"wxZCacheInfo";
-NSString* const KEY_PAGE_PROPERTIES_GREY_BUNDLE = @"wxGreyBundle";
+NSString* const KEY_PAGE_PROPERTIES_AIR_TAG = @"wxAirTag";
 NSString* const KEY_PAGE_PROPERTIES_JS_FM_INIT  = @"wxJsFrameworkInit";
 NSString* const KEY_PAGE_PROPERTIES_BUNDLE_TYPE = @"wxBundleType";
 NSString* const KEY_PAGE_PROPERTIES_CONTAINER_NAME = @"wxContainerName";
@@ -441,9 +441,10 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
         return;
     }
     
-    id wxGreyBundle = [extInfo objectForKey:KEY_PAGE_PROPERTIES_GREY_BUNDLE];
-    if (nil != wxGreyBundle && [wxGreyBundle isKindOfClass:NSString.class]) {
-        [self setProperty:KEY_PAGE_PROPERTIES_GREY_BUNDLE withValue:wxGreyBundle];
+    id wxAirTag = [extInfo objectForKey:KEY_PAGE_PROPERTIES_AIR_TAG];
+    if (nil != wxAirTag && [wxAirTag isKindOfClass:NSString.class]) {
+        [self setProperty:KEY_PAGE_PROPERTIES_AIR_TAG withValue:wxAirTag];
+        _airInfo = wxAirTag;
     }
 
     id wxRequestType = [extInfo objectForKey:KEY_PAGE_PROPERTIES_REQUEST_TYPE];
