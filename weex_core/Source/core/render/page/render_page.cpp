@@ -338,8 +338,6 @@ bool RenderPage::UpdateStyle(
   if (src != nullptr) {
     src->clear();
     src->shrink_to_fit();
-    delete src;
-    src = nullptr;
   }
 
   if (style != nullptr) {
@@ -395,8 +393,6 @@ bool RenderPage::UpdateAttr(
   if (attrs != nullptr) {
     attrs->clear();
     attrs->shrink_to_fit();
-    delete attrs;
-    attrs = nullptr;
   }
 
   return true;

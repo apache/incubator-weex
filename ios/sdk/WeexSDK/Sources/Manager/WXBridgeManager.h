@@ -252,6 +252,8 @@ extern "C" {
 
 - (void)checkJSThread;
 
++ (NSThread *)jsThread;
+
 @end
 
 NS_ASSUME_NONNULL_END

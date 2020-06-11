@@ -1821,9 +1821,9 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     return nullptr;
 }
 
-+ (std::vector<std::pair<std::string, std::string>>*)_parseMapValuePairs:(NSDictionary *)data
++ (std::unique_ptr<std::vector<std::pair<std::string, std::string>>>)_parseMapValuePairs:(NSDictionary *)data
 {
-    std::vector<std::pair<std::string, std::string>>* result = new std::vector<std::pair<std::string, std::string>>();
+    __block std::unique_ptr<std::vector<std::pair<std::string, std::string>>> result = std::make_unique<std::vector<std::pair<std::string, std::string>>>();
     [data enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
         ConvertToCString(obj, ^(const char * value) {
             if (value != nullptr) {
@@ -1831,7 +1831,7 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
             }
         });
     }];
-    return result;
+    return std::move(result);
 }
 
 + (void)callAddElement:(NSString*)pageId parentRef:(NSString*)parentRef data:(NSDictionary*)data index:(int)index
@@ -1877,13 +1877,13 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 + (void)callUpdateAttrs:(NSString*)pageId ref:(NSString*)ref data:(NSDictionary*)data
 {
     SetConvertCurrentPage(pageId);
-    WeexCore::RenderManager::GetInstance()->UpdateAttr([pageId UTF8String] ?: "", [ref UTF8String] ?: "", [self _parseMapValuePairs:data]);
+    WeexCore::RenderManager::GetInstance()->UpdateAttr([pageId UTF8String] ?: "", [ref UTF8String] ?: "", [self _parseMapValuePairs:data].get());
 }
 
 + (void)callUpdateStyle:(NSString*)pageId ref:(NSString*)ref data:(NSDictionary*)data
 {
     SetConvertCurrentPage(pageId);
-    WeexCore::RenderManager::GetInstance()->UpdateStyle([pageId UTF8String] ?: "", [ref UTF8String] ?: "", [self _parseMapValuePairs:data]);
+    WeexCore::RenderManager::GetInstance()->UpdateStyle([pageId UTF8String] ?: "", [ref UTF8String] ?: "", [self _parseMapValuePairs:data].get());
 }
 
 + (void)callAddEvent:(NSString*)pageId ref:(NSString*)ref event:(NSString*)event

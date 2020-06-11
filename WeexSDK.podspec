@@ -107,7 +107,8 @@ Pod::Spec.new do |s|
                           'weex_core/Source/core/layout/flex_enum.h',
                           'weex_core/Source/core/layout/layout.h',
                           'weex_core/Source/core/layout/style.h',
-                          'weex_core/Source/core/bridge/eagle_bridge.h'
+                          'weex_core/Source/core/bridge/eagle_bridge.h',
+                          'weex_core/Source/core/render/page/reactor_page.h'
 
   s.module_map = 'WeexSDK.modulemap'
 
