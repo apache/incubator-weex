@@ -575,6 +575,14 @@
 		BD88C14C22F02128004467AA /* render_action_update_richtext_child_style.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD88C14822F02128004467AA /* render_action_update_richtext_child_style.cpp */; };
 		BD9205FB223651D900EDF93D /* eagle_bridge.h in Headers */ = {isa = PBXBuildFile; fileRef = BD9205F9223651D800EDF93D /* eagle_bridge.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BD9205FC223651D900EDF93D /* eagle_bridge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD9205FA223651D800EDF93D /* eagle_bridge.cpp */; };
+		BDB112982459D6C2008492F9 /* WXReactorProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = BDB112972459D6C2008492F9 /* WXReactorProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BDB1129B2459D71E008492F9 /* reactor_page.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDB112992459D71E008492F9 /* reactor_page.cpp */; };
+		BDB1129C2459D71E008492F9 /* reactor_page.h in Headers */ = {isa = PBXBuildFile; fileRef = BDB1129A2459D71E008492F9 /* reactor_page.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BDB1129D2459D802008492F9 /* WXReactorProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = BDB112972459D6C2008492F9 /* WXReactorProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BDB1129E2459D8D3008492F9 /* reactor_page.cpp in Headers */ = {isa = PBXBuildFile; fileRef = BDB112992459D71E008492F9 /* reactor_page.cpp */; };
+		BDB1129F2459D8FC008492F9 /* reactor_page.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDB112992459D71E008492F9 /* reactor_page.cpp */; };
+		BDB112A02459D90F008492F9 /* reactor_page.h in Headers */ = {isa = PBXBuildFile; fileRef = BDB1129A2459D71E008492F9 /* reactor_page.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BDBA319B248D0A5200C6EDD0 /* reactor_page.cpp in Headers */ = {isa = PBXBuildFile; fileRef = BDB112992459D71E008492F9 /* reactor_page.cpp */; };
 		BDEEADBA22F2902E0099F1D7 /* time_calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDEEADB822F2902D0099F1D7 /* time_calculator.cpp */; };
 		BDEEADBB22F2902E0099F1D7 /* time_calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDEEADB822F2902D0099F1D7 /* time_calculator.cpp */; };
 		BDEEADBC22F2902E0099F1D7 /* time_calculator.h in Headers */ = {isa = PBXBuildFile; fileRef = BDEEADB922F2902E0099F1D7 /* time_calculator.h */; };
@@ -1331,6 +1339,9 @@
 		BD88C14822F02128004467AA /* render_action_update_richtext_child_style.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_action_update_richtext_child_style.cpp; sourceTree = "<group>"; };
 		BD9205F9223651D800EDF93D /* eagle_bridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = eagle_bridge.h; sourceTree = "<group>"; };
 		BD9205FA223651D800EDF93D /* eagle_bridge.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = eagle_bridge.cpp; sourceTree = "<group>"; };
+		BDB112972459D6C2008492F9 /* WXReactorProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXReactorProtocol.h; sourceTree = "<group>"; };
+		BDB112992459D71E008492F9 /* reactor_page.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = reactor_page.cpp; sourceTree = "<group>"; };
+		BDB1129A2459D71E008492F9 /* reactor_page.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = reactor_page.h; sourceTree = "<group>"; };
 		BDEEADB822F2902D0099F1D7 /* time_calculator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = time_calculator.cpp; sourceTree = "<group>"; };
 		BDEEADB922F2902E0099F1D7 /* time_calculator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = time_calculator.h; sourceTree = "<group>"; };
 		C401945D1E344E8300D19C31 /* WXFloatCompareTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXFloatCompareTests.m; sourceTree = "<group>"; };
@@ -1887,6 +1898,7 @@
 		77D1611C1C02DD3C0010B15B /* Protocol */ = {
 			isa = PBXGroup;
 			children = (
+				BDB112972459D6C2008492F9 /* WXReactorProtocol.h */,
 				D7D6B6E1238E1B1D00BE56DD /* WXDarkSchemeProtocol.h */,
 				33CE19122153444900CF9670 /* WXJSFrameworkLoadProtocol.h */,
 				17036A5220FDE7490029AE3D /* WXApmProtocol.h */,
@@ -2226,6 +2238,8 @@
 		B8D66B372125572F003960BD /* page */ = {
 			isa = PBXGroup;
 			children = (
+				BDB112992459D71E008492F9 /* reactor_page.cpp */,
+				BDB1129A2459D71E008492F9 /* reactor_page.h */,
 				77788B6E2229252C000D5102 /* render_page_base.cpp */,
 				77788B702229252C000D5102 /* render_page_base.h */,
 				77788B6F2229252C000D5102 /* render_page_custom.cpp */,
@@ -2448,6 +2462,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BDB112982459D6C2008492F9 /* WXReactorProtocol.h in Headers */,
+				BDB1129C2459D71E008492F9 /* reactor_page.h in Headers */,
 				77E659F11C0C3612008B8775 /* WXModuleFactory.h in Headers */,
 				F75C591C2313C1FC002FFF94 /* WXStreamModule.h in Headers */,
 				986CEAA723B230C2004166E0 /* WXEaglePlugin.h in Headers */,
@@ -2461,7 +2477,6 @@
 				45E0B4C121CB7B82005D1B3B /* WXConvertUtility.h in Headers */,
 				BD88C13F22F02111004467AA /* render_action_remove_child_from_richtext.h in Headers */,
 				BD9205FB223651D900EDF93D /* eagle_bridge.h in Headers */,
-				BD9205F82236518700EDF93D /* WXDataRenderHandler.h in Headers */,
 				D7D6B6E2238E1B1D00BE56DD /* WXDarkSchemeProtocol.h in Headers */,
 				7715EB6221A69DD9001F1108 /* WXRichText.h in Headers */,
 				B8D66C1B21255730003960BD /* style.h in Headers */,
@@ -2523,6 +2538,7 @@
 				B8D66C6B21255730003960BD /* render_scroller.h in Headers */,
 				B8D66C6921255730003960BD /* render_mask.h in Headers */,
 				C4C30DE91E1B833D00786B6C /* WXComponent+PseudoClassManagement.h in Headers */,
+				BDB1129E2459D8D3008492F9 /* reactor_page.cpp in Headers */,
 				591DD3321D23AD5800BE8709 /* WXErrorView.h in Headers */,
 				B8D66C8D21255730003960BD /* render_creator.h in Headers */,
 				17C74F0B2072145100AB4CAB /* WXAnalyzerCenter+Transfer.h in Headers */,
@@ -2700,6 +2716,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BDB1129D2459D802008492F9 /* WXReactorProtocol.h in Headers */,
+				BDB112A02459D90F008492F9 /* reactor_page.h in Headers */,
 				DCA4461D1EFA5AAA00D0CFA8 /* WXHandlerFactory.h in Headers */,
 				DCA446101EFA5A8500D0CFA8 /* WXBridgeMethod.h in Headers */,
 				DCA4461A1EFA5AA000D0CFA8 /* WXInvocationConfig.h in Headers */,
@@ -2769,6 +2787,7 @@
 				DCA4459F1EFA56EC00D0CFA8 /* WXURLRewriteProtocol.h in Headers */,
 				DCA445A21EFA570100D0CFA8 /* WXScrollerComponent.h in Headers */,
 				B8D66C7621255730003960BD /* render_object.h in Headers */,
+				BDBA319B248D0A5200C6EDD0 /* reactor_page.cpp in Headers */,
 				DCA445B71EFA579200D0CFA8 /* WXImgLoaderProtocol.h in Headers */,
 				1746EA7420E9D253007E55BD /* WXComponent_performance.h in Headers */,
 				B8D66CEB21255B2A003960BD /* WXWebSocketLoader.h in Headers */,
@@ -3208,6 +3227,7 @@
 				744D61111E49979000B624B3 /* WXFooterComponent.m in Sources */,
 				B8D66C0721255730003960BD /* core_environment.cpp in Sources */,
 				745B2D6F1E5A8E1E0092D38A /* WXRecyclerUpdateController.m in Sources */,
+				BDB1129B2459D71E008492F9 /* reactor_page.cpp in Sources */,
 				745B2D6B1E5A8E1E0092D38A /* WXRecyclerComponent.mm in Sources */,
 				B8D66C0D21255730003960BD /* core_side_in_platform.cpp in Sources */,
 				B8D66C5D21255730003960BD /* render_action_appendtree_createfinish.cpp in Sources */,
@@ -3387,6 +3407,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D77286FF22C9B22C00E1DA7D /* eagle_bridge.cpp in Sources */,
+				BDB1129F2459D8FC008492F9 /* reactor_page.cpp in Sources */,
 				453F376F219A78D700A03F1D /* WXConvertUtility.mm in Sources */,
 				453F376E219A789A00A03F1D /* default_request_handler.mm in Sources */,
 				453F376A219A784F00A03F1D /* http_module.cc in Sources */,

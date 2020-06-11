@@ -121,6 +121,11 @@ typedef BOOL (^WXModuleInterceptCallback)(NSString *moduleName, NSString *method
 @property (nonatomic, strong) NSDictionary* containerInfo;
 
 /**
+* Params for Canal
+**/
+@property (nonatomic, strong) NSMutableDictionary* canalParams;
+
+/**
  * Whether this instance is rendered or not. Please MUST not render an instance twice even if you have called destroyInstance.
  **/
 @property (nonatomic, assign, readonly) BOOL isRendered;
@@ -386,6 +391,11 @@ typedef enum : NSUInteger {
  * complete url based with bundle url
  */
 - (NSURL *)completeURL:(NSString *)url;
+
+/**
+* register jscontext for reactor
+*/
+- (void)registerReactorContext:(JSContext*)context;
 
 /**
  * jsbundle str ,may be nil (weak)

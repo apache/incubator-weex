@@ -416,11 +416,14 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
         return;
     }
     if (!CGRectEqualToRect(self.view.frame, CGRectZero)) {
+        CGPoint pageLocation = [recognizer locationInView:self.weexInstance.rootView];
         CGRect frame = [self.view.superview convertRect:self.view.frame toView:self.view.window];
         position[@"x"] = @(frame.origin.x/scaleFactor);
         position[@"y"] = @(frame.origin.y/scaleFactor);
         position[@"width"] = @(frame.size.width/scaleFactor);
         position[@"height"] = @(frame.size.height/scaleFactor);
+        position[@"pageX"] = @(pageLocation.x/scaleFactor);
+        position[@"pageY"] = @(pageLocation.y/scaleFactor);
     }
     [self fireEvent:@"click" params:@{@"position":position}];
 }

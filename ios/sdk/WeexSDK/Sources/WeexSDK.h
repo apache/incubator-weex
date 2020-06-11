@@ -24,6 +24,7 @@ FOUNDATION_EXPORT double WeexSDKVersionNumber;
 FOUNDATION_EXPORT const unsigned char WeexSDKVersionString[];
 
 #import <WeexSDK/style.h>
+#import <WeexSDK/reactor_page.h>
 #import <WeexSDK/layout.h>
 #import <WeexSDK/flex_enum.h>
 #import <WeexSDK/eagle_bridge.h>
@@ -49,6 +50,7 @@ FOUNDATION_EXPORT const unsigned char WeexSDKVersionString[];
 #import <WeexSDK/WXResourceLoader.h>
 #import <WeexSDK/WXRefreshComponent.h>
 #import <WeexSDK/WXRecyclerComponent.h>
+#import <WeexSDK/WXReactorProtocol.h>
 #import <WeexSDK/WXPrerenderManager.h>
 #import <WeexSDK/WXPageEventNotifyEvent.h>
 #import <WeexSDK/WXNetworkProtocol.h>

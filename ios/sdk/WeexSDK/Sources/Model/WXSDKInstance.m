@@ -54,6 +54,7 @@
 #import "WXDarkSchemeProtocol.h"
 #import "WXDarkSchemeModule.h"
 #import <WeexSDK/WXEaglePluginManager.h>
+#import "WXReactorProtocol.h"
 
 #define WEEX_RENDER_TYPE_PLATFORM       @"platform"
 
@@ -164,6 +165,8 @@ typedef enum : NSUInteger {
         _apmInstance = [[WXApmForInstance alloc] init];
                 
         _useBackupJsThread = NO;
+        _useReactor = NO;
+        _canalParams = [NSMutableDictionary dictionary];
 
         [self addObservers];
     }
@@ -339,7 +342,7 @@ typedef enum : NSUInteger {
         return;
     }
     WXLogInfo(@"pageid: %@ renderWithURL: %@", _instanceId, url.absoluteString);
-    
+
     _renderPlugin = [WXEaglePluginManager renderWithURL:&url];
     if (!_renderPlugin) {
         _renderPlugin = [WXEaglePluginManager renderWithOption:options];
@@ -399,6 +402,21 @@ typedef enum : NSUInteger {
         NSMutableDictionary *newOptions = [NSMutableDictionary dictionaryWithDictionary:options];
         [newOptions setValue:_jsData forKey:@"jsData"];
         [self.renderPlugin runPluginTask:_instanceId task:@"_downloadAndExecScript:options:" options:newOptions];
+    }
+}
+
+- (void)registerReactorContext:(JSContext*)context {
+    if (!context) {
+        return;
+    }
+    [WXCoreBridge install];
+    [self.canalParams setObject:context forKey:@"mainJSContext"];
+
+    id<WXReactorProtocol> reactorHandler = [WXHandlerFactory handlerForProtocol:NSProtocolFromString(@"WXReactorProtocol")];
+    if (reactorHandler) {
+        [reactorHandler registerJSContext:self.instanceId];
+    } else {
+        WXLogError(@"There is no reactor handler");
     }
 }
 
@@ -597,7 +615,20 @@ typedef enum : NSUInteger {
         return;
     }
     
-    [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:mainBundleString options:dictionary data:_jsData];
+    if ([dictionary[@"USE_REACTOR"] boolValue]) {
+        id<WXReactorProtocol> reactorHandler = [WXHandlerFactory handlerForProtocol:NSProtocolFromString(@"WXReactorProtocol")];
+        if (reactorHandler) {
+            _useReactor = YES;
+            if (![self.canalParams objectForKey:@"mainJSContext"]) {
+                [reactorHandler registerJSContext:self.instanceId];
+            }
+            [reactorHandler render:self.instanceId source:mainBundleString data:_jsData];
+        } else {
+            WXLogError(@"There is no reactor handler");
+        }
+    } else {
+        [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:mainBundleString options:dictionary data:_jsData];
+    }
     
     WX_MONITOR_PERF_SET(WXPTBundleSize, [mainBundleString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], self);
     
@@ -830,7 +861,15 @@ typedef enum : NSUInteger {
 
     [WXPrerenderManager removePrerenderTaskforUrl:[self.scriptURL absoluteString]];
     [WXPrerenderManager destroyTask:self.instanceId];
-    if (!self.renderPlugin) {
+
+    if (_useReactor) {
+        id<WXReactorProtocol> reactorHandler = [WXHandlerFactory handlerForProtocol:NSProtocolFromString(@"WXReactorProtocol")];
+        if (reactorHandler) {
+            [reactorHandler unregisterJSContext:self.instanceId];
+        } else {
+            WXLogError(@"There is no reactor handler");
+        }
+    } else if (!self.renderPlugin) {
         [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
     }
     

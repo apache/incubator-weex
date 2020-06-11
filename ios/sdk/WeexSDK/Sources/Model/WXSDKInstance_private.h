@@ -36,6 +36,8 @@
 @property (nonatomic, strong) NSString *mainBundleString;
 @property (nonatomic, weak) id <WXEaglePlugin> renderPlugin;
 
+@property (nonatomic, assign) BOOL useReactor;
+
 // add monitor information
 @property (nonatomic, strong) NSString *callCreateInstanceContext;
 @property (nonatomic, strong) NSString *createInstanceContextResult;

@@ -39,6 +39,7 @@
 #import "WXExceptionUtils.h"
 #import "WXSDKEngine.h"
 #import "WXConfigCenterProtocol.h"
+#import "WXReactorProtocol.h"
 
 @interface WXBridgeManager ()
 
@@ -642,7 +643,16 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
         WXLogError(@"Event type and component ref should not be nil");
         return;
     }
-    
+    if (instance.useReactor) {
+        id<WXReactorProtocol> reactorHandler = [WXHandlerFactory handlerForProtocol:NSProtocolFromString(@"WXReactorProtocol")];
+        if (reactorHandler) {
+            [reactorHandler fireEvent:instanceId ref:ref event:type args:params?:@{} domChanges:domChanges?:@{}];
+        } else {
+            WXLogError(@"There is no reactor handler");
+        }
+        return;
+    }
+
     NSArray *args = @[ref, type, params?:@{}, domChanges?:@{}];
     if (handlerArguments) {
         NSMutableArray *newArgs = [args mutableCopy];
@@ -706,7 +716,14 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
             [instance.renderPlugin invokeCallBack:instanceId function:funcId args:strongArgs keepAlive:keepAlive];
         });
     }
-    else {
+    else if (instance.useReactor) {
+        id<WXReactorProtocol> reactorHandler = [WXHandlerFactory handlerForProtocol:NSProtocolFromString(@"WXReactorProtocol")];
+        if (reactorHandler) {
+            [reactorHandler invokeCallBack:instanceId function:funcId args:args];
+        } else {
+            WXLogError(@"There is no reactor handler");
+        }
+    } else {
         WXCallJSMethod *method = [[WXCallJSMethod alloc] initWithModuleName:@"jsBridge" methodName:@"callback" arguments:args instance:instance];
         [self callJsMethod:method];
     }
