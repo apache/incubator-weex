@@ -82,6 +82,9 @@ static NSMutableDictionary *recordExceptionHistory = nil;
             }
             [extInfo setObject:bundleTemplateCommit forKey:@"wxTemplateOfBundle"];
             [extInfo setObject:[instance.apmInstance templateInfo] forKey:@"templateInfo"];
+            if (instance.apmInstance.airInfo) {
+                [extInfo setObject:instance.apmInstance.airInfo forKey:KEY_PAGE_PROPERTIES_AIR_TAG];
+            }
             NSNumber* pageStartTime = [instance.apmInstance.stageDic objectForKey:KEY_PAGE_STAGES_DOWN_BUNDLE_START];
             if (nil == pageStartTime) {
                 pageStartTime = [instance.apmInstance.stageDic objectForKey:KEY_PAGE_STAGES_RENDER_ORGIGIN];
