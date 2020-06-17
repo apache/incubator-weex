@@ -158,34 +158,35 @@ static const CGFloat WXToastDefaultPadding = 30.0;
     CGSize windowSize = window.frame.size;
     if ([WXUtility enableAdaptiveLayout]) {
         windowSize = self.weexInstance.viewController.view.frame.size;
-    }
-    
-    // adjust to screen orientation
-    UIInterfaceOrientation orientation = (UIInterfaceOrientation)[[UIApplication sharedApplication] statusBarOrientation];
-    switch (orientation) {
-        case UIDeviceOrientationPortrait: {
-            point = CGPointMake(windowSize.width/2, windowSize.height/2);
-            break;
+        point = window.center;
+    } else {
+        // adjust to screen orientation
+        UIInterfaceOrientation orientation = (UIInterfaceOrientation)[[UIApplication sharedApplication] statusBarOrientation];
+        switch (orientation) {
+            case UIDeviceOrientationPortrait: {
+                point = CGPointMake(windowSize.width/2, windowSize.height/2);
+                break;
+            }
+            case UIDeviceOrientationPortraitUpsideDown: {
+                toastView.transform = CGAffineTransformMakeRotation(M_PI);
+                float width = windowSize.width;
+                float height = windowSize.height;
+                point = CGPointMake(width/2, height/2);
+                break;
+            }
+            case UIDeviceOrientationLandscapeLeft: {
+                toastView.transform = CGAffineTransformMakeRotation(M_PI/2); //rotation in radians
+                point = CGPointMake(windowSize.width/2, windowSize.height/2);
+                break;
+            }
+            case UIDeviceOrientationLandscapeRight: {
+                toastView.transform = CGAffineTransformMakeRotation(-M_PI/2);
+                point = CGPointMake(windowSize.width/2, windowSize.height/2);
+                break;
+            }
+            default:
+                break;
         }
-        case UIDeviceOrientationPortraitUpsideDown: {
-            toastView.transform = CGAffineTransformMakeRotation(M_PI);
-            float width = windowSize.width;
-            float height = windowSize.height;
-            point = CGPointMake(width/2, height/2);
-            break;
-        }
-        case UIDeviceOrientationLandscapeLeft: {
-            toastView.transform = CGAffineTransformMakeRotation(M_PI/2); //rotation in radians
-            point = CGPointMake(windowSize.width/2, windowSize.height/2);
-            break;
-        }
-        case UIDeviceOrientationLandscapeRight: {
-            toastView.transform = CGAffineTransformMakeRotation(-M_PI/2);
-            point = CGPointMake(windowSize.width/2, windowSize.height/2);
-            break;
-        }
-        default:
-            break;
     }
     
     toastView.center = point;
