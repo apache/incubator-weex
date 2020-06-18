@@ -271,23 +271,22 @@
 
 + (void)initSDKEnvironment:(NSString *)script
 {
-    WX_MONITOR_PERF_START(WXPTInitalize)
-    WX_MONITOR_PERF_START(WXPTInitalizeSync)
-    
-    if (!script || script.length <= 0) {
-        NSMutableString *errMsg = [NSMutableString stringWithFormat:@"[WX_KEY_EXCEPTION_SDK_INIT_JSFM_INIT_FAILED] script don't exist:%@",script];
-        [WXExceptionUtils commitCriticalExceptionRT:@"WX_KEY_EXCEPTION_SDK_INIT" errCode:[NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_SDK_INIT] function:@"initSDKEnvironment" exception:errMsg extParams:nil];
-        WX_MONITOR_FAIL(WXMTJSFramework, WX_ERR_JSFRAMEWORK_LOAD, errMsg);
-        return;
-    }
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
+        WX_MONITOR_PERF_START(WXPTInitalize)
+        WX_MONITOR_PERF_START(WXPTInitalizeSync)
+
+        if (!script || script.length <= 0) {
+            NSMutableString *errMsg = [NSMutableString stringWithFormat:@"[WX_KEY_EXCEPTION_SDK_INIT_JSFM_INIT_FAILED] script don't exist:%@",script];
+            [WXExceptionUtils commitCriticalExceptionRT:@"WX_KEY_EXCEPTION_SDK_INIT" errCode:[NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_SDK_INIT] function:@"initSDKEnvironment" exception:errMsg extParams:nil];
+            WX_MONITOR_FAIL(WXMTJSFramework, WX_ERR_JSFRAMEWORK_LOAD, errMsg);
+            return;
+        }
         [self registerDefaults];
         [[WXSDKManager bridgeMgr] executeJsFramework:script];
+
+        WX_MONITOR_PERF_END(WXPTInitalizeSync)
     });
-    
-    WX_MONITOR_PERF_END(WXPTInitalizeSync)
-    
 }
 
 + (void)registerDefaults
