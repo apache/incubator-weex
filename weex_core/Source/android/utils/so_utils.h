@@ -81,6 +81,11 @@ class SoUtils {
 
   inline static const char* lib_ld_path() { return g_lib_ld_path; }
 
+  inline static const int android_api() {return g_android_api;}
+  inline static void set_android_api(int android_api) {
+    g_android_api = android_api;
+  }
+
   static void updateSoLinkPath(const char *lib_ld_path);
 
  private:
@@ -94,6 +99,7 @@ class SoUtils {
   static char* g_jsc_so_path;
   static char* g_lib_ld_path;
   static bool g_pie_support;
+  static int g_android_api;
   static std::function<void(const char*, const char*)> g_exception_handler;
 };
 }  // namespace WeexCore

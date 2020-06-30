@@ -53,7 +53,7 @@ add_definitions(-DLOG_JS_DEBUG=0)
 add_definitions(-DUSE_JS_RUNTIME=1)
 
 
-add_definitions(-DUSE_SYSTEM_MALLOC=1)
+add_definitions(-DUSE_SYSTEM_MALLOC=0)
 if (${ANDROID_PLATFORM} STREQUAL "android-21")
 else ()
     add_definitions(-D_POSIX_THREAD_KEYS_MAX=128)                              

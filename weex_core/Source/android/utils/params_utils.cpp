@@ -143,6 +143,15 @@ std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(
     }                                                                       \
   }
 
+  jclass versionClass = env->FindClass("android/os/Build$VERSION");
+  if (versionClass) {
+    jfieldID sdk_init_filed_id = env->GetStaticFieldID(versionClass, "SDK_INT", "I");
+    if (sdk_init_filed_id) {
+      SoUtils::set_android_api(env->GetStaticIntField(versionClass, sdk_init_filed_id));
+    } else {
+    }
+  }
+
   jclass c_params = env->GetObjectClass(params);
   if (c_params == nullptr) {
     ADDSTRING(nullptr);
