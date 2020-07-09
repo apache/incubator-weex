@@ -166,8 +166,10 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       }
 
       int lineHeight = WXStyle.getLineHeight(getStyles(),getViewPortWidth());
-      if (lineHeight != UNSET)
+      if (lineHeight != UNSET){
         mLineHeight = lineHeight;
+        getHostView().setLineHeight(mLineHeight);
+      }
 
       if (fontSize != UNSET)
         mPaint.setTextSize(fontSize);
