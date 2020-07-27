@@ -16,11 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-/*
- * Implementation of the user-space ashmem API for devices, which have our
- * ashmem-enabled kernel. See ashmem-sim.c for the "fake" tmp-based version,
- * used by the simulator.
- */
 
 #include <fcntl.h>
 #include <string.h>
@@ -37,7 +32,6 @@
 #include <pthread.h>
 
 #define ASHMEM_DEVICE "/dev/ashmem"
-
 
 static int system_property_get_int(const char* name) {
     int result = 0;
@@ -69,6 +63,7 @@ static ASharedMemoryFuncs s_ashmem_funcs = {
         NULL, NULL, NULL
 };
 static pthread_once_t s_ashmem_funcs_once = PTHREAD_ONCE_INIT;
+
 
 /*
  * ashmem_create_region - creates a new ashmem region and returns the file
@@ -143,10 +138,11 @@ static const ASharedMemoryFuncs* ashmem_get_funcs() {
     pthread_once(&s_ashmem_funcs_once, ashmem_init_funcs);
     return &s_ashmem_funcs;
 }
+
 int ashmem_create_region(const char *name, size_t size)
  {
     return ashmem_get_funcs()->create(name, size);
- }
+}
 
 int ashmem_set_prot_region(int fd, int prot)
 {
@@ -156,14 +152,4 @@ int ashmem_set_prot_region(int fd, int prot)
 int ashmem_get_size_region(int fd)
 {
     return (int)ashmem_get_funcs()->getSize(fd);
-}
-
-int ashmem_purge_all(void)
-{
-    const int fd = open(ASHMEM_DEVICE, O_RDWR);
-    if (fd < 0)
-        return fd;
-    const int ret = ioctl(fd, ASHMEM_PURGE_ALL_CACHES, 0);
-    close(fd);
-    return ret;
 }
