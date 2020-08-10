@@ -650,7 +650,7 @@ void *WeexConnInfo::mmap_for_ipc() {
 }
 
 int WeexConnInfo::memfd_create(const char *name, size_t size) {
-  if (SoUtils::android_api() < __ANDROID_API_O__) {
+  if (SoUtils::android_api() <= __ANDROID_API_P__) {
     return ashmem_create_region(name, size);
   }
 
