@@ -1329,7 +1329,8 @@ typedef enum : NSUInteger {
             if (originalColor == [UIColor clearColor]) {
                 return originalColor;
             }
-            return [[WXSDKInstance darkSchemeColorHandler] getInvertedColorFor:originalColor ofScene:scene withDefault:originalColor];
+            UIColor* invertdColor = [[WXSDKInstance darkSchemeColorHandler] getInvertedColorFor:originalColor ofScene:scene withDefault:originalColor];
+            return invertdColor ?:originalColor;
         }
         else {
             return originalColor;
