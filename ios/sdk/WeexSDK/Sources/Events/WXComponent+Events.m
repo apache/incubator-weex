@@ -955,7 +955,7 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
     if(_listenPseudoTouch) {
         [self recoveryPseudoStyles:_component.styles];
     }
-
+    self.state = UIGestureRecognizerStateEnded;
 }
 
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
