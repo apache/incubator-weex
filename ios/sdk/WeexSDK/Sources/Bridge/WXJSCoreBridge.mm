@@ -148,7 +148,7 @@
         [[WXBridgeManager sharedManager].lastMethodInfo setObject:method ?: @"" forKey:@"method"];
         [[WXBridgeManager sharedManager].lastMethodInfo setObject:args ?: @[] forKey:@"args"];
     });
-    return [[_jsContext globalObject] invokeMethod:method withArguments:args];
+    return [[_jsContext globalObject] invokeMethod:method withArguments:[args copy]];
 }
 
 - (void)registerCallNative:(WXJSCallNative)callNative
