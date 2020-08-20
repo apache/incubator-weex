@@ -66,6 +66,13 @@ public:
                           const std::string& options,
                           int options_length);
 
+    void CallNativeComponent(const std::string& ref,
+                             const std::string& method,
+                             const std::string& arguments,
+                             size_t arguments_length,
+                             const std::string& options,
+                             int options_length);
+
 private:
     RenderObject* CreateRenderObject(const std::string& ref, const std::string& type, unsigned index, const std::map<std::string, std::string>& styles, const std::map<std::string, std::string>& attrs, const std::vector<std::string>& events, bool reserve_styles, WeexCore::RenderObject* parent);
 

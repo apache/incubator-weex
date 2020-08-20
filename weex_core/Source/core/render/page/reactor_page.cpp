@@ -89,6 +89,22 @@ void ReactorPage::CallNativeModule(const std::string& module,
       ->CallNativeModule(page_id_.c_str(), module.c_str(), method.c_str(), arguments.c_str(), static_cast<int>(arguments_length), options.c_str(), options_length);
 }
 
+void ReactorPage::CallNativeComponent(const std::string& ref,
+                                      const std::string& method,
+                                      const std::string& arguments,
+                                      size_t arguments_length,
+                                      const std::string& options,
+                                      int options_length) {
+    WeexCoreManager::Instance()->getPlatformBridge()
+    ->platform_side()->CallNativeComponent(page_id_.c_str(),
+                                           ref.c_str(),
+                                           method.c_str(),
+                                           arguments.c_str(),
+                                           static_cast<int>(arguments_length),
+                                           options.c_str(),
+                                           options_length);
+}
+
 RenderObject* ReactorPage::CreateRenderObject(const std::string& ref,
                                               const std::string& type,
                                               unsigned index,
