@@ -93,6 +93,7 @@
 @property (nonatomic, assign) BOOL listenTouchEnd;
 @property (nonatomic, assign) BOOL listenTouchCancel;
 @property (nonatomic, assign) BOOL listenPseudoTouch;
+@property (nonatomic, assign) NSInteger activeTouches;
 
 - (instancetype)initWithComponent:(WXComponent *)component NS_DESIGNATED_INITIALIZER;
 
@@ -914,6 +915,7 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
         _listenTouchEnd = NO;
         _listenTouchMove = NO;
         _listenTouchCancel = NO;
+        _activeTouches = 0;
         
         self.cancelsTouchesInView = NO;
     }
@@ -933,6 +935,10 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
         [_component updatePseudoClassStyles:styles];
     }
 
+    _activeTouches += [touches count];
+    if (_activeTouches > (NSInteger)[event.allTouches count]) {
+        _activeTouches = [event.allTouches count];
+    }
 }
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
@@ -956,6 +962,11 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
         [self recoveryPseudoStyles:_component.styles];
     }
 
+    _activeTouches -= [touches count];
+    if (_activeTouches <= 0) {
+        self.state = UIGestureRecognizerStateEnded;
+        _activeTouches = 0;
+    }
 }
 
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
@@ -967,6 +978,12 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
     }
     if(_listenPseudoTouch) {
         [self recoveryPseudoStyles:_component.styles];
+    }
+
+    _activeTouches -= [touches count];
+    if (_activeTouches <= 0) {
+        self.state = UIGestureRecognizerStateEnded;
+        _activeTouches = 0;
     }
 }
 
