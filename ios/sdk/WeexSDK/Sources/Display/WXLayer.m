@@ -26,7 +26,6 @@
 
 - (void)display
 {
-    [super display];
     [self.wx_component _willDisplayLayer:self];
 }
 
