@@ -214,7 +214,7 @@
             [itemDiffResult.inserts enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
                 WXCellComponent *cell = [newSection.cellComponents wx_safeObjectAtIndex:idx];
                 if (cell.isLayoutComplete) {
-                    NSIndexPath *insertIndexPath = [NSIndexPath indexPathForItem:idx inSection:sectionUpdate.oldIndex];
+                    NSIndexPath *insertIndexPath = [NSIndexPath indexPathForItem:idx inSection:sectionUpdate.newIndex];
                     [insertIndexPaths addObject:insertIndexPath];
                 }
             }];
