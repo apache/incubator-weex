@@ -59,7 +59,7 @@ public:
 
     const std::string& page_id() const {return page_id_;}
 
-    void CallNativeModule(const std::string& module,
+    std::string CallNativeModule(const std::string& module,
                           const std::string& method,
                           const std::string& arguments,
                           size_t arguments_length,

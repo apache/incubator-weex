@@ -19,6 +19,8 @@
 
 #include "core/render/page/reactor_page.h"
 
+#include "third_party/json11/json11.hpp"
+#include "base/string_util.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/page/render_page.h"
 #include "core/render/node/factory/render_creator.h"
@@ -32,6 +34,87 @@ void PostTaskOnComponentThread(const std::function<void()>& callback) {
 #else
     callback();
 #endif
+}
+
+static std::string ResultToString(const std::unique_ptr<ValueWithType>& result) {
+  switch (result->type) {
+    case ParamsType::DOUBLE:
+      return json11::Json(result->value.doubleValue).dump();
+    case ParamsType::STRING: {
+      if (!result->value.string) {
+        return "";
+      } else {
+        std::string ret;
+        if (result->value.string->length > 0) {
+          const auto& basic_string = weex::base::to_utf8(result->value.string->content,
+                                                         result->value.string->length);
+          ret = json11::Json(basic_string).dump();
+        } else {
+          ret = json11::Json("").dump();
+        }
+        free(result->value.string);
+        return ret;
+      }
+    }
+    case ParamsType::BYTEARRAYSTRING: {
+      if (!result->value.byteArray) {
+        return "";//null
+      } else {
+        std::string ret;
+        if (result->value.byteArray->length > 0) {
+          ret = json11::Json(result->value.byteArray->content).dump();
+        } else {
+          ret = json11::Json("").dump();
+        }
+        free(result->value.byteArray);
+        return ret;
+      }
+    }
+    case ParamsType::JSONSTRING: {
+      if (!result->value.string) {
+        return "";
+      } else {
+        std::string ret;
+        std::string err;
+        if (result->value.string->length > 0) {
+          const auto& raw_str = weex::base::to_utf8(result->value.string->content,
+                                                    result->value.string->length);
+
+          const json11::Json& json = json11::Json::parse(raw_str, err);
+          if (err.empty()) {
+            //succ
+            ret = json.dump();
+          } else {
+            LOGE("VnodeManager CallNative return value to object err, %s", err.c_str());
+          }
+        }
+        free(result->value.string);
+        return ret;
+      }
+    }
+    case ParamsType::BYTEARRAYJSONSTRING: {
+      if (!result->value.byteArray) {
+        return "";
+      } else {
+        std::string ret;
+        std::string err;
+        if (result->value.string->length > 0) {
+          const json11::Json& json = json11::Json::parse(result->value.byteArray->content, err);
+          if (err.empty()) {
+            //succ
+            ret = json.dump();
+          } else {
+            LOGE("VnodeManager CallNative return value to object err, %s", err.c_str());
+          }
+        }
+        free(result->value.byteArray);
+        return ret;
+      }
+    }
+    case ParamsType::BYTEARRAY:
+    default:
+      return "";
+  }
 }
 
 void ReactorPage::CreateBody(const std::string& ref,
@@ -77,7 +160,7 @@ void ReactorPage::RemoveElement(const std::string& ref) {
     WeexCore::WeexCoreManager::Instance()->script_bridge()->core_side()->RemoveElement(page_id_.c_str(), ref.c_str());
 }
 
-void ReactorPage::CallNativeModule(const std::string& module,
+std::string ReactorPage::CallNativeModule(const std::string& module,
                                    const std::string& method,
                                    const std::string& arguments,
                                    size_t arguments_length,
@@ -87,6 +170,8 @@ void ReactorPage::CallNativeModule(const std::string& module,
       ->getPlatformBridge()
       ->platform_side()
       ->CallNativeModule(page_id_.c_str(), module.c_str(), method.c_str(), arguments.c_str(), static_cast<int>(arguments_length), options.c_str(), options_length);
+
+  return ResultToString(ptr);
 }
 
 void ReactorPage::CallNativeComponent(const std::string& ref,
