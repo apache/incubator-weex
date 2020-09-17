@@ -796,6 +796,7 @@ static NSThread *WXComponentThread;
                 CGRect rect = self.weexInstance.rootView.frame; // no change of origin
                 rect.size = frame.size;
                 self.weexInstance.rootView.frame = rect;
+                self.weexInstance.frame = rect;
             }
         });
     }
