@@ -8,7 +8,7 @@ matrix:
       - env: TEST_SUITE=jsfm
       - env: TEST_SUITE=ios
         os: osx
-        osx_image: xcode11.2
+        osx_image: xcode12
         language: objective-c
       - env: TEST_SUITE=android ABI=armeabi-v7a
         language: android
@@ -45,7 +45,7 @@ matrix:
       # static check
       - env: TEST_SUITE=static_code_analysis OCLINT=true
         os: osx
-        osx_image: xcode11.2
+        osx_image: xcode12
         language: objective-c
       - env: TEST_SUITE=static_code_analysis ANDROID_LINT=true
         language: android
