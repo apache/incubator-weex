@@ -63,6 +63,9 @@
         }
         
         datePicker.datePickerMode=UIDatePickerModeDate;
+        if (@available(iOS 13.4, *)) {
+            datePicker.preferredDatePickerStyle = UIDatePickerStyleWheels;
+        }
         CGRect pickerFrame = CGRectMake(0, 44, [UIScreen mainScreen].bounds.size.width, WXPickerHeight-44);
         datePicker.backgroundColor = [UIColor whiteColor];
         datePicker.frame = pickerFrame;
