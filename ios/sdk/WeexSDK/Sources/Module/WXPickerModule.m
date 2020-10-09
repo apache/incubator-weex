@@ -432,9 +432,11 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 {
     self.callback = callback;
     self.datePicker = [[UIDatePicker alloc]init];
+#ifdef __IPHONE_13_4
     if (@available(iOS 13.4, *)) {
-            self.datePicker.preferredDatePickerStyle = UIDatePickerStyleWheels;
+        self.datePicker.preferredDatePickerStyle = UIDatePickerStyleWheels;
     }
+#endif
     if (UIDatePickerModeDate == self.datePickerMode) {
         self.datePicker.datePickerMode = UIDatePickerModeDate;
         NSString *value = [WXConvert NSString:options[@"value"]];
