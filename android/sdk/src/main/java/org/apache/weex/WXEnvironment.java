@@ -565,7 +565,7 @@ public class WXEnvironment {
   }
 
   public static int memfd_create(String name, int size) {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
       return 0;
     }
 

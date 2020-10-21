@@ -693,7 +693,7 @@ int WeexConnInfo::memfd_create_below_androidR(const char *name, size_t size) {
 
 int WeexConnInfo::memfd_create_androidR(const char *name, size_t size) {
   JNIEnv *env = base::android::AttachCurrentThread();
-  jclass wx_env = env->FindClass("com/taobao/weex/WXEnvironment");
+  jclass wx_env = env->FindClass("org/apache/weex/WXEnvironment");
   if (wx_env) {
     jmethodID m_memfd_create_id =
         env->GetStaticMethodID(wx_env, "memfd_create", "(Ljava/lang/String;I)I");
