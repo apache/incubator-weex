@@ -1087,7 +1087,6 @@ do {\
     {
         CTLineRef lineRef = NULL;
         lineRef = (CTLineRef)CFArrayGetValueAtIndex(lines, lineIndex);
-        // 该方法在14.0版本以上获取的Text高度存在问题
         CTLineGetTypographicBounds(lineRef, &ascent, &descent, &leading);
         totalHeight += ascent + descent;
         actualLineCount ++;
@@ -1102,7 +1101,6 @@ do {\
         return CGSizeMake(aWidth, suggestSize.height);
     }
     if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"14.0")) {
-        // 通过布局计算Text高度
         CGPoint lineOrigins[lineCount];
         CTFrameGetLineOrigins(frameRef, CFRangeMake(0, 0), lineOrigins);
         if (_lines && lineCount > _lines) {
