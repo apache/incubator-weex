@@ -947,7 +947,7 @@ do {\
         attrs = attrs ? attrs.mutableCopy : [NSMutableDictionary new];
         CTFontRef font = (__bridge CTFontRef)(attrs[(id)kCTFontAttributeName]);
         CGFloat fontSize = font ? CTFontGetSize(font):32 * self.weexInstance.pixelScaleFactor;
-        UIFont * uiFont = [UIFont systemFontOfSize:fontSize];
+        UIFont *uiFont = [WXUtility fontWithSize:fontSize textWeight:_fontWeight textStyle:WXTextStyleNormal fontFamily:self.fontFamily scaleFactor:self.weexInstance.pixelScaleFactor useCoreText:[self useCoreText]];
         if (uiFont) {
             font = CTFontCreateWithFontDescriptor((__bridge CTFontDescriptorRef)uiFont.fontDescriptor, uiFont.pointSize, NULL);
         }
@@ -1087,13 +1087,12 @@ do {\
     {
         CTLineRef lineRef = NULL;
         lineRef = (CTLineRef)CFArrayGetValueAtIndex(lines, lineIndex);
+        // 该方法在14.0版本以上获取的Text高度存在问题
         CTLineGetTypographicBounds(lineRef, &ascent, &descent, &leading);
         totalHeight += ascent + descent;
         actualLineCount ++;
     }
-    
     totalHeight = totalHeight + actualLineCount * leading;
-    CFRelease(frameRef);
     
     if (WX_SYS_VERSION_LESS_THAN(@"10.0")) {
         // there is something wrong with coreText drawing text height, trying to fix this with more efficent way.
@@ -1102,6 +1101,18 @@ do {\
         }
         return CGSizeMake(aWidth, suggestSize.height);
     }
+    if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"14.0")) {
+        // 通过布局计算Text高度
+        CGPoint lineOrigins[lineCount];
+        CTFrameGetLineOrigins(frameRef, CFRangeMake(0, 0), lineOrigins);
+        if (_lines && lineCount > _lines) {
+            actualLineCount = _lines;
+        } else {
+            actualLineCount = lineCount;
+        }
+        return CGSizeMake(aWidth, lineOrigins[0].y - lineOrigins[actualLineCount].y);
+    }
+    CFRelease(frameRef);
     return CGSizeMake(aWidth, totalHeight);
 }
 
