@@ -61,7 +61,11 @@
         {
             datePicker = [[UIDatePicker alloc]init];
         }
-        
+#ifdef __IPHONE_13_4
+        if (@available(iOS 13.4, *)) {
+            datePicker.preferredDatePickerStyle = UIDatePickerStyleWheels;
+        }
+#endif
         datePicker.datePickerMode=UIDatePickerModeDate;
 #ifdef __IPHONE_13_4
         if (@available(iOS 13.4, *)) {
