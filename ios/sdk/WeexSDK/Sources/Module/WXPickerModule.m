@@ -437,9 +437,6 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
         self.datePicker.preferredDatePickerStyle = UIDatePickerStyleWheels;
     }
 #endif
-    if (@available(iOS 13.4, *)) {
-            self.datePicker.preferredDatePickerStyle = UIDatePickerStyleWheels;
-    }
     if (UIDatePickerModeDate == self.datePickerMode) {
         self.datePicker.datePickerMode = UIDatePickerModeDate;
         NSString *value = [WXConvert NSString:options[@"value"]];
