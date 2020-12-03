@@ -24,6 +24,7 @@
 #import <UIKit/UIPickerView.h>
 #import <UIKit/UIDatePicker.h>
 #import <UIKit/UIKit.h>
+#import "WXLegacyAdapter.h"
 
 #define WXPickerHeight 266
 #define WXPickerToolBarHeight 44
@@ -432,11 +433,9 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 {
     self.callback = callback;
     self.datePicker = [[UIDatePicker alloc]init];
-#ifdef __IPHONE_13_4
     if (@available(iOS 13.4, *)) {
         self.datePicker.preferredDatePickerStyle = UIDatePickerStyleWheels;
     }
-#endif
     if (UIDatePickerModeDate == self.datePickerMode) {
         self.datePicker.datePickerMode = UIDatePickerModeDate;
         NSString *value = [WXConvert NSString:options[@"value"]];
