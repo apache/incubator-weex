@@ -913,6 +913,8 @@
 		ED053503207F4DEB007B4568 /* JSContext+Weex.m in Sources */ = {isa = PBXBuildFile; fileRef = ED0534FF207F4DEB007B4568 /* JSContext+Weex.m */; };
 		F75C58EB2313C03C002FFF94 /* WXTimerModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D3FC0DF51C508B2A002B9E31 /* WXTimerModule.h */; };
 		F75C591C2313C1FC002FFF94 /* WXStreamModule.h in Headers */ = {isa = PBXBuildFile; fileRef = 74A4BAA41CB4F98300195969 /* WXStreamModule.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F769EECA2578E3000027B29B /* WXLegacyAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = F769EEC92578E3000027B29B /* WXLegacyAdapter.h */; };
+		F769EECB2578E3000027B29B /* WXLegacyAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = F769EEC92578E3000027B29B /* WXLegacyAdapter.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1420,6 +1422,7 @@
 		DCF343661E49CAEE00A2FB34 /* WXJSExceptionInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXJSExceptionInfo.m; sourceTree = "<group>"; };
 		ED0534FE207F4DEB007B4568 /* JSContext+Weex.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "JSContext+Weex.h"; sourceTree = "<group>"; };
 		ED0534FF207F4DEB007B4568 /* JSContext+Weex.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "JSContext+Weex.m"; sourceTree = "<group>"; };
+		F769EEC92578E3000027B29B /* WXLegacyAdapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXLegacyAdapter.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1935,6 +1938,7 @@
 		77D161481C02E3670010B15B /* Utility */ = {
 			isa = PBXGroup;
 			children = (
+				F769EEC92578E3000027B29B /* WXLegacyAdapter.h */,
 				453F374B219A76A500A03F1D /* WXConvertUtility.h */,
 				453F374C219A76A500A03F1D /* WXConvertUtility.mm */,
 				C4D872231E5DDF7500E39BC1 /* WXBoxShadow.h */,
@@ -2618,6 +2622,7 @@
 				B8394F3721468AF100CA1EFF /* render_action_trigger_vsync.h in Headers */,
 				B8D66C8921255730003960BD /* render_object_interface.h in Headers */,
 				74BA4AB31F70F4B600AC29BF /* WXRecycleListLayout.h in Headers */,
+				F769EECA2578E3000027B29B /* WXLegacyAdapter.h in Headers */,
 				B8D66C3521255730003960BD /* render_action_move_element.h in Headers */,
 				742AD7311DF98C45007DC46C /* WXResourceRequestHandlerDefaultImpl.h in Headers */,
 				C4F0127D1E1502A6003378D0 /* WXWebSocketHandler.h in Headers */,
@@ -2872,6 +2877,7 @@
 				B8F3323D2141A4C600701BA0 /* string_util.h in Headers */,
 				77788B782229252D000D5102 /* render_page_base.h in Headers */,
 				DCA446091EFA5A6D00D0CFA8 /* WXThreadSafeCounter.h in Headers */,
+				F769EECB2578E3000027B29B /* WXLegacyAdapter.h in Headers */,
 				B8D66C3421255730003960BD /* render_action_update_attr.h in Headers */,
 				DCA445F11EFA5A2000D0CFA8 /* WXCanvasComponent.h in Headers */,
 				B8D66CB021255730003960BD /* wson_parser.h in Headers */,

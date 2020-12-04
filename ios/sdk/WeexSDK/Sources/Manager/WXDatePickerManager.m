@@ -22,6 +22,7 @@
 #import <UIKit/UIKit.h>
 #import "WXConvert.h"
 #import "WXUtility.h"
+#import "WXLegacyAdapter.h"
 
 #define WXPickerHeight 266
 
@@ -61,17 +62,10 @@
         {
             datePicker = [[UIDatePicker alloc]init];
         }
-#ifdef __IPHONE_13_4
         if (@available(iOS 13.4, *)) {
             datePicker.preferredDatePickerStyle = UIDatePickerStyleWheels;
         }
-#endif
         datePicker.datePickerMode=UIDatePickerModeDate;
-#ifdef __IPHONE_13_4
-        if (@available(iOS 13.4, *)) {
-            datePicker.preferredDatePickerStyle = UIDatePickerStyleWheels;
-        }
-#endif
         CGRect pickerFrame = CGRectMake(0, 44, [UIScreen mainScreen].bounds.size.width, WXPickerHeight-44);
         datePicker.backgroundColor = [UIColor whiteColor];
         datePicker.frame = pickerFrame;
