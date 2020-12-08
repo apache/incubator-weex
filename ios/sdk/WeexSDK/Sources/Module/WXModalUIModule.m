@@ -91,6 +91,7 @@ WX_EXPORT_METHOD(@selector(prompt:callback:))
 #pragma mark - Toast
 
 static const double WXToastDefaultDuration = 3.0;
+static const double WXToastDefaultAnimationTime = 0.3;
 static const CGFloat WXToastDefaultFontSize = 16.0;
 static const CGFloat WXToastDefaultWidth = 230.0;
 static const CGFloat WXToastDefaultHeight = 30.0;
@@ -107,9 +108,48 @@ static const CGFloat WXToastDefaultPadding = 30.0;
         duration = WXToastDefaultDuration;
     }
     
-    WXPerformBlockOnMainThread(^{
-        [self toast:message duration:duration];
-    });
+    NSString *tag = [self stringValue:param[@"tag"]];
+    if (tag && [tag isEqualToString:@"weex"]) {
+        double animationTime = [param[@"animationTime"] doubleValue];
+        if (animationTime <= 0) {
+            animationTime = WXToastDefaultAnimationTime;
+        }
+        WXPerformBlockOnMainThread(^{
+            [self toast:message duration:duration animationTime:animationTime];
+        });
+    } else {
+        WXPerformBlockOnMainThread(^{
+            [self toast:message duration:duration];
+        });
+    }
+}
+
+- (void)toast:(NSString *)message duration:(double)duration animationTime:(double)animationTime{
+    WXAssertMainThread();
+    UIView *superView = self.weexInstance.rootView.window;
+    if (!superView) {
+        superView =  self.weexInstance.rootView;
+    }
+    UIView *toastView = [self toastViewForMessage:message superView:superView];
+    
+    UIView* toastingView = [WXToastManager sharedManager].toastingView;
+    if (toastingView) {
+        [toastingView removeFromSuperview];
+        [WXToastManager sharedManager].toastingView = nil;
+    }
+    if (!toastView || !superView) {
+        return;
+    }
+    [WXToastManager sharedManager].toastingView = toastView;
+    [superView addSubview:toastView];
+    [UIView animateWithDuration:animationTime delay:duration options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        toastView.alpha = 0;
+    } completion:^(BOOL finished) {
+        [toastView removeFromSuperview];
+        if ([WXToastManager sharedManager].toastingView == toastView) {
+            [WXToastManager sharedManager].toastingView = nil;
+        }
+    }];
 }
 
 - (void)toast:(NSString *)message duration:(double)duration
