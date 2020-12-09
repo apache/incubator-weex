@@ -108,12 +108,8 @@ static const CGFloat WXToastDefaultPadding = 30.0;
         duration = WXToastDefaultDuration;
     }
     
-    NSString *tag = [self stringValue:param[@"tag"]];
-    if (tag && [tag isEqualToString:@"weex"]) {
-        double animationTime = [param[@"animationTime"] doubleValue];
-        if (animationTime <= 0) {
-            animationTime = WXToastDefaultAnimationTime;
-        }
+    double animationTime = [param[@"animationTime"] doubleValue];
+    if (animationTime > 0) {
         WXPerformBlockOnMainThread(^{
             [self toast:message duration:duration animationTime:animationTime];
         });
