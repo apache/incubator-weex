@@ -22,7 +22,11 @@
 
 API_AVAILABLE(ios(13.4))
 @interface UIDatePicker (LegacyXcode)
+
+#if (defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130400)
 @property (nonatomic, readwrite, assign) UIDatePickerStyle preferredDatePickerStyle;
+#endif
+
 @end
 
 
