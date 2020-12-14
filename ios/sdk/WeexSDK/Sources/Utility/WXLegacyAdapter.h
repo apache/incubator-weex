@@ -22,7 +22,7 @@
 
 API_AVAILABLE(ios(13.4))
 @interface UIDatePicker (LegacyXcode)
-@property (nonatomic, readwrite, assign) UIDatePickerStyle preferredDatePickerStyle;
+@property (nonatomic, readwrite, assign) NSInteger preferredDatePickerStyle;
 @end
 
 
