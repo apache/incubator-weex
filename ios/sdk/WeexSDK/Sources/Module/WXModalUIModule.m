@@ -65,6 +65,8 @@ typedef enum : NSUInteger {
 
 @interface WXModalUIModule () <UIAlertViewDelegate>
 
+@property (nonatomic, assign) CGFloat maxWidth;
+
 @end
 
 @implementation WXModalUIModule
@@ -106,6 +108,13 @@ static const CGFloat WXToastDefaultPadding = 30.0;
     double duration = [param[@"duration"] doubleValue];
     if (duration <= 0) {
         duration = WXToastDefaultDuration;
+    }
+    
+    double maxWidth = [param[@"maxWidth"] doubleValue];
+    if (maxWidth <= 0) {
+        _maxWidth = WXToastDefaultWidth;
+    } else {
+        _maxWidth = maxWidth;
     }
     
     double animationTime = [param[@"animationTime"] doubleValue];
@@ -168,7 +177,7 @@ static const CGFloat WXToastDefaultPadding = 30.0;
 - (UIView *)toastViewForMessage:(NSString *)message superView:(UIView *)superView
 {
     CGFloat padding = WXToastDefaultPadding;
-    UILabel *messageLabel = [[UILabel alloc] initWithFrame:CGRectMake(padding/2, padding/2, WXToastDefaultWidth, WXToastDefaultHeight)];
+    UILabel *messageLabel = [[UILabel alloc] initWithFrame:CGRectMake(padding/2, padding/2, _maxWidth, WXToastDefaultHeight)];
     messageLabel.numberOfLines =  0;
     messageLabel.textAlignment = NSTextAlignmentCenter;
     messageLabel.text = message;
