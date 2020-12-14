@@ -110,11 +110,12 @@ static const CGFloat WXToastDefaultPadding = 30.0;
         duration = WXToastDefaultDuration;
     }
     
-    double maxWidth = [param[@"maxWidth"] doubleValue];
-    if (maxWidth <= 0) {
-        _maxWidth = WXToastDefaultWidth;
-    } else {
-        _maxWidth = maxWidth;
+    _maxWidth = WXToastDefaultWidth;
+    if (param[@"maxWidth"]) {
+        double maxWidth = [param[@"maxWidth"] doubleValue];
+        if (maxWidth > 0) {
+            _maxWidth = maxWidth;
+        }
     }
     
     double animationTime = [param[@"animationTime"] doubleValue];
