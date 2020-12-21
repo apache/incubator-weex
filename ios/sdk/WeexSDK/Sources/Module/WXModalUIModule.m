@@ -65,6 +65,8 @@ typedef enum : NSUInteger {
 
 @interface WXModalUIModule () <UIAlertViewDelegate>
 
+@property (nonatomic, assign) CGFloat maxWidth;
+
 @end
 
 @implementation WXModalUIModule
@@ -91,6 +93,7 @@ WX_EXPORT_METHOD(@selector(prompt:callback:))
 #pragma mark - Toast
 
 static const double WXToastDefaultDuration = 3.0;
+static const double WXToastDefaultAnimationTime = 0.3;
 static const CGFloat WXToastDefaultFontSize = 16.0;
 static const CGFloat WXToastDefaultWidth = 230.0;
 static const CGFloat WXToastDefaultHeight = 30.0;
@@ -107,9 +110,52 @@ static const CGFloat WXToastDefaultPadding = 30.0;
         duration = WXToastDefaultDuration;
     }
     
-    WXPerformBlockOnMainThread(^{
-        [self toast:message duration:duration];
-    });
+    _maxWidth = WXToastDefaultWidth;
+    if (param[@"maxWidth"]) {
+        double maxWidth = [param[@"maxWidth"] doubleValue];
+        if (maxWidth > 0) {
+            _maxWidth = maxWidth;
+        }
+    }
+    
+    double animationTime = [param[@"animationTime"] doubleValue];
+    if (animationTime > 0) {
+        WXPerformBlockOnMainThread(^{
+            [self toast:message duration:duration animationTime:animationTime];
+        });
+    } else {
+        WXPerformBlockOnMainThread(^{
+            [self toast:message duration:duration];
+        });
+    }
+}
+
+- (void)toast:(NSString *)message duration:(double)duration animationTime:(double)animationTime{
+    WXAssertMainThread();
+    UIView *superView = self.weexInstance.rootView.window;
+    if (!superView) {
+        superView =  self.weexInstance.rootView;
+    }
+    UIView *toastView = [self toastViewForMessage:message superView:superView];
+    
+    UIView* toastingView = [WXToastManager sharedManager].toastingView;
+    if (toastingView) {
+        [toastingView removeFromSuperview];
+        [WXToastManager sharedManager].toastingView = nil;
+    }
+    if (!toastView || !superView) {
+        return;
+    }
+    [WXToastManager sharedManager].toastingView = toastView;
+    [superView addSubview:toastView];
+    [UIView animateWithDuration:animationTime delay:duration options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        toastView.alpha = 0;
+    } completion:^(BOOL finished) {
+        [toastView removeFromSuperview];
+        if ([WXToastManager sharedManager].toastingView == toastView) {
+            [WXToastManager sharedManager].toastingView = nil;
+        }
+    }];
 }
 
 - (void)toast:(NSString *)message duration:(double)duration
@@ -132,7 +178,7 @@ static const CGFloat WXToastDefaultPadding = 30.0;
 - (UIView *)toastViewForMessage:(NSString *)message superView:(UIView *)superView
 {
     CGFloat padding = WXToastDefaultPadding;
-    UILabel *messageLabel = [[UILabel alloc] initWithFrame:CGRectMake(padding/2, padding/2, WXToastDefaultWidth, WXToastDefaultHeight)];
+    UILabel *messageLabel = [[UILabel alloc] initWithFrame:CGRectMake(padding/2, padding/2, _maxWidth, WXToastDefaultHeight)];
     messageLabel.numberOfLines =  0;
     messageLabel.textAlignment = NSTextAlignmentCenter;
     messageLabel.text = message;
