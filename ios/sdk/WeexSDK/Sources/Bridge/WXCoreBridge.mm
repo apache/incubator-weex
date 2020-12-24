@@ -300,7 +300,7 @@ namespace WeexCore
                     if ([object isKindOfClass:[NSString class]]) {
                         returnValue->type = ParamsType::BYTEARRAYSTRING;
                         const char *pcstr_utf8 = [(NSString *)object UTF8String];
-                        returnValue->value.byteArray = generator_bytes_array(pcstr_utf8, ((NSString *)object).length);
+                        returnValue->value.byteArray = generator_bytes_array(pcstr_utf8, [(NSString *)object lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
                     }
                     if ([object isKindOfClass:[NSDictionary class]] || [object isKindOfClass:[NSArray class]]) {
                         NSString *jsonString = [WXUtility JSONString:object];
