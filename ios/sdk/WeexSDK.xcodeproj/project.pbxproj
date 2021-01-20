@@ -3015,7 +3015,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 77D161111C02DBE70010B15B /* Build configuration list for PBXNativeTarget "WeexSDK" */;
 			buildPhases = (
-				59D3CA601D003832008835DC /* Generate WeexSDK.h */,
 				77D160F81C02DBE70010B15B /* Sources */,
 				77D160F91C02DBE70010B15B /* Frameworks */,
 				77D160FA1C02DBE70010B15B /* Headers */,
@@ -3148,20 +3147,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Sets the target folders and the final framework product.\n# 如果工程名称和Framework的Target名称不一样的话，要自定义FMKNAME\nFMK_NAME=${PROJECT_NAME}\n# Install dir will be the final output to the framework.\n# The following line create it in the root folder of the current project.\nINSTALL_DIR=${SRCROOT}/Products/${FMK_NAME}.framework\n# Working dir will be deleted after the framework creation.\nWRK_DIR=build\nDEVICE_DIR=${WRK_DIR}/Release-iphoneos/${FMK_NAME}.framework\nSIMULATOR_DIR=${WRK_DIR}/Release-iphonesimulator/${FMK_NAME}.framework\n# -configuration ${CONFIGURATION}\n# Clean and Building both architectures.\necho xcodebuild -configuration \"Release\" -target \"${FMK_NAME}\" -sdk iphoneos \"CODE_SIGN_IDENTITY=${CODE_SIGN_IDENTITY}\" clean build\nxcodebuild -configuration \"Release\" -target \"${FMK_NAME}\" -sdk iphoneos \"CODE_SIGN_IDENTITY=${CODE_SIGN_IDENTITY}\" clean build\nif [ \"$?\" != \"0\" ]; then\nexit 1\nfi\necho xcodebuild -configuration \"Release\" -target \"${FMK_NAME}\" -sdk iphonesimulator \"CODE_SIGN_IDENTITY=${CODE_SIGN_IDENTITY}\" build\nxcodebuild -configuration \"Release\" -target \"${FMK_NAME}\" -sdk iphonesimulator \"CODE_SIGN_IDENTITY=${CODE_SIGN_IDENTITY}\" build\nif [ \"$?\" != \"0\" ]; then\nexit 1\nfi\n# Cleaning the oldest.\nif [ -d \"${INSTALL_DIR}\" ]\nthen\nrm -rf \"${INSTALL_DIR}\"\nfi\nmkdir -p \"${INSTALL_DIR}\"\ncp -R \"${SIMULATOR_DIR}/\" \"${INSTALL_DIR}/\"\n# 移除签名资源和 Info.plist\nrm \"${INSTALL_DIR}/Info.plist\"\nrm -rf \"${INSTALL_DIR}/_CodeSignature\"\n# Uses the Lipo Tool to merge both binary files (i386 + armv6/armv7) into one Universal final product.\nlipo -create \"${DEVICE_DIR}/${FMK_NAME}\" \"${SIMULATOR_DIR}/${FMK_NAME}\" -output \"${INSTALL_DIR}/${FMK_NAME}\"\nrm -r \"${WRK_DIR}\"\n";
-		};
-		59D3CA601D003832008835DC /* Generate WeexSDK.h */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Generate WeexSDK.h";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = ". \"${PROJECT_DIR}/buildScripts.sh\"\n\ngenerateSDKHeader 'WeexSDK'\ngenerateBuildTime \"${PROJECT_DIR}/WeexSDK/Sources/Utility/WXVersion.m\"\n";
 		};
 		DCA445C81EFA584000D0CFA8 /* Generate WeexSDK.h */ = {
 			isa = PBXShellScriptBuildPhase;
