@@ -862,14 +862,7 @@ typedef enum : NSUInteger {
     [WXPrerenderManager removePrerenderTaskforUrl:[self.scriptURL absoluteString]];
     [WXPrerenderManager destroyTask:self.instanceId];
 
-    if (_useReactor) {
-        id<WXReactorProtocol> reactorHandler = [WXHandlerFactory handlerForProtocol:NSProtocolFromString(@"WXReactorProtocol")];
-        if (reactorHandler) {
-            [reactorHandler unregisterJSContext:self.instanceId];
-        } else {
-            WXLogError(@"There is no reactor handler");
-        }
-    } else if (!self.renderPlugin) {
+    if (!self.renderPlugin && !_useReactor) {
         [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
     }
     
@@ -900,6 +893,14 @@ typedef enum : NSUInteger {
         
         // Reading config from orange for Release instance in Main Thread or not, for Bug #15172691 +{
         dispatch_async(dispatch_get_main_queue(), ^{
+            if (self.useReactor) {
+                id<WXReactorProtocol> reactorHandler = [WXHandlerFactory handlerForProtocol:NSProtocolFromString(@"WXReactorProtocol")];
+                if (reactorHandler) {
+                    [reactorHandler unregisterJSContext:self.instanceId];
+                } else {
+                    WXLogError(@"There is no reactor handler");
+                }
+            }
             [WXSDKManager removeInstanceforID:instanceId];
             WXLogInfo(@"Finally remove instance: %@", instanceId);
         });
