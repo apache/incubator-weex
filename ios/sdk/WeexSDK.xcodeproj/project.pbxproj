@@ -583,6 +583,11 @@
 		BDB1129F2459D8FC008492F9 /* reactor_page.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDB112992459D71E008492F9 /* reactor_page.cpp */; };
 		BDB112A02459D90F008492F9 /* reactor_page.h in Headers */ = {isa = PBXBuildFile; fileRef = BDB1129A2459D71E008492F9 /* reactor_page.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BDBA319B248D0A5200C6EDD0 /* reactor_page.cpp in Headers */ = {isa = PBXBuildFile; fileRef = BDB112992459D71E008492F9 /* reactor_page.cpp */; };
+		BDC402D925889EF900EA838A /* WXUnicornRenderProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = BDD94B6425761DAA002AD864 /* WXUnicornRenderProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BDC402DE25889F0900EA838A /* WXUnicornEventListenerHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = BDD94B5125761CC7002AD864 /* WXUnicornEventListenerHandler.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BDD94B5225761CC7002AD864 /* WXUnicornEventListenerHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = BDD94B5025761CC7002AD864 /* WXUnicornEventListenerHandler.m */; };
+		BDD94B5325761CC7002AD864 /* WXUnicornEventListenerHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = BDD94B5125761CC7002AD864 /* WXUnicornEventListenerHandler.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BDD94B6525761DAA002AD864 /* WXUnicornRenderProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = BDD94B6425761DAA002AD864 /* WXUnicornRenderProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BDEEADBA22F2902E0099F1D7 /* time_calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDEEADB822F2902D0099F1D7 /* time_calculator.cpp */; };
 		BDEEADBB22F2902E0099F1D7 /* time_calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDEEADB822F2902D0099F1D7 /* time_calculator.cpp */; };
 		BDEEADBC22F2902E0099F1D7 /* time_calculator.h in Headers */ = {isa = PBXBuildFile; fileRef = BDEEADB922F2902E0099F1D7 /* time_calculator.h */; };
@@ -1344,6 +1349,9 @@
 		BDB112972459D6C2008492F9 /* WXReactorProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXReactorProtocol.h; sourceTree = "<group>"; };
 		BDB112992459D71E008492F9 /* reactor_page.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = reactor_page.cpp; sourceTree = "<group>"; };
 		BDB1129A2459D71E008492F9 /* reactor_page.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = reactor_page.h; sourceTree = "<group>"; };
+		BDD94B5025761CC7002AD864 /* WXUnicornEventListenerHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXUnicornEventListenerHandler.m; sourceTree = "<group>"; };
+		BDD94B5125761CC7002AD864 /* WXUnicornEventListenerHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXUnicornEventListenerHandler.h; sourceTree = "<group>"; };
+		BDD94B6425761DAA002AD864 /* WXUnicornRenderProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXUnicornRenderProtocol.h; sourceTree = "<group>"; };
 		BDEEADB822F2902D0099F1D7 /* time_calculator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = time_calculator.cpp; sourceTree = "<group>"; };
 		BDEEADB922F2902E0099F1D7 /* time_calculator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = time_calculator.h; sourceTree = "<group>"; };
 		C401945D1E344E8300D19C31 /* WXFloatCompareTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXFloatCompareTests.m; sourceTree = "<group>"; };
@@ -1518,6 +1526,8 @@
 		59A583031CF5B2FD0081FD3E /* Handler */ = {
 			isa = PBXGroup;
 			children = (
+				BDD94B5125761CC7002AD864 /* WXUnicornEventListenerHandler.h */,
+				BDD94B5025761CC7002AD864 /* WXUnicornEventListenerHandler.m */,
 				D7D6B6E5238E1B2A00BE56DD /* WXDarkSchemeDefaultImpl.h */,
 				D7D6B6E4238E1B2A00BE56DD /* WXDarkSchemeDefaultImpl.m */,
 				33CE190C2153443000CF9670 /* WXJSFrameworkLoadDefaultImpl.h */,
@@ -1901,6 +1911,7 @@
 		77D1611C1C02DD3C0010B15B /* Protocol */ = {
 			isa = PBXGroup;
 			children = (
+				BDD94B6425761DAA002AD864 /* WXUnicornRenderProtocol.h */,
 				BDB112972459D6C2008492F9 /* WXReactorProtocol.h */,
 				D7D6B6E1238E1B1D00BE56DD /* WXDarkSchemeProtocol.h */,
 				33CE19122153444900CF9670 /* WXJSFrameworkLoadProtocol.h */,
@@ -2466,6 +2477,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BDD94B5325761CC7002AD864 /* WXUnicornEventListenerHandler.h in Headers */,
+				BDD94B6525761DAA002AD864 /* WXUnicornRenderProtocol.h in Headers */,
 				BDB112982459D6C2008492F9 /* WXReactorProtocol.h in Headers */,
 				BDB1129C2459D71E008492F9 /* reactor_page.h in Headers */,
 				77E659F11C0C3612008B8775 /* WXModuleFactory.h in Headers */,
@@ -2723,6 +2736,8 @@
 			files = (
 				BDB1129D2459D802008492F9 /* WXReactorProtocol.h in Headers */,
 				BDB112A02459D90F008492F9 /* reactor_page.h in Headers */,
+				BDC402DE25889F0900EA838A /* WXUnicornEventListenerHandler.h in Headers */,
+				BDC402D925889EF900EA838A /* WXUnicornRenderProtocol.h in Headers */,
 				DCA4461D1EFA5AAA00D0CFA8 /* WXHandlerFactory.h in Headers */,
 				DCA446101EFA5A8500D0CFA8 /* WXBridgeMethod.h in Headers */,
 				DCA4461A1EFA5AA000D0CFA8 /* WXInvocationConfig.h in Headers */,
@@ -3033,7 +3048,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = DCA4452C1EFA555400D0CFA8 /* Build configuration list for PBXNativeTarget "WeexSDK-Dynamic" */;
 			buildPhases = (
-				DCA445C81EFA584000D0CFA8 /* Generate WeexSDK.h */,
 				DCA445201EFA555400D0CFA8 /* Sources */,
 				DCA445211EFA555400D0CFA8 /* Frameworks */,
 				DCA445221EFA555400D0CFA8 /* Headers */,
@@ -3147,21 +3161,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Sets the target folders and the final framework product.\n# 如果工程名称和Framework的Target名称不一样的话，要自定义FMKNAME\nFMK_NAME=${PROJECT_NAME}\n# Install dir will be the final output to the framework.\n# The following line create it in the root folder of the current project.\nINSTALL_DIR=${SRCROOT}/Products/${FMK_NAME}.framework\n# Working dir will be deleted after the framework creation.\nWRK_DIR=build\nDEVICE_DIR=${WRK_DIR}/Release-iphoneos/${FMK_NAME}.framework\nSIMULATOR_DIR=${WRK_DIR}/Release-iphonesimulator/${FMK_NAME}.framework\n# -configuration ${CONFIGURATION}\n# Clean and Building both architectures.\necho xcodebuild -configuration \"Release\" -target \"${FMK_NAME}\" -sdk iphoneos \"CODE_SIGN_IDENTITY=${CODE_SIGN_IDENTITY}\" clean build\nxcodebuild -configuration \"Release\" -target \"${FMK_NAME}\" -sdk iphoneos \"CODE_SIGN_IDENTITY=${CODE_SIGN_IDENTITY}\" clean build\nif [ \"$?\" != \"0\" ]; then\nexit 1\nfi\necho xcodebuild -configuration \"Release\" -target \"${FMK_NAME}\" -sdk iphonesimulator \"CODE_SIGN_IDENTITY=${CODE_SIGN_IDENTITY}\" build\nxcodebuild -configuration \"Release\" -target \"${FMK_NAME}\" -sdk iphonesimulator \"CODE_SIGN_IDENTITY=${CODE_SIGN_IDENTITY}\" build\nif [ \"$?\" != \"0\" ]; then\nexit 1\nfi\n# Cleaning the oldest.\nif [ -d \"${INSTALL_DIR}\" ]\nthen\nrm -rf \"${INSTALL_DIR}\"\nfi\nmkdir -p \"${INSTALL_DIR}\"\ncp -R \"${SIMULATOR_DIR}/\" \"${INSTALL_DIR}/\"\n# 移除签名资源和 Info.plist\nrm \"${INSTALL_DIR}/Info.plist\"\nrm -rf \"${INSTALL_DIR}/_CodeSignature\"\n# Uses the Lipo Tool to merge both binary files (i386 + armv6/armv7) into one Universal final product.\nlipo -create \"${DEVICE_DIR}/${FMK_NAME}\" \"${SIMULATOR_DIR}/${FMK_NAME}\" -output \"${INSTALL_DIR}/${FMK_NAME}\"\nrm -r \"${WRK_DIR}\"\n";
-		};
-		DCA445C81EFA584000D0CFA8 /* Generate WeexSDK.h */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Generate WeexSDK.h";
-			outputPaths = (
-				"$(PROJECT_DIR)/myfile",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = ". \"${PROJECT_DIR}/buildScripts.sh\"\n\ngenerateSDKHeader 'WeexSDK'\ngenerateBuildTime \"${PROJECT_DIR}/WeexSDK/Sources/Utility/WXVersion.m\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -3302,6 +3301,7 @@
 				DCAB35FF1D658EB700C0EA70 /* WXRuleManager.m in Sources */,
 				77D161251C02DDD10010B15B /* WXSDKInstance.m in Sources */,
 				DC7764931F3C2CA300B5727E /* WXRecyclerDragController.m in Sources */,
+				BDD94B5225761CC7002AD864 /* WXUnicornEventListenerHandler.m in Sources */,
 				744D61151E4AF23E00B624B3 /* WXDiffUtil.m in Sources */,
 				B8D66C4321255730003960BD /* render_action_remove_element.cpp in Sources */,
 				B8D66BFB2125572F003960BD /* render_performance.cpp in Sources */,

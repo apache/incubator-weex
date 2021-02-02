@@ -33,6 +33,8 @@ FOUNDATION_EXPORT const unsigned char WeexSDKVersionString[];
 #import <WeexSDK/WXView.h>
 #import <WeexSDK/WXValidateProtocol.h>
 #import <WeexSDK/WXUtility.h>
+#import <WeexSDK/WXUnicornRenderProtocol.h>
+#import <WeexSDK/WXUnicornEventListenerHandler.h>
 #import <WeexSDK/WXURLRewriteProtocol.h>
 #import <WeexSDK/WXType.h>
 #import <WeexSDK/WXStreamModule.h>

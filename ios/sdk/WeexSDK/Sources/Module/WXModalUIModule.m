@@ -93,7 +93,6 @@ WX_EXPORT_METHOD(@selector(prompt:callback:))
 #pragma mark - Toast
 
 static const double WXToastDefaultDuration = 3.0;
-static const double WXToastDefaultAnimationTime = 0.3;
 static const CGFloat WXToastDefaultFontSize = 16.0;
 static const CGFloat WXToastDefaultWidth = 230.0;
 static const CGFloat WXToastDefaultHeight = 30.0;

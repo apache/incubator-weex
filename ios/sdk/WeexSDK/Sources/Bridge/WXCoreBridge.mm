@@ -1529,6 +1529,7 @@ break; \
 
 static WeexCore::PlatformBridge* platformBridge = nullptr;
 static WeexCore::ScriptBridge* jsBridge = nullptr;
+static UnicornRenderFunc unicornRenderFunction = nullptr;
 
 + (void)install
 {
@@ -1559,6 +1560,9 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 #else
         weex::base::LogImplement::getLog()->setDebugMode(false);
 #endif
+
+        Class UnicornRenderClass = NSClassFromString(@"UnicornRender");
+        unicornRenderFunction = [(id<WXUnicornRenderProtocol>)UnicornRenderClass getRenderFunc];
         
         platformBridge = new WeexCore::PlatformBridge();
         platformBridge->set_platform_side(new WeexCore::IOSSide());
@@ -1928,6 +1932,24 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
         return NO;
     }
     return static_cast<RenderPage*>(page)->reserve_css_styles();
+}
+
++ (void)callUnicornRenderAction:(NSString*)instanceId
+                         module:(const char*)module
+                         method:(const char*)method
+                        context:(JSContext*)context
+                           args:(JSValueRef[])args
+                       argCount:(int)argCount {
+  std::unique_ptr<JSValueRef[]> values = std::unique_ptr<JSValueRef[]>(new JSValueRef[argCount]);
+  for (int i = 0; i < argCount; i ++) {
+    values[i] = args[i];
+  }
+  unicornRenderFunction([instanceId UTF8String],
+                        module,
+                        method,
+                        context.JSGlobalContextRef,
+                        values.get(),
+                        argCount);
 }
 
 @end
