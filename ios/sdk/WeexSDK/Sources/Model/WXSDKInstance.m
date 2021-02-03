@@ -91,6 +91,9 @@ typedef enum : NSUInteger {
 
 - (void)dealloc
 {
+    if (self.unicornRender) {
+        [self.unicornRender shutdown];
+    }
     [_moduleEventObservers removeAllObjects];
     [self removeObservers];
 }
@@ -364,6 +367,16 @@ typedef enum : NSUInteger {
     self.needValidate = [[WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)] needValidate:url];
     WXResourceRequest *request = [WXResourceRequest requestWithURL:url resourceType:WXResourceTypeMainBundle referrer:@"" cachePolicy:NSURLRequestUseProtocolCachePolicy];
     [self _renderWithRequest:request options:options data:data];
+    if ([options[@"USE_UNICORN"] boolValue]) {
+        __weak typeof(self) weakSelf = self;
+        WXPerformBlockOnMainThread(^{
+            __strong typeof(weakSelf) strongSelf = weakSelf;
+            if (strongSelf == nil) {
+                return;
+            }
+            [strongSelf initUnicornRender];
+        });
+    }
 
     if (self.renderPlugin.isSupportExecScript) {
         NSMutableDictionary *newOptions = [NSMutableDictionary dictionaryWithDictionary:options];
@@ -390,6 +403,16 @@ typedef enum : NSUInteger {
     }
 
     self.needValidate = [[WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)] needValidate:self.scriptURL];
+    if ([options[@"USE_UNICORN"] boolValue]) {
+        __weak typeof(self) weakSelf = self;
+        WXPerformBlockOnMainThread(^{
+            __strong typeof(weakSelf) strongSelf = weakSelf;
+            if (strongSelf == nil) {
+                return;
+            }
+            [strongSelf initUnicornRender];
+        });
+    }
 
     if ([source isKindOfClass:[NSString class]]) {
         WXLogDebug(@"Render source: %@, data:%@", self, [WXUtility JSONString:data]);
@@ -523,7 +546,7 @@ typedef enum : NSUInteger {
         WXLogError(@"Fail to find instance！");
         return;
     }
-    
+
     if (_isRendered) {
         [WXExceptionUtils commitCriticalExceptionRT:self.instanceId errCode:[NSString stringWithFormat:@"%d", WX_ERR_RENDER_TWICE] function:@"_renderWithMainBundleString:" exception:[NSString stringWithFormat:@"instance is rendered twice"] extParams:nil];
         return;
@@ -537,6 +560,9 @@ typedef enum : NSUInteger {
     [_apmInstance setProperty:KEY_PAGE_PROPERTIES_UIKIT_TYPE withValue:_renderType?: WEEX_RENDER_TYPE_PLATFORM];
     if (self.renderPlugin) {
         [self.apmInstance setProperty:KEY_PAGE_PROPERTIES_RENDER_TYPE withValue:@"eagle"];
+    }
+    if (_options[@"USE_UNICORN"]) {
+        [self.apmInstance setProperty:KEY_PAGE_PROPERTIES_RENDER_TYPE withValue:@"weex2"];
     }
     
     self.performance.renderTimeOrigin = CACurrentMediaTime()*1000;
@@ -581,10 +607,15 @@ typedef enum : NSUInteger {
     if ([WXDebugTool getReplacedBundleJS]) {
         mainBundleString = [WXDebugTool getReplacedBundleJS];
     }
-    
+
     WXPerformBlockOnMainThread(^{
         if (self.isCustomRenderType) {
             self->_rootView = [WXCustomPageBridge createPageRootView:self.instanceId pageType:self.renderType frame:self.frame];
+        } else if ([self->_options[@"USE_UNICORN"] boolValue]) {
+            [self initUnicornRender];
+            self->_rootView = [[WXRootView alloc] initWithFrame:self.frame];
+            [self->_rootView addSubview:self.unicornRender.rootView];
+            ((WXRootView*)(self->_rootView)).instance = self;
         }
         else {
             self->_rootView = [[WXRootView alloc] initWithFrame:self.frame];
@@ -1140,6 +1171,20 @@ typedef enum : NSUInteger {
         [[NSNotificationCenter defaultCenter] removeObserver:self];
     }
     @catch (NSException *exception) {//!OCLint
+    }
+}
+
+- (void)initUnicornRender {
+    if (_unicornRender) {
+        return;
+    }
+    Class UnicornRenderClass = NSClassFromString(@"UnicornRender");
+    if (UnicornRenderClass) {
+        _unicornRender = (id<WXUnicornRenderProtocol>)[[UnicornRenderClass alloc] initWithInstanceId:self.instanceId];
+        _unicornRender.frame = self.frame;
+        [_unicornRender startEngine:self->_viewController];
+    } else {
+        WXLogError(@"There is no UnicornRender");
     }
 }
 

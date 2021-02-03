@@ -30,6 +30,7 @@
 #import "WXExceptionUtils.h"
 #import "WXSDKInstance_performance.h"
 #import "WXAnalyzerCenter+Transfer.h"
+#import "WXSDKInstance_private.h"
 
 
 #pragma mark - const static string
@@ -379,11 +380,15 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     if (_isEnd) {
         return;
     }
-    _isEnd = YES;
+    WXSDKInstance* instance = [WXSDKManager instanceForID:self.instanceId];
     [self onStage:KEY_PAGE_STAGES_DESTROY];
+    if (instance.unicornRender) {
+        [self onStageWithTime:KEY_PAGE_STAGES_INTERACTION time:[instance.unicornRender getFirstScreenTimeStamp]];
+    }
     if (nil != _apmProtocolInstance) {
          [self.apmProtocolInstance onEnd];
     }
+    _isEnd = YES;
     
     WXPerformBlockOnComponentThread(^{
         WXLogInfo(@"APM data of instance: %@, %@", self.instanceId, self.recordStageMap);
