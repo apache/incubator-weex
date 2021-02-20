@@ -459,7 +459,7 @@ WX_EXPORT_METHOD(@selector(save:))
                         // reload image with main image url
                         NSString* newURL = [choosedSrc copy];
                         WX_REWRITE_URL(choosedSrc, WXResourceTypeImage, strongSelf.weexInstance)
-                        NSDictionary *userInfo = @{@"imageQuality":@(strongSelf.imageQuality), @"imageSharp":@(strongSelf.imageSharp),  @"blurRadius":@(strongSelf.blurRadius), @"instanceId":[strongSelf _safeInstanceId], @"pageURL": strongSelf.weexInstance.scriptURL ?: @""};
+                        NSDictionary *userInfo = @{@"imageQuality":@(strongSelf.imageQuality), @"imageSharp":@(strongSelf.imageSharp),  @"blurRadius":@(strongSelf.blurRadius), @"instanceId":[strongSelf _safeInstanceId], @"pageURL": strongSelf.weexInstance.scriptURL ?: @"", @"attributes" : strongSelf.attributes};
                         [[strongSelf imageLoader] setImageViewWithURL:imageView url:[NSURL URLWithString:newURL] placeholderImage:nil options:userInfo progress:nil completed:^(UIImage *image, NSError *error, WXImageLoaderCacheType cacheType, NSURL *imageURL) {
                             WXLogInfo(@"Image re-requested because placeholder may override main image. %@", imageURL);
                         }];
@@ -474,7 +474,7 @@ WX_EXPORT_METHOD(@selector(save:))
         }
         WXLogInfo(@"Will download image: %@", newURL);
         WX_REWRITE_URL(choosedSrc, WXResourceTypeImage, self.weexInstance)
-        NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp),  @"blurRadius":@(self.blurRadius), @"instanceId":[self _safeInstanceId], @"pageURL": self.weexInstance.scriptURL ?: @""};
+        NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp),  @"blurRadius":@(self.blurRadius), @"instanceId":[self _safeInstanceId], @"pageURL": self.weexInstance.scriptURL ?: @"", @"attributes" : self.attributes};
         [[self imageLoader] setImageViewWithURL:(UIImageView*)self.view url:[NSURL URLWithString:newURL] placeholderImage:nil options:userInfo progress:^(NSInteger receivedSize, NSInteger expectedSize) {
             // progress when loading image
         } completed:^(UIImage *image, NSError *error, WXImageLoaderCacheType cacheType, NSURL *imageURL) {
@@ -628,7 +628,7 @@ WX_EXPORT_METHOD(@selector(save:))
     }
     
     WXLogDebug(@"Updating image:%@, component:%@", choosedSrc, self.ref);
-    NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp), @"blurRadius":@(self.blurRadius), @"instanceId":[self _safeInstanceId], @"pageURL": self.weexInstance.scriptURL ?: @""};
+    NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp), @"blurRadius":@(self.blurRadius), @"instanceId":[self _safeInstanceId], @"pageURL": self.weexInstance.scriptURL ?: @"", @"attributes" : self.attributes};
     NSString * newURL = [choosedSrc copy];
     WX_REWRITE_URL(choosedSrc, WXResourceTypeImage, self.weexInstance)
     __weak typeof(self) weakSelf = self;
