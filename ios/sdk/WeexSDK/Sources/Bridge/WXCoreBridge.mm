@@ -1944,6 +1944,10 @@ static UnicornRenderFunc unicornRenderFunction = nullptr;
   for (int i = 0; i < argCount; i ++) {
     values[i] = args[i];
   }
+  if (!unicornRenderFunction) {
+      Class UnicornRenderClass = NSClassFromString(@"UnicornRender");
+      unicornRenderFunction = [(id<WXUnicornRenderProtocol>)UnicornRenderClass getRenderFunc];
+  }
   unicornRenderFunction([instanceId UTF8String],
                         module,
                         method,
