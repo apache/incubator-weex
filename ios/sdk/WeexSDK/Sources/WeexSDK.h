@@ -100,4 +100,5 @@ FOUNDATION_EXPORT const unsigned char WeexSDKVersionString[];
 #import <WeexSDK/WXAComponent.h>
 #import <WeexSDK/NSObject+WXSwizzle.h>
 #import <WeexSDK/JSContext+Weex.h>
+#import <WeexSDK/WXCanalProtocol.h>
 

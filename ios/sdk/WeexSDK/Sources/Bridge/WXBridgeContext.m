@@ -53,6 +53,8 @@
 #import "WXExtendCallNativeManager.h"
 #import "WXEaglePluginManager.h"
 
+#import "WXCanalProtocol.h"
+
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
 _Pragma("clang diagnostic push") \
@@ -589,10 +591,23 @@ _Pragma("clang diagnostic pop") \
                                            @"instanceId":sdkInstance.instanceId?:@"unknownId"
                                         };
                 sdkInstance.instanceJavaScriptContext.javaScriptContext[@"wxExtFuncInfo"]= funcInfo;
-                if ([NSURL URLWithString:sdkInstance.pageName] || sdkInstance.scriptURL) {
-                    [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString withSourceURL:[NSURL URLWithString:sdkInstance.pageName]?:sdkInstance.scriptURL];
+                
+                if (sdkInstance.useCanal) {
+                    id<WXCanalProtocol> canalHandler = [WXHandlerFactory handlerForProtocol:NSProtocolFromString(@"WXCanalProtocol")];
+                    if (canalHandler) {
+                        [canalHandler createContextWithParams:@{
+                            @"instanceId": sdkInstance.instanceId,
+                            @"jsbundle"  : jsBundleString,
+                        }];
+                    } else {
+                        WXLogError(@"There is no canal handler");
+                    }
                 } else {
-                    [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString];
+                    if ([NSURL URLWithString:sdkInstance.pageName] || sdkInstance.scriptURL) {
+                        [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString withSourceURL:[NSURL URLWithString:sdkInstance.pageName]?:sdkInstance.scriptURL];
+                    } else {
+                        [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString];
+                    }
                 }
                 sdkInstance.instanceJavaScriptContext.javaScriptContext[@"wxExtFuncInfo"] = nil;
                 [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_EXECUTE_BUNDLE_END];

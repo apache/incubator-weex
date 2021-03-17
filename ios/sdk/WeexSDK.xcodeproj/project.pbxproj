@@ -920,6 +920,8 @@
 		F75C591C2313C1FC002FFF94 /* WXStreamModule.h in Headers */ = {isa = PBXBuildFile; fileRef = 74A4BAA41CB4F98300195969 /* WXStreamModule.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F769EECA2578E3000027B29B /* WXLegacyAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = F769EEC92578E3000027B29B /* WXLegacyAdapter.h */; };
 		F769EECB2578E3000027B29B /* WXLegacyAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = F769EEC92578E3000027B29B /* WXLegacyAdapter.h */; };
+		F7E4A09E25EDE1A800FBE2AE /* WXCanalProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = F7E4A09D25EDE1A800FBE2AE /* WXCanalProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F7E4A09F25EDE1A800FBE2AE /* WXCanalProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = F7E4A09D25EDE1A800FBE2AE /* WXCanalProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1431,6 +1433,7 @@
 		ED0534FE207F4DEB007B4568 /* JSContext+Weex.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "JSContext+Weex.h"; sourceTree = "<group>"; };
 		ED0534FF207F4DEB007B4568 /* JSContext+Weex.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "JSContext+Weex.m"; sourceTree = "<group>"; };
 		F769EEC92578E3000027B29B /* WXLegacyAdapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXLegacyAdapter.h; sourceTree = "<group>"; };
+		F7E4A09D25EDE1A800FBE2AE /* WXCanalProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXCanalProtocol.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1931,6 +1934,7 @@
 				042013AC1E66CD6A001FC79C /* WXValidateProtocol.h */,
 				DC6836E51EBB12B200AD2D84 /* WXConfigCenterProtocol.h */,
 				C4424E591F24DA3D009F52E2 /* WXExtendCallNativeProtocol.h */,
+				F7E4A09D25EDE1A800FBE2AE /* WXCanalProtocol.h */,
 			);
 			path = Protocol;
 			sourceTree = "<group>";
@@ -2673,6 +2677,7 @@
 				C4B3D6D41E6954300013F38D /* WXEditComponent.h in Headers */,
 				74CC7A1C1C2BC5F800829368 /* WXCellComponent.h in Headers */,
 				74896F301D1AC79400D1D593 /* NSObject+WXSwizzle.h in Headers */,
+				F7E4A09E25EDE1A800FBE2AE /* WXCanalProtocol.h in Headers */,
 				B8D66C5921255730003960BD /* render_action_remove_element.h in Headers */,
 				DCF343671E49CAEE00A2FB34 /* WXJSExceptionInfo.h in Headers */,
 				C4F012821E1502E9003378D0 /* WXWebSocketModule.h in Headers */,
@@ -2930,6 +2935,7 @@
 				DCA445D71EFA598D00D0CFA8 /* WXComponent+ViewManagement.h in Headers */,
 				DCA445D31EFA594A00D0CFA8 /* WXRoundedRect.h in Headers */,
 				B8D66BFE2125572F003960BD /* render_performance.h in Headers */,
+				F7E4A09F25EDE1A800FBE2AE /* WXCanalProtocol.h in Headers */,
 				DCA445EA1EFA5A0300D0CFA8 /* WXCellComponent.h in Headers */,
 				DCA446201EFA5AB800D0CFA8 /* WXComponent+Navigation.h in Headers */,
 				DCA445F81EFA5A3500D0CFA8 /* WXGlobalEventModule.h in Headers */,

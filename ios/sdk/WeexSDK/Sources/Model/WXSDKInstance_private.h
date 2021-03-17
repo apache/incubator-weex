@@ -38,6 +38,7 @@
 @property (nonatomic, weak) id <WXEaglePlugin> renderPlugin;
 
 @property (nonatomic, assign) BOOL useReactor;
+@property (nonatomic, assign) BOOL useCanal;
 
 @property (nonatomic, strong) id<WXUnicornRenderProtocol> unicornRender;
 
