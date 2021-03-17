@@ -55,6 +55,7 @@
 #import "WXDarkSchemeModule.h"
 #import <WeexSDK/WXEaglePluginManager.h>
 #import "WXReactorProtocol.h"
+#import "WXCanalProtocol.h"
 
 #define WEEX_RENDER_TYPE_PLATFORM       @"platform"
 
@@ -645,7 +646,9 @@ typedef enum : NSUInteger {
         [self.apmInstance setProperty:KEY_PROPERTIES_ERROR_CODE withValue:[@(wxErrorCode) stringValue]];
         return;
     }
-    
+    if ([dictionary[@"USE_CANAL"] boolValue]) {
+        _useCanal = YES;
+    }
     if ([dictionary[@"USE_REACTOR"] boolValue]) {
         id<WXReactorProtocol> reactorHandler = [WXHandlerFactory handlerForProtocol:NSProtocolFromString(@"WXReactorProtocol")];
         if (reactorHandler) {
@@ -930,6 +933,14 @@ typedef enum : NSUInteger {
                     [reactorHandler unregisterJSContext:self.instanceId];
                 } else {
                     WXLogError(@"There is no reactor handler");
+                }
+            }
+            if (self.useCanal) {
+                id<WXCanalProtocol> canalHandler = [WXHandlerFactory handlerForProtocol:NSProtocolFromString(@"WXCanalProtocol")];
+                if (canalHandler) {
+                    [canalHandler destroyContextWithParams:@{@"instanceId" : self.instanceId}];
+                } else {
+                    WXLogError(@"There is no canal handler");
                 }
             }
             [WXSDKManager removeInstanceforID:instanceId];
