@@ -98,6 +98,8 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     UILongPressGestureRecognizer *_longPressGesture;
     UIPanGestureRecognizer *_panGesture;
     
+    BOOL _enableScreenEdgePanGesture;
+
     BOOL _cancelsTouchesInView;
     
     BOOL _listenPanStart;
