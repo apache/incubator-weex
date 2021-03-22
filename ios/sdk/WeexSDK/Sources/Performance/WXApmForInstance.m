@@ -74,6 +74,7 @@ NSString* const KEY_PAGE_STAGES_CREATE_FINISH = @"wxJSBundleCreateFinish";
 NSString* const KEY_PAGE_STAGES_FSRENDER  = @"wxFsRender";
 NSString* const KEY_PAGE_STAGES_NEW_FSRENDER = @"wxNewFsRender";
 NSString* const KEY_PAGE_STAGES_INTERACTION  = @"wxInteraction";
+NSString* const KEY_PAGE_STAGES_INTERACTION_TM  = @"wxInteractionTimeStamp";
 NSString* const KEY_PAGE_STAGES_DESTROY  = @"wxDestroy";
 
 ///************** stats *****************/
@@ -383,7 +384,8 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     WXSDKInstance* instance = [WXSDKManager instanceForID:self.instanceId];
     [self onStage:KEY_PAGE_STAGES_DESTROY];
     if (instance.unicornRender) {
-        [self onStageWithTime:KEY_PAGE_STAGES_INTERACTION time:[instance.unicornRender getFirstScreenTimeStamp]];
+        [self onStageWithTime:KEY_PAGE_STAGES_INTERACTION_TM time:[instance.unicornRender getFirstScreenTimeStamp]];
+        [self onStageWithTime:KEY_PAGE_STAGES_INTERACTION time:[instance.unicornRender getFirstScreenTimeInterval] + [WXUtility getIntervalTime]];
     }
     if (nil != _apmProtocolInstance) {
          [self.apmProtocolInstance onEnd];
