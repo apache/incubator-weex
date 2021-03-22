@@ -46,6 +46,7 @@
 static BOOL enableRTLLayoutDirection = YES;
 static BOOL isDarkSchemeSupportEnabled = YES;
 static BOOL enableAdaptiveLayout = NO;
+static long intervalTime = 0;
 
 void WXPerformBlockOnMainThread(void (^ _Nonnull block)(void))
 {
@@ -1115,8 +1116,13 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a, CGFloat b ,double precision){
     
     dispatch_once(&unixTimeToken, ^{
         sInterval = [[NSDate date] timeIntervalSince1970] * 1000 - CACurrentMediaTime()*1000;
+        intervalTime = sInterval;
     });
     return sInterval+CACurrentMediaTime()*1000;
+}
+
++ (long)getIntervalTime {
+    return intervalTime;
 }
 
 + (NSArray<NSString *> *)extractPropertyNamesOfJSValueObject:(JSValue *)jsvalue
