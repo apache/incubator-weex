@@ -76,6 +76,10 @@ NSString* const KEY_PAGE_STAGES_NEW_FSRENDER = @"wxNewFsRender";
 NSString* const KEY_PAGE_STAGES_INTERACTION  = @"wxInteraction";
 NSString* const KEY_PAGE_STAGES_INTERACTION_TM  = @"wxInteractionTimeStamp";
 NSString* const KEY_PAGE_STAGES_DESTROY  = @"wxDestroy";
+NSString* const KEY_PAGE_STAGES_CREATE_INSTANCE_START  = @"wxCreateInstanceStart";
+NSString* const KEY_PAGE_STAGES_CREATE_INSTANCE_END  = @"wxCreateInstanceEnd";
+NSString* const KEY_PAGE_UNICORN_ENGINE_INIT_START  = @"wxUnicornEngineInitStart";
+NSString* const KEY_PAGE_UNICORN_ENGINE_INIT_END  = @"wxUnicornEngineInitEnd";
 
 ///************** stats *****************/
 NSString* const KEY_PAGE_STATS_BUNDLE_SIZE  = @"wxBundleSize";
@@ -386,6 +390,13 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     if (instance.unicornRender) {
         [self onStageWithTime:KEY_PAGE_STAGES_INTERACTION_TM time:[instance.unicornRender getFirstScreenTimeStamp]];
         [self onStageWithTime:KEY_PAGE_STAGES_INTERACTION time:[instance.unicornRender getFirstScreenTimeInterval] + [WXUtility getIntervalTime]];
+
+        NSString* timeLine = [instance.unicornRender getEngineTimeline];
+        NSDictionary* timeLineDic = [WXUtility objectFromJSON:timeLine];
+        for (NSString* key in timeLineDic) {
+            long time = [[timeLineDic objectForKey:key] longLongValue] + [WXUtility getIntervalTime];
+            [self onStageWithTime:[@"wxUni" stringByAppendingString:key] time:time];
+        }
     }
     if (nil != _apmProtocolInstance) {
          [self.apmProtocolInstance onEnd];

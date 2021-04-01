@@ -403,6 +403,10 @@ typedef enum : NSUInteger {
         [[WXSDKManager bridgeMgr] executeJSTaskQueue];
     }
 
+    [self _checkPageName];
+    [self.apmInstance startRecord:self.instanceId];
+    self.apmInstance.isStartRender = YES;
+
     self.needValidate = [[WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)] needValidate:self.scriptURL];
     if ([options[@"USE_UNICORN"] boolValue]) {
         __weak typeof(self) weakSelf = self;
@@ -552,11 +556,6 @@ typedef enum : NSUInteger {
         [WXExceptionUtils commitCriticalExceptionRT:self.instanceId errCode:[NSString stringWithFormat:@"%d", WX_ERR_RENDER_TWICE] function:@"_renderWithMainBundleString:" exception:[NSString stringWithFormat:@"instance is rendered twice"] extParams:nil];
         return;
     }
-
-    //some case , with out render (url)
-    [self _checkPageName];
-    [self.apmInstance startRecord:self.instanceId];
-    self.apmInstance.isStartRender = YES;
     
     [_apmInstance setProperty:KEY_PAGE_PROPERTIES_UIKIT_TYPE withValue:_renderType?: WEEX_RENDER_TYPE_PLATFORM];
     if (self.renderPlugin) {
@@ -1191,9 +1190,11 @@ typedef enum : NSUInteger {
     }
     Class UnicornRenderClass = NSClassFromString(@"UnicornRender");
     if (UnicornRenderClass) {
+        [self.apmInstance onStage:KEY_PAGE_UNICORN_ENGINE_INIT_START];
         _unicornRender = (id<WXUnicornRenderProtocol>)[[UnicornRenderClass alloc] initWithInstanceId:self.instanceId];
         _unicornRender.frame = self.frame;
         [_unicornRender startEngine:self->_viewController];
+        [self.apmInstance onStage:KEY_PAGE_UNICORN_ENGINE_INIT_END];
     } else {
         WXLogError(@"There is no UnicornRender");
     }
