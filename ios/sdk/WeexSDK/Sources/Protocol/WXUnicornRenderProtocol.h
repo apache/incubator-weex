@@ -44,6 +44,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (uint64_t)getFirstScreenTimeStamp;
 - (uint64_t)getFirstScreenTimeInterval;
 
+- (NSString*)getEngineTimeline;
+
 #ifdef __cplusplus
 typedef void(*UnicornRenderFunc)(const std::string& instance_id,
                                  const std::string& module,
