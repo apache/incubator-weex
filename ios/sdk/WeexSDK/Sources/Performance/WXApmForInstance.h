@@ -46,6 +46,7 @@ extern NSString* const KEY_PAGE_PROPERTIES_UIKIT_TYPE;
 
 ///************** stages *****************/
 extern NSString* const KEY_PAGE_STAGES_START;
+extern NSString* const KEY_PAGE_STAGES_CONTAINER_READY;
 extern NSString* const KEY_PAGE_STAGES_DOWN_BUNDLE_START;
 extern NSString* const KEY_PAGE_STAGES_DOWN_BUNDLE_END;
 extern NSString* const KEY_PAGE_STAGES_DOWN_JS_START;

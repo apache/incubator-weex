@@ -58,6 +58,7 @@ NSString* const KEY_PAGE_PROPERTIES_UIKIT_TYPE = @"wxUIKitType";
 
 ///************** stages *****************/
 NSString* const KEY_PAGE_STAGES_START = @"wxRecordStart";
+NSString* const KEY_PAGE_STAGES_CONTAINER_READY = @"wxContainerReady";
 NSString* const KEY_PAGE_STAGES_DOWN_BUNDLE_START  = @"wxStartDownLoadBundle";
 NSString* const KEY_PAGE_STAGES_DOWN_BUNDLE_END  = @"wxEndDownLoadBundle";
 NSString* const KEY_PAGE_STAGES_DOWN_JS_START  = @"wxStartDownLoadJS";
@@ -352,6 +353,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     if (nil != _apmProtocolInstance) {
         [self.apmProtocolInstance onStart:instanceId topic:WEEX_PAGE_TOPIC];
     }
+    [self onStage:KEY_PAGE_STAGES_CONTAINER_READY];
     [self onStage:KEY_PAGE_STAGES_START];
     WXSDKInstance* instance = [WXSDKManager instanceForID:instanceId];
     if (nil == instance) {
