@@ -22,7 +22,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class WXScrollSnapData;
+@class WXScrollSnapData, WXScrollAnimator;
 
 @interface WXScrollerComponent : WXComponent <WXScrollerProtocol, UIScrollViewDelegate>
 
@@ -35,6 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) CGSize contentSize;
 
 @property (nonatomic, strong) WXScrollSnapData *snapData;
+
+@property (nonatomic, strong) WXScrollAnimator * _Nullable scrollAnimator;
 
 - (void)handleAppear;
 
@@ -82,6 +84,58 @@ typedef NS_ENUM(NSUInteger, WXScrollSnapAlignment) {
 - (WXScrollSnapStatus)shouldTriggerSnap:(CGPoint)offset velocity:(CGPoint)velocity;
 /// 
 - (CGFloat)calcScrollSnapPositionOffset;
+
+@end
+
+typedef NS_ENUM(NSUInteger, WXScrollAnimateFunction) {
+    WXScrollAnimateLinear,
+    WXScrollAnimateQuadOut,
+    WXScrollAnimateQuadInOut,
+    WXScrollAnimateQuadIn,
+    WXScrollAnimateCubicIn,
+    WXScrollAnimateCubicOut,
+    WXScrollAnimateCubicInOut,
+    WXScrollAnimateQuartIn,
+    WXScrollAnimateQuartOut,
+    WXScrollAnimateQuartInOut,
+    WXScrollAnimateSineIn,
+    WXScrollAnimateSineOut,
+    WXScrollAnimateSineInOut,
+    WXScrollAnimateQuintIn,
+    WXScrollAnimateQuintOut,
+    WXScrollAnimateQuintInOut,
+    WXScrollAnimateExpoIn,
+    WXScrollAnimateExpoOut,
+    WXScrollAnimateExpoInOut,
+    WXScrollAnimateCircleIn,
+    WXScrollAnimateCircleOut,
+    WXScrollAnimateCircleInOut,
+};
+
+typedef void(^WXScrollAnimatorCompletion)(void);
+
+@interface WXScrollAnimator : NSObject
+
+@property (nonatomic, weak) UIScrollView *scrollView;
+
+@property (nonatomic, assign) WXScrollAnimateFunction timingFunction;
+
+@property (nonatomic, assign) NSTimeInterval startTime;
+@property (nonatomic, assign) NSTimeInterval duration;
+@property (nonatomic, assign) NSTimeInterval runTime;
+
+@property (nonatomic, assign) CGPoint startOffset;
+@property (nonatomic, assign) CGPoint destinationOffset;
+
+@property (nonatomic, copy) WXScrollAnimatorCompletion completion;
+
+@property (nonatomic, strong) CADisplayLink *timer;
+
+- (instancetype)initWithScrollView:(UIScrollView *)scrollView timingFunction:(WXScrollAnimateFunction)timingFunction;
+
+- (void)setContentOffset:(CGPoint)offset duration:(NSTimeInterval)duration;
+
+- (CGFloat)computeAnimateWithTime:(CGFloat)time begin:(CGFloat)begin change:(CGFloat)change duration:(CGFloat)duration;
 
 @end
 

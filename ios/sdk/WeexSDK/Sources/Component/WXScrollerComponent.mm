@@ -208,6 +208,156 @@ CGFloat kDefaultScrollSnapTriggerOffset = 60;
 
 @end
 
+@interface WXScrollAnimator()
+
+@end
+
+@implementation WXScrollAnimator
+
+- (instancetype)initWithScrollView:(WXScrollerComponentView *)scrollView timingFunction:(WXScrollAnimateFunction)timingFunction {
+    if (self = [super init]) {
+        _scrollView = scrollView;
+        _timingFunction = timingFunction;
+    }
+    return self;
+}
+
+- (CGFloat)computeAnimateWithTime:(CGFloat)time begin:(CGFloat)begin change:(CGFloat)change duration:(CGFloat)duration {
+    switch (self.timingFunction) {
+        case WXScrollAnimateLinear:
+            return change * time / duration + begin;
+        case WXScrollAnimateQuadOut:
+            time /= duration;
+            return -change * time * (time - 2) + begin;
+        case WXScrollAnimateQuadInOut:
+            time /= (duration / 2);
+            if (time < 1) {
+                return change / 2 * time * time + begin;
+            }
+            time -= 1;
+            return -change / 2 * (time * (time - 2) - 1) + begin;
+        case WXScrollAnimateQuadIn:
+            time /= duration;
+            return change * time * time + begin;
+        case WXScrollAnimateCubicIn:
+            time /= duration;
+            return change * time * time * time + begin;
+        case WXScrollAnimateCubicOut:
+            time = time / duration - 1;
+            return change * (time * time * time + 1) + begin;
+        case WXScrollAnimateCubicInOut:
+            time /= duration / 2;
+            if (time < 1) {
+                return change / 2 * time * time * time + begin;
+            }
+            time -= 2;
+            return change / 2 * ( time * time * time + 2) + begin;
+        case WXScrollAnimateQuartIn:
+            time /= duration;
+            return change * time * time * time * time + begin;
+        case WXScrollAnimateQuartOut:
+            time = time / duration - 1;
+            return -change * (time * time * time * time - 1) + begin;
+        case WXScrollAnimateQuartInOut:
+            time /= duration / 2;
+            if (time < 1) {
+                return change / 2 * time * time * time * time + begin;
+            }
+            time -= 2;
+            return -change / 2 * (time * time * time * time - 2) + begin;
+        case WXScrollAnimateSineIn:
+            return -change * cos(time / duration * M_PI_2) + change + begin;
+        case WXScrollAnimateSineOut:
+            return change * sin(time / duration * M_PI_2) + begin;
+        case WXScrollAnimateSineInOut:
+            return -change / 2 * (cos(M_PI * time / duration) - 1) + begin;
+        case WXScrollAnimateQuintIn:
+            time /= duration;
+            return change * time * time * time * time * time + begin;
+        case WXScrollAnimateQuintOut:
+            time = time / duration - 1;
+            return change * (time * time * time * time * time + 1) + begin;
+        case WXScrollAnimateQuintInOut:
+            time /= duration / 2;
+            if (time < 1) {
+                return change / 2 * time * time * time * time * time + begin;
+            }
+            time -= 2;
+            return change / 2 * (time * time * time * time * time + 2) + begin;
+        case WXScrollAnimateExpoIn:
+            return (time == 0) ? begin : change * pow(2, 10*(time / duration - 1)) + begin;
+        case WXScrollAnimateExpoOut:
+            return (time == duration) ? begin + change : change * (-pow(2, -10 * time / duration) + 1) + begin;
+        case WXScrollAnimateExpoInOut:
+            if (time == 0) {
+                return begin;
+            }
+            if (time == duration) {
+                return begin + change;
+            }
+            time /= duration / 2;
+            if (time < 1) {
+                return change / 2 * pow(2, 10 * (time - 1)) + begin;
+            }
+            time -= 1;
+            return change / 2 * (-pow(2, -10 * time) + 2) + begin;
+        case WXScrollAnimateCircleIn:
+            time /= duration;
+            return -change * (sqrt(1 - time * time) - 1) + begin;
+        case WXScrollAnimateCircleOut:
+            time = time / duration - 1;
+            return change * sqrt(1 - time * time) + begin;
+        case WXScrollAnimateCircleInOut:
+            time /= duration / 2;
+            if (time < 1) {
+                return -change / 2 * (sqrt(1 - time * time) - 1) + begin;
+            }
+            time -= 2;
+            return change / 2 * (sqrt(1 - time * time) + 1) + begin;
+    }
+}
+
+- (void)setContentOffset:(CGPoint)offset duration:(NSTimeInterval)duration {
+    if (!_scrollView) {
+        return;
+    }
+    _startTime = [[NSDate date] timeIntervalSince1970];
+    _startOffset = _scrollView.contentOffset;
+    _destinationOffset = offset;
+    _duration = duration;
+    _runTime = 0;
+    if (_duration < 0) {
+        [_scrollView setContentOffset:offset animated:false];
+        return;
+    }
+    if (_timer == nil) {
+        _timer = [CADisplayLink displayLinkWithTarget:self selector:@selector(animatedScroll)];
+        [_timer addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+    }
+}
+
+- (void)animatedScroll {
+    if (!_timer || !_scrollView) {
+        return;
+    }
+    _runTime += _timer.duration;
+    if (_runTime >= _duration) {
+        [_scrollView setContentOffset:_destinationOffset animated:false];
+        [_timer invalidate];
+        _timer = nil;
+        if (self.completion) {
+            self.completion();
+        }
+        return;
+    }
+    CGPoint offset = _scrollView.contentOffset;
+    offset.x = [self computeAnimateWithTime:_runTime begin:_startOffset.x change:(_destinationOffset.x - _startOffset.x) duration:_duration];
+    offset.y = [self computeAnimateWithTime:_runTime begin:_startOffset.y change:(_destinationOffset.y - _startOffset.y) duration:_duration];
+    [_scrollView setContentOffset:offset animated:false];
+}
+
+@end
+
 
 @interface WXScrollerComponent()
 
@@ -1048,12 +1198,34 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     return CGPointMake(-1, -1);
 }
 
+- (void)setContentOffset:(CGPoint)contentOffset duration:(NSTimeInterval)duration timingFunction:(WXScrollAnimateFunction)timingFunction completion:(void(^)(void))completion {
+    if (!_scrollAnimator) {
+        _scrollAnimator = [[WXScrollAnimator alloc] initWithScrollView:(UIScrollView *)self.view timingFunction:timingFunction];
+    }
+    __weak typeof(self) weakSelf = self;
+    _scrollAnimator.completion = ^{
+        __strong typeof(self) strongSelf = weakSelf;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            strongSelf.scrollAnimator = nil;
+        });
+        if (completion) {
+            completion();
+        }
+    };
+    [_scrollAnimator setContentOffset:contentOffset duration:duration];
+}
+
 - (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset
 {
     if (_snapData.useSnap) {
         CGPoint offset = [self calculateSnapPosition:scrollView withVelocity:velocity startPosition:_scrollStartPoint targetPosition:CGPointMake(targetContentOffset->x, targetContentOffset->y)];
-        targetContentOffset->x = offset.x;
-        targetContentOffset->y = offset.y;
+//        targetContentOffset->x = offset.x;
+//        targetContentOffset->y = offset.y;
+//        targetContentOffset->x = _scrollStartPoint.x;
+//        targetContentOffset->y = _scrollStartPoint.y;
+        [self setContentOffset:offset duration:0.25 timingFunction:WXScrollAnimateQuadInOut completion:^{
+            WXLogInfo(@"[StepScroll] scroll animate over");
+        }];
         self.snapData.targetPosition = offset;
         WXLogInfo(@"%@", _snapData);
     }
