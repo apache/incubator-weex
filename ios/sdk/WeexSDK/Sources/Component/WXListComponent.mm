@@ -171,6 +171,9 @@
     BOOL _isUpdating;
     NSMutableArray<void(^)(void)> *_updates;
     NSTimeInterval _reloadInterval;
+    
+    CGPoint *_targetContentOffset;
+    CGPoint _nextStepContentOffset;
 }
 
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
@@ -726,6 +729,145 @@
     } else {
         return 0.0;
     }
+}
+
+- (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset {
+    [super scrollViewWillEndDragging:scrollView withVelocity:velocity targetContentOffset:targetContentOffset];
+}
+
+- (NSIndexPath *)getNeighbouringIndexPath:(NSIndexPath *)currentIndexPath findNext:(BOOL)findNext {
+    NSIndexPath *neighbourIndexPath;
+    if (findNext) {
+        if (currentIndexPath.row == _completedSections[currentIndexPath.section].rows.count - 1) {
+            if (currentIndexPath.section == _completedSections.count-1) {// 最后一个cell
+                neighbourIndexPath = [NSIndexPath indexPathForRow:currentIndexPath.row inSection:currentIndexPath.section];
+            } else {// 下一个section第一个cell
+                neighbourIndexPath = [NSIndexPath indexPathForRow:0 inSection:currentIndexPath.section+1];
+            }
+        } else {// 下一个cell
+            neighbourIndexPath = [NSIndexPath indexPathForRow:currentIndexPath.row+1 inSection:currentIndexPath.section];
+        }
+    } else {
+        if (currentIndexPath.row == 0) {
+            if (currentIndexPath.section == 0) {// 第一个cell
+                neighbourIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+            } else {// 上一个section最后一个cell
+                neighbourIndexPath = [NSIndexPath indexPathForRow:_completedSections[currentIndexPath.section-1].rows.count-1 inSection:currentIndexPath.section-1];
+            }
+        } else {// 上一个cell
+            neighbourIndexPath = [NSIndexPath indexPathForRow:currentIndexPath.row-1 inSection:currentIndexPath.section];
+        }
+    }
+    return neighbourIndexPath;
+}
+
+
+- (CGPoint)calculateSnapPosition:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity startPosition:(CGPoint)startPosition targetPosition:(CGPoint)preTargetPosition{
+    [self.snapData bindingScrollView:scrollView];
+    WXTableView *tableView = (WXTableView *)scrollView;
+    /// 计算起始点的cell时添加的偏移，为了避免在连续滑动过程中上一次滑动还未结束便开始下一次滑动，导致position计算有问题
+    CGFloat kstartPositionOffset = 10.f;
+    
+    /// 手指按下时scroll container捕捉点
+    self.snapData.startPosition = startPosition;
+    CGPoint snapContainerPosition, currentOffset;
+    CGPoint currentPoint = scrollView.contentOffset;
+    /// 捕捉点相对容器顶点的偏移
+    CGFloat snapOffset = [self.snapData calcScrollSnapPositionOffset];
+    if (self.scrollDirection == WXScrollDirectionHorizontal) {
+        currentOffset = CGPointMake(currentPoint.x-startPosition.x, currentPoint.y);
+        snapContainerPosition = CGPointMake(startPosition.x + snapOffset, startPosition.y);
+    } else {
+        currentOffset = CGPointMake(currentPoint.x, currentPoint.y-startPosition.y);
+        snapContainerPosition = CGPointMake(startPosition.x, startPosition.y + snapOffset);
+    }
+    /// 计算snap staus
+    WXScrollSnapStatus snapStatus = [self.snapData shouldTriggerSnap:currentOffset velocity:velocity];
+    
+    CGPoint targetContentOffset = startPosition;
+    /// 负轴复原
+    if (currentPoint.x < 0 || currentPoint.y < 0) {
+        targetContentOffset.x = 0;
+        targetContentOffset.y = 0;
+        return targetContentOffset;
+    }
+    /// 回弹到原始状态
+    if (snapStatus == WXScrollSnapNone) {
+        return targetContentOffset;
+    }
+    
+    /// 起始点判断，对于对齐方式为Start的方式取+4偏移点，Center的方式取捕捉点，End的方式取-4捕捉点
+    CGPoint correctSnapPosition = snapContainerPosition;
+    if (self.scrollDirection == WXScrollDirectionHorizontal) {
+        switch (self.snapData.alignment) {
+            case WXScrollSnapAlignStart:
+                correctSnapPosition.x += kstartPositionOffset;
+                break;
+            case WXScrollSnapAlignEnd:
+                correctSnapPosition.x -= kstartPositionOffset;
+                break;
+            default:
+                break;
+        }
+    } else {
+        switch (self.snapData.alignment) {
+            case WXScrollSnapAlignStart:
+                correctSnapPosition.y += kstartPositionOffset;
+                break;
+            case WXScrollSnapAlignEnd:
+                correctSnapPosition.y -= kstartPositionOffset;
+                break;
+            default:
+                break;
+        }
+    }
+    /// 起始点所在cell位置
+    NSIndexPath *beginIndexPath = [tableView indexPathForRowAtPoint:correctSnapPosition];
+    CGRect beginCellRect = [tableView rectForRowAtIndexPath:beginIndexPath];
+    if (CGRectIsNull(beginCellRect)) {
+        return targetContentOffset;
+    }
+    NSIndexPath *targetIndexPath = beginIndexPath;
+    
+    if (snapStatus == WXScrollSnapStay) {
+        WXLogInfo(@"[ScrollSnap] stay");
+    } else {
+        targetIndexPath = [self getNeighbouringIndexPath:beginIndexPath findNext:(snapStatus == WXScrollSnapToNext)];
+    }
+    
+    CGRect targetCellRect = [tableView rectForRowAtIndexPath:targetIndexPath];
+    
+    if (self.scrollDirection == WXScrollDirectionVertical) {
+        targetContentOffset.y = targetCellRect.origin.y - snapOffset;
+        if (self.snapData.alignment == WXScrollSnapAlignCenter) {
+            targetContentOffset.y += (targetCellRect.size.height / 2);
+        } else if (self.snapData.alignment == WXScrollSnapAlignEnd) {
+            targetContentOffset.y += targetCellRect.size.height;
+        }
+        if (targetContentOffset.y < 0) {
+            targetContentOffset.y = 0;
+        }
+    } else {
+        targetContentOffset.x = targetCellRect.origin.x - snapOffset;
+        if (self.snapData.alignment == WXScrollSnapAlignCenter) {
+            targetContentOffset.x += (targetCellRect.size.width / 2);
+        } else if (self.snapData.alignment == WXScrollSnapAlignEnd) {
+            targetContentOffset.x += targetCellRect.size.width;
+        }
+        if (targetContentOffset.x < 0) {
+            targetContentOffset.x = 0;
+        }
+    }
+    WXLogInfo(@"[JK][STEPSCROLL] veloc:%.2f (%.2f,%.2f)=>(%.2f,%.2f)", velocity.y, startPosition.x, startPosition.y, targetContentOffset.x, targetContentOffset.y);
+    self.snapData.targetIndexPath = targetIndexPath;
+    self.snapData.snapping = true;
+    
+    return targetContentOffset;
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+    [super scrollViewDidEndDecelerating:scrollView];
+
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView

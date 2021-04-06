@@ -488,6 +488,63 @@ typedef enum : NSUInteger {
 
 #pragma mark - UICollectionViewDelegate
 
+//- (void)handleStepScroll:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity startContentOffset:(CGPoint)startContentOffset targetContentOffset:(inout CGPoint *)targetContentOffset {
+//    WXMultiColumnLayout *layout = (WXMultiColumnLayout *)_collectionViewlayout;
+//    if (layout.columnCount.intValue > 1) {
+//        return;
+//    }
+//    WXCollectionView *collectionView = (WXCollectionView *)scrollView;
+//    CGPoint currentPoint = collectionView.contentOffset;
+//    NSIndexPath *indexPath = [collectionView indexPathForItemAtPoint:CGPointMake(currentPoint.x, currentPoint.y)];
+//    NSIndexPath *nextIndexPath = [NSIndexPath indexPathForRow:indexPath.row inSection:indexPath.section];
+//
+//    BOOL scrollToNextCell = (self.scrollDirection == WXScrollDirectionVertical && velocity.y > 0) || (self.scrollDirection == WXScrollDirectionHorizontal && velocity.x > 0);
+//    if (self.scrollDirection == WXScrollDirectionVertical && targetContentOffset->y > startContentOffset.y) {
+//        scrollToNextCell = true;
+//    } else if (self.scrollDirection == WXScrollDirectionHorizontal && targetContentOffset->x > startContentOffset.x) {
+//        scrollToNextCell = true;
+//    }
+//    
+//    NSUInteger rowCount = [self.dataController numberOfItemsInSection:indexPath.section];
+//    // calc nextIndexPath
+//    if (indexPath == nil) {
+//        nextIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+//    }
+//    else if (scrollToNextCell) {
+//        BOOL scrollToBottom = NO;
+//        if (self.scrollDirection == WXScrollDirectionVertical) {
+//            if (currentPoint.y + collectionView.bounds.size.height > collectionView.contentSize.height) {
+//                nextIndexPath = [indexPath copy];
+//                scrollToBottom = YES;
+//            }
+//        } else {
+//            if (currentPoint.y + collectionView.bounds.size.height > collectionView.contentSize.height) {
+//                nextIndexPath = [indexPath copy];
+//                scrollToBottom = YES;
+//            }
+//        }
+//        if (!scrollToBottom) {
+//            if (indexPath.row == rowCount - 1) {
+//                nextIndexPath = [NSIndexPath indexPathForRow:0 inSection:indexPath.section+1];
+//            } else {
+//                nextIndexPath = [NSIndexPath indexPathForRow:indexPath.row+1 inSection:indexPath.section];
+//            }
+//        }
+//    }
+//    // calc targetContentOffset
+//    // calc targetContentOffset
+//    UICollectionViewLayoutAttributes *layoutAttr = [collectionView layoutAttributesForItemAtIndexPath:nextIndexPath];
+//    CGRect rect = layoutAttr.frame;
+//    if (self.scrollDirection == WXScrollDirectionVertical) {
+//        targetContentOffset->x = rect.origin.x;
+//        targetContentOffset->y = rect.origin.y + self.stepScrollOffset;
+//    } else {
+//        targetContentOffset->x = rect.origin.x + self.stepScrollOffset;
+//        targetContentOffset->y = rect.origin.y;
+//    }
+//    WXLogInfo(@"[STEPSCROLL][waterfall] (%.2f,%.2f)=>(%.2f,%.2f)  (%ld) => (%ld)", currentPoint.x, currentPoint.y, targetContentOffset->x, targetContentOffset->y, indexPath.row, nextIndexPath.row);
+//}
+
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath
 {
     WXLogDebug(@"will display cell:%@, at index path:%@", cell, indexPath);

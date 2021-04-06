@@ -22,6 +22,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class WXScrollSnapData;
+
 @interface WXScrollerComponent : WXComponent <WXScrollerProtocol, UIScrollViewDelegate>
 
 @property (nonatomic, copy) void (^onScroll)(UIScrollView *scrollView);
@@ -32,9 +34,54 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign) CGSize contentSize;
 
+@property (nonatomic, strong) WXScrollSnapData *snapData;
+
 - (void)handleAppear;
 
 - (CGPoint)absolutePositionForComponent:(WXComponent *)component;
+
+@end
+
+typedef NS_ENUM(NSUInteger, WXScrollSnapStatus) {
+    WXScrollSnapToNext,
+    WXScrollSnapToPrev,
+    WXScrollSnapStay,
+    WXScrollSnapNone,
+};
+
+typedef NS_ENUM(NSUInteger, WXScrollSnapAlignment) {
+    WXScrollSnapAlignStart,
+    WXScrollSnapAlignCenter,
+    WXScrollSnapAlignEnd,
+    WXScrollSnapAlignNone,
+};
+
+@interface WXScrollSnapData : NSObject
+/// snap开关
+@property (nonatomic, assign) BOOL useSnap;
+/// 主轴方向
+@property (nonatomic, assign) WXScrollDirection axis;
+/// 对齐位置
+@property (nonatomic, assign) WXScrollSnapAlignment alignment;
+/// snap padding
+@property (nonatomic, assign) UIEdgeInsets padding;
+/// 目标位置
+@property (nonatomic, strong) NSIndexPath *targetIndexPath;
+/// 绑定的scrollView
+@property (nonatomic, weak) UIScrollView *scrollView;
+/// 起始位置
+@property (nonatomic, assign) CGPoint startPosition;
+/// 目标位置
+@property (nonatomic, assign) CGPoint targetPosition;
+/// 是否正在snapping
+@property (nonatomic, assign) BOOL snapping;
+
+/// 绑定scrollView，更新分页属性和减速度
+- (void)bindingScrollView:(UIScrollView *)scrollView;
+/// 计算snap staus;
+- (WXScrollSnapStatus)shouldTriggerSnap:(CGPoint)offset velocity:(CGPoint)velocity;
+/// 
+- (CGFloat)calcScrollSnapPositionOffset;
 
 @end
 
