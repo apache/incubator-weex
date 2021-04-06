@@ -93,6 +93,7 @@
 
 /// 默认的触发速度阈值
 CGFloat kDefaultScrollSnapVelocity = 1.2;
+CGFloat kDefaultScrollSnapTriggerOffset = 60;
 
 @implementation WXScrollSnapData
 
@@ -100,7 +101,7 @@ CGFloat kDefaultScrollSnapVelocity = 1.2;
 {
     self = [super init];
     if (self) {
-        self.triggerOffset = CGPointMake(60, 60);
+        self.triggerOffset = CGPointMake(kDefaultScrollSnapTriggerOffset, kDefaultScrollSnapTriggerOffset);
         self.useSnap = false;
         self.padding = UIEdgeInsetsZero;
     }
