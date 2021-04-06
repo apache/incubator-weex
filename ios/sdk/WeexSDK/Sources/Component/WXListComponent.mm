@@ -832,7 +832,14 @@
     if (snapStatus == WXScrollSnapStay) {
         WXLogInfo(@"[ScrollSnap] stay");
     } else {
+        NSIndexPath *lastIndexPath = beginIndexPath;
         targetIndexPath = [self getNeighbouringIndexPath:beginIndexPath findNext:(snapStatus == WXScrollSnapToNext)];
+        WXCellComponent *cell = [self cellForIndexPath:targetIndexPath];
+        while (cell.ignoreScrollSnap && [lastIndexPath compare:targetIndexPath] != NSOrderedSame) {
+            lastIndexPath = targetIndexPath;
+            targetIndexPath = [self getNeighbouringIndexPath:targetIndexPath findNext:(snapStatus == WXScrollSnapToNext)];
+            cell = [self cellForIndexPath:targetIndexPath];
+        }
     }
     
     CGRect targetCellRect = [tableView rectForRowAtIndexPath:targetIndexPath];
