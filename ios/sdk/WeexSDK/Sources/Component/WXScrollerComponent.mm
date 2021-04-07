@@ -104,6 +104,8 @@ CGFloat kDefaultScrollSnapTriggerOffset = 60;
         self.triggerOffset = CGPointMake(kDefaultScrollSnapTriggerOffset, kDefaultScrollSnapTriggerOffset);
         self.useSnap = false;
         self.padding = UIEdgeInsetsZero;
+        self.scrollAnimateDuration = 0.25;
+        self.timingFunction = WXScrollAnimateCircleOut;
     }
     return self;
 }
@@ -544,7 +546,44 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
                 _snapData.alignment = WXScrollSnapAlignNone;
             }
         }
+        if (attrs[@"scrollAnimateFunc"]) {
+            _snapData.timingFunction = [self translateScrollAnimateFunction:attrs[@"scrollAnimateFunc"]];
+        }
+        if (attrs[@"scrollAnimateDuration"]) {
+            _snapData.scrollAnimateDuration = [WXConvert CGFloat:attrs[@"scrollAnimateDuration"]];
+        }
     }
+}
+
+- (WXScrollAnimateFunction)translateScrollAnimateFunction:(NSString *)name {
+    NSDictionary *dic = @{
+        @"linear" : @(WXScrollAnimateLinear),
+        @"quadIn" : @(WXScrollAnimateQuadIn),
+        @"quadOut" : @(WXScrollAnimateQuadOut),
+        @"quadInOut" : @(WXScrollAnimateQuadInOut),
+        @"cubicIn" : @(WXScrollAnimateCubicIn),
+        @"cubicOut" : @(WXScrollAnimateCubicOut),
+        @"cubicInOut" : @(WXScrollAnimateCubicInOut),
+        @"quartIn" : @(WXScrollAnimateQuartIn),
+        @"quartOut" : @(WXScrollAnimateQuartOut),
+        @"quartInOut" : @(WXScrollAnimateQuartInOut),
+        @"quintIn" : @(WXScrollAnimateQuintIn),
+        @"quintOut" : @(WXScrollAnimateQuintOut),
+        @"quintInOut" : @(WXScrollAnimateQuintInOut),
+        @"sineIn" : @(WXScrollAnimateSineIn),
+        @"sineOut" : @(WXScrollAnimateSineOut),
+        @"sineInOut" : @(WXScrollAnimateSineInOut),
+        @"expoIn" : @(WXScrollAnimateExpoIn),
+        @"expoOut" : @(WXScrollAnimateExpoOut),
+        @"expoInOut" : @(WXScrollAnimateExpoInOut),
+        @"circleIn" : @(WXScrollAnimateCircleIn),
+        @"circleOut" : @(WXScrollAnimateCircleOut),
+        @"circleInOut" : @(WXScrollAnimateCircleInOut),
+    };
+    if (dic[name]) {
+        return (WXScrollAnimateFunction)[dic[name] integerValue];
+    }
+    return WXScrollAnimateCircleOut;
 }
 
 - (UIView *)loadView
@@ -1223,7 +1262,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 //        targetContentOffset->y = offset.y;
 //        targetContentOffset->x = _scrollStartPoint.x;
 //        targetContentOffset->y = _scrollStartPoint.y;
-        [self setContentOffset:offset duration:0.25 timingFunction:WXScrollAnimateQuadInOut completion:^{
+        [self setContentOffset:offset duration:self.snapData.scrollAnimateDuration timingFunction:self.snapData.timingFunction completion:^{
             WXLogInfo(@"[StepScroll] scroll animate over");
         }];
         self.snapData.targetPosition = offset;

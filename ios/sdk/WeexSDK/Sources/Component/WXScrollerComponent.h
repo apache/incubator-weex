@@ -58,37 +58,8 @@ typedef NS_ENUM(NSUInteger, WXScrollSnapAlignment) {
     WXScrollSnapAlignNone,
 };
 
-@interface WXScrollSnapData : NSObject
-/// snap开关
-@property (nonatomic, assign) BOOL useSnap;
-/// 主轴方向
-@property (nonatomic, assign) WXScrollDirection axis;
-/// 对齐位置
-@property (nonatomic, assign) WXScrollSnapAlignment alignment;
-/// snap padding
-@property (nonatomic, assign) UIEdgeInsets padding;
-/// 目标位置
-@property (nonatomic, strong) NSIndexPath *targetIndexPath;
-/// 绑定的scrollView
-@property (nonatomic, weak) UIScrollView *scrollView;
-/// 起始位置
-@property (nonatomic, assign) CGPoint startPosition;
-/// 目标位置
-@property (nonatomic, assign) CGPoint targetPosition;
-/// 是否正在snapping
-@property (nonatomic, assign) BOOL snapping;
-
-/// 绑定scrollView，更新分页属性和减速度
-- (void)bindingScrollView:(UIScrollView *)scrollView;
-/// 计算snap staus;
-- (WXScrollSnapStatus)shouldTriggerSnap:(CGPoint)offset velocity:(CGPoint)velocity;
-/// 
-- (CGFloat)calcScrollSnapPositionOffset;
-
-@end
-
 typedef NS_ENUM(NSUInteger, WXScrollAnimateFunction) {
-    WXScrollAnimateLinear,
+    WXScrollAnimateLinear = 0,
     WXScrollAnimateQuadOut,
     WXScrollAnimateQuadInOut,
     WXScrollAnimateQuadIn,
@@ -111,6 +82,39 @@ typedef NS_ENUM(NSUInteger, WXScrollAnimateFunction) {
     WXScrollAnimateCircleOut,
     WXScrollAnimateCircleInOut,
 };
+
+@interface WXScrollSnapData : NSObject
+/// snap开关
+@property (nonatomic, assign) BOOL useSnap;
+/// 主轴方向
+@property (nonatomic, assign) WXScrollDirection axis;
+/// 对齐位置
+@property (nonatomic, assign) WXScrollSnapAlignment alignment;
+/// snap padding
+@property (nonatomic, assign) UIEdgeInsets padding;
+/// 目标位置
+@property (nonatomic, strong) NSIndexPath *targetIndexPath;
+/// 绑定的scrollView
+@property (nonatomic, weak) UIScrollView *scrollView;
+/// 起始位置
+@property (nonatomic, assign) CGPoint startPosition;
+/// 目标位置
+@property (nonatomic, assign) CGPoint targetPosition;
+/// 是否正在snapping
+@property (nonatomic, assign) BOOL snapping;
+
+/// 动画设置
+@property (nonatomic, assign) WXScrollAnimateFunction timingFunction;
+@property (nonatomic, assign) CGFloat scrollAnimateDuration;
+
+/// 绑定scrollView，更新分页属性和减速度
+- (void)bindingScrollView:(UIScrollView *)scrollView;
+/// 计算snap staus;
+- (WXScrollSnapStatus)shouldTriggerSnap:(CGPoint)offset velocity:(CGPoint)velocity;
+/// 
+- (CGFloat)calcScrollSnapPositionOffset;
+
+@end
 
 typedef void(^WXScrollAnimatorCompletion)(void);
 
