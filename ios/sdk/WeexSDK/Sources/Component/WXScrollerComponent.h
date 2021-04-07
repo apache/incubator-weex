@@ -59,7 +59,8 @@ typedef NS_ENUM(NSUInteger, WXScrollSnapAlignment) {
 };
 
 typedef NS_ENUM(NSUInteger, WXScrollAnimateFunction) {
-    WXScrollAnimateLinear = 0,
+    WXScrollAnimateNone = 0,
+    WXScrollAnimateLinear,
     WXScrollAnimateQuadOut,
     WXScrollAnimateQuadInOut,
     WXScrollAnimateQuadIn,

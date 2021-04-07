@@ -105,7 +105,7 @@ CGFloat kDefaultScrollSnapTriggerOffset = 60;
         self.useSnap = false;
         self.padding = UIEdgeInsetsZero;
         self.scrollAnimateDuration = 0.25;
-        self.timingFunction = WXScrollAnimateCircleOut;
+        self.timingFunction = WXScrollAnimateNone;
     }
     return self;
 }
@@ -226,6 +226,8 @@ CGFloat kDefaultScrollSnapTriggerOffset = 60;
 
 - (CGFloat)computeAnimateWithTime:(CGFloat)time begin:(CGFloat)begin change:(CGFloat)change duration:(CGFloat)duration {
     switch (self.timingFunction) {
+        case WXScrollAnimateNone:
+            return 0;
         case WXScrollAnimateLinear:
             return change * time / duration + begin;
         case WXScrollAnimateQuadOut:
@@ -583,7 +585,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     if (dic[name]) {
         return (WXScrollAnimateFunction)[dic[name] integerValue];
     }
-    return WXScrollAnimateCircleOut;
+    return WXScrollAnimateNone;
 }
 
 - (UIView *)loadView
@@ -1258,13 +1260,14 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 {
     if (_snapData.useSnap) {
         CGPoint offset = [self calculateSnapPosition:scrollView withVelocity:velocity startPosition:_scrollStartPoint targetPosition:CGPointMake(targetContentOffset->x, targetContentOffset->y)];
-//        targetContentOffset->x = offset.x;
-//        targetContentOffset->y = offset.y;
-//        targetContentOffset->x = _scrollStartPoint.x;
-//        targetContentOffset->y = _scrollStartPoint.y;
-        [self setContentOffset:offset duration:self.snapData.scrollAnimateDuration timingFunction:self.snapData.timingFunction completion:^{
-            WXLogInfo(@"[StepScroll] scroll animate over");
-        }];
+        if (self.snapData.scrollAnimateDuration != WXScrollAnimateNone) {
+            [self setContentOffset:offset duration:self.snapData.scrollAnimateDuration timingFunction:self.snapData.timingFunction completion:^{
+                WXLogInfo(@"[StepScroll] scroll animate over");
+            }];
+        } else {
+            targetContentOffset->x = offset.x;
+            targetContentOffset->y = offset.y;
+        }
         self.snapData.targetPosition = offset;
         WXLogInfo(@"%@", _snapData);
     }
