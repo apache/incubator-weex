@@ -1260,7 +1260,15 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 {
     if (_snapData.useSnap) {
         CGPoint offset = [self calculateSnapPosition:scrollView withVelocity:velocity startPosition:_scrollStartPoint targetPosition:CGPointMake(targetContentOffset->x, targetContentOffset->y)];
-        if (self.snapData.scrollAnimateDuration != WXScrollAnimateNone) {
+        // 边界情况使用默认动画保证bounce能力
+        if (offset.x + scrollView.frame.size.width > scrollView.contentSize.width ||
+            offset.y + scrollView.frame.size.height > scrollView.contentSize.height ||
+            (self.scrollDirection == WXScrollDirectionVertical && offset.y <= 0) ||
+            (self.scrollDirection == WXScrollDirectionHorizontal && offset.x <= 0)) {
+            targetContentOffset->x = offset.x;
+            targetContentOffset->y = offset.y;
+        }
+        else if (self.snapData.scrollAnimateDuration != WXScrollAnimateNone) {
             [self setContentOffset:offset duration:self.snapData.scrollAnimateDuration timingFunction:self.snapData.timingFunction completion:^{
                 WXLogInfo(@"[StepScroll] scroll animate over");
             }];

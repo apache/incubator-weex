@@ -626,7 +626,8 @@
     NSIndexPath *fromIndexPath = [self indexPathForCell:cell sections:_sections];
     NSIndexPath *toIndexPath = [self indexPathForSubIndex:index];
     if (toIndexPath.row > [_sections[toIndexPath.section].rows count] || toIndexPath.row < 0) {
-        WXLogError(@"toIndexPath %@ is out of range as the current is %lu",toIndexPath ,(unsigned long)[_sections[toIndexPath.section].rows count]);
+    // FixMe: WXLogError出现crash问题
+//        WXLogError(@"toIndexPath %@ is out of range as the current is %lu",toIndexPath ,(unsigned long)[_sections[toIndexPath.section].rows count]);
         return;
     }
     [self removeCellForIndexPath:fromIndexPath withSections:_sections];
@@ -787,8 +788,8 @@
     CGPoint targetContentOffset = startPosition;
     /// 负轴复原
     if (currentPoint.x < 0 || currentPoint.y < 0) {
-        targetContentOffset.x = 0;
-        targetContentOffset.y = 0;
+//        targetContentOffset.x = 0;
+//        targetContentOffset.y = 0;
         return targetContentOffset;
     }
     /// 回弹到原始状态
