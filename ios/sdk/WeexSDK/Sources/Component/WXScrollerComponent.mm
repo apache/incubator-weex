@@ -1268,7 +1268,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             targetContentOffset->x = offset.x;
             targetContentOffset->y = offset.y;
         }
-        else if (self.snapData.scrollAnimateDuration != WXScrollAnimateNone) {
+        else if (self.snapData.timingFunction != WXScrollAnimateNone) {
             [self setContentOffset:offset duration:self.snapData.scrollAnimateDuration timingFunction:self.snapData.timingFunction completion:^{
                 WXLogInfo(@"[StepScroll] scroll animate over");
             }];
