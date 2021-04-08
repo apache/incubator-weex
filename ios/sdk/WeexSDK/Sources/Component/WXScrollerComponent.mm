@@ -1442,7 +1442,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         }
     }
     if (_snapData.useSnap) {
-        [self fireEvent:@"stepchange" params:@{@"section" : @(self.snapData.targetIndexPath.section), @"row" : @(self.snapData.targetIndexPath.row)} domChanges:nil];
+        [self fireEvent:@"snapend" params:@{@"section" : @(self.snapData.targetIndexPath.section), @"row" : @(self.snapData.targetIndexPath.row)} domChanges:nil];
     }
 }
 

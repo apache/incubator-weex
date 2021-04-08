@@ -285,6 +285,18 @@
     contentOffsetY += cellRect.origin.y;
     contentOffsetY += offset * self.weexInstance.pixelScaleFactor;
     
+    if (self.snapData.useSnap) {
+        CGFloat snapOffset = [self.snapData calcScrollSnapPositionOffset];
+        contentOffsetY -= (offset * self.weexInstance.pixelScaleFactor + snapOffset);
+        if (self.snapData.alignment == WXScrollSnapAlignCenter) {
+            contentOffsetY += (cellRect.size.height / 2);
+        } else if (self.snapData.alignment == WXScrollSnapAlignEnd) {
+            contentOffsetY += cellRect.size.height;
+        }
+        if (contentOffsetY < 0) {
+            contentOffsetY = 0;
+        }
+    }
     if (_tableView.contentSize.height >= _tableView.frame.size.height && contentOffsetY > _tableView.contentSize.height - _tableView.frame.size.height) {
         contentOffset.y = _tableView.contentSize.height - _tableView.frame.size.height;
     } else {
