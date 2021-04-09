@@ -91,7 +91,7 @@
 
 @end
 
-/// 默认的触发速度阈值
+/// Default snap trigger velocity and offset
 CGFloat kDefaultScrollSnapVelocity = 1.2;
 CGFloat kDefaultScrollSnapTriggerOffset = 60;
 
@@ -1260,7 +1260,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 {
     if (_snapData.useSnap) {
         CGPoint offset = [self calculateSnapPosition:scrollView withVelocity:velocity startPosition:_scrollStartPoint targetPosition:CGPointMake(targetContentOffset->x, targetContentOffset->y)];
-        // 边界情况使用默认动画保证bounce能力
+        // offset beyond bounary use default animation, make sure bounce effect
         if (offset.x + scrollView.frame.size.width > scrollView.contentSize.width ||
             offset.y + scrollView.frame.size.height > scrollView.contentSize.height ||
             (self.scrollDirection == WXScrollDirectionVertical && offset.y <= 0) ||
@@ -1270,14 +1270,13 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         }
         else if (self.snapData.timingFunction != WXScrollAnimateNone) {
             [self setContentOffset:offset duration:self.snapData.scrollAnimateDuration timingFunction:self.snapData.timingFunction completion:^{
-                WXLogInfo(@"[StepScroll] scroll animate over");
+                WXLogInfo(@"snap scroll animate over");
             }];
         } else {
             targetContentOffset->x = offset.x;
             targetContentOffset->y = offset.y;
         }
         self.snapData.targetPosition = offset;
-        WXLogInfo(@"%@", _snapData);
     }
     // Page stop effect
     if (_pagingEnabled && _pageSize > 0) {
