@@ -630,16 +630,13 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         scrollView.scrollsToTop = YES;
     }
     
-    if (_pagingEnabled && _pageSize > 0) {
+    if ((_pagingEnabled && _pageSize > 0) || _snapData.useSnap) {
         scrollView.pagingEnabled = NO; // turn off system default paging
         scrollView.decelerationRate = UIScrollViewDecelerationRateFast;
+        [_snapData bindingScrollView:scrollView];
     }
     else {
         scrollView.decelerationRate = UIScrollViewDecelerationRateNormal;
-    }
-    
-    if (_snapData.useSnap) {
-        [_snapData bindingScrollView:scrollView];
     }
 }
 
@@ -693,10 +690,13 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         }
     }
     
+    [self handleScrollSnapAttributes:attributes];
+    
     if ([self isViewLoaded]) {
-        if (_pagingEnabled && _pageSize > 0) {
+        if ((_pagingEnabled && _pageSize > 0) || _snapData.useSnap) {
             ((UIScrollView *)self.view).pagingEnabled = NO; // turn off system default paging
             ((UIScrollView *)self.view).decelerationRate = UIScrollViewDecelerationRateFast;
+            [_snapData bindingScrollView:(UIScrollView *)self.view];
         }
         else {
             ((UIScrollView *)self.view).decelerationRate = UIScrollViewDecelerationRateNormal;
@@ -744,13 +744,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     
     if (attributes[@"scrollDirection"]) {
         _scrollDirection = attributes[@"scrollDirection"] ? [WXConvert WXScrollDirection:attributes[@"scrollDirection"]] : WXScrollDirectionVertical;
-    }
-    
-    [self handleScrollSnapAttributes:attributes];
-    if (_snapData.useSnap) {
-        [_snapData bindingScrollView:(UIScrollView *)self.view];
-    } else {
-        ((UIScrollView *)self.view).decelerationRate = UIScrollViewDecelerationRateNormal;
     }
 }
 
