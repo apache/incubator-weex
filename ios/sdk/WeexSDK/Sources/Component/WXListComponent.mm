@@ -744,10 +744,6 @@
     }
 }
 
-- (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset {
-    [super scrollViewWillEndDragging:scrollView withVelocity:velocity targetContentOffset:targetContentOffset];
-}
-
 - (NSIndexPath *)getNeighbouringIndexPath:(NSIndexPath *)currentIndexPath findNext:(BOOL)findNext {
     NSIndexPath *neighbourIndexPath;
     if (findNext) {
@@ -880,11 +876,6 @@
     self.snapData.snapping = true;
     
     return targetContentOffset;
-}
-
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
-    [super scrollViewDidEndDecelerating:scrollView];
-
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView

@@ -747,7 +747,11 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
     
     [self handleScrollSnapAttributes:attributes];
-    [_snapData bindingScrollView:(UIScrollView *)self.view];
+    if (_snapData.useSnap) {
+        [_snapData bindingScrollView:(UIScrollView *)self.view];
+    } else {
+        ((UIScrollView *)self.view).decelerationRate = UIScrollViewDecelerationRateNormal;
+    }
 }
 
 - (void)addEvent:(NSString *)eventName
