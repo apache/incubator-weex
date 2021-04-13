@@ -522,38 +522,38 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     if (attrs[@"scrollSnap"]) {
         _snapData.useSnap = attrs[@"scrollSnap"] ? [WXConvert BOOL:attrs[@"scrollSnap"]] : NO;
         _snapData.axis = _scrollDirection;
-        CGFloat top=0, right=0, bottom=0, left=0;
-        if (attrs[@"scrollPaddingTop"]) {
-            top = attrs[@"scrollPaddingTop"] ? [WXConvert WXPixelType:attrs[@"scrollPaddingTop"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0.f;
+    }
+    CGFloat top=0, right=0, bottom=0, left=0;
+    if (attrs[@"scrollPaddingTop"]) {
+        top = attrs[@"scrollPaddingTop"] ? [WXConvert WXPixelType:attrs[@"scrollPaddingTop"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0.f;
+    }
+    if (attrs[@"scrollPaddingRight"]) {
+        right = attrs[@"scrollPaddingRight"] ? [WXConvert WXPixelType:attrs[@"scrollPaddingRight"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0.f;
+    }
+    if (attrs[@"scrollPaddingBottom"]) {
+        bottom = attrs[@"scrollPaddingBottom"] ? [WXConvert WXPixelType:attrs[@"scrollPaddingBottom"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0.f;
+    }
+    if (attrs[@"scrollPaddingLeft"]) {
+        left = attrs[@"scrollPaddingLeft"] ? [WXConvert WXPixelType:attrs[@"scrollPaddingLeft"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0.f;
+    }
+    _snapData.padding = UIEdgeInsetsMake(top, left, bottom, right);
+    if (attrs[@"scrollSnapAlign"]) {
+        NSString *alignment = attrs[@"scrollSnapAlign"];
+        if ([alignment isEqualToString:@"start"]) {
+            _snapData.alignment = WXScrollSnapAlignStart;
+        } else if ([alignment isEqualToString:@"center"]) {
+            _snapData.alignment = WXScrollSnapAlignCenter;
+        } else if ([alignment isEqualToString:@"end"]) {
+            _snapData.alignment = WXScrollSnapAlignEnd;
+        } else {
+            _snapData.alignment = WXScrollSnapAlignNone;
         }
-        if (attrs[@"scrollPaddingRight"]) {
-            right = attrs[@"scrollPaddingRight"] ? [WXConvert WXPixelType:attrs[@"scrollPaddingRight"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0.f;
-        }
-        if (attrs[@"scrollPaddingBottom"]) {
-            bottom = attrs[@"scrollPaddingBottom"] ? [WXConvert WXPixelType:attrs[@"scrollPaddingBottom"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0.f;
-        }
-        if (attrs[@"scrollPaddingLeft"]) {
-            left = attrs[@"scrollPaddingLeft"] ? [WXConvert WXPixelType:attrs[@"scrollPaddingLeft"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0.f;
-        }
-        _snapData.padding = UIEdgeInsetsMake(top, left, bottom, right);
-        if (attrs[@"scrollSnapAlign"]) {
-            NSString *alignment = attrs[@"scrollSnapAlign"];
-            if ([alignment isEqualToString:@"start"]) {
-                _snapData.alignment = WXScrollSnapAlignStart;
-            } else if ([alignment isEqualToString:@"center"]) {
-                _snapData.alignment = WXScrollSnapAlignCenter;
-            } else if ([alignment isEqualToString:@"end"]) {
-                _snapData.alignment = WXScrollSnapAlignEnd;
-            } else {
-                _snapData.alignment = WXScrollSnapAlignNone;
-            }
-        }
-        if (attrs[@"scrollAnimateFunc"]) {
-            _snapData.timingFunction = [self translateScrollAnimateFunction:attrs[@"scrollAnimateFunc"]];
-        }
-        if (attrs[@"scrollAnimateDuration"]) {
-            _snapData.scrollAnimateDuration = [WXConvert CGFloat:attrs[@"scrollAnimateDuration"]];
-        }
+    }
+    if (attrs[@"scrollAnimateFunc"]) {
+        _snapData.timingFunction = [self translateScrollAnimateFunction:attrs[@"scrollAnimateFunc"]];
+    }
+    if (attrs[@"scrollAnimateDuration"]) {
+        _snapData.scrollAnimateDuration = [WXConvert CGFloat:attrs[@"scrollAnimateDuration"]];
     }
 }
 
