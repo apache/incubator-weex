@@ -581,9 +581,6 @@ static NSThread *WXComponentThread;
     
     double diffTime = CACurrentMediaTime()*1000 - buildStartTime;
     [self.weexInstance.performance recordComponentCreatePerformance:diffTime forComponent:component];
-    if ([type isEqualToString:@"gcanvas"]) {
-        [self.weexInstance.apmInstance setProperty:@"wxUseGCanvasModule" withValue:@(1)];
-    }
     
     return component;
 }
