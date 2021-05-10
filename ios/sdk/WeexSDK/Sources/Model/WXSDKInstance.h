@@ -146,7 +146,7 @@ typedef NS_ENUM(NSInteger, WXState) {//state.code
     WeexInstanceMemoryWarning,
     WeexInstanceBindChanged,
     WeexInstanceDestroy
-};
+}; 
 
 
 typedef NS_ENUM(NSInteger, WXErrorType) {//error.domain
