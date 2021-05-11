@@ -28,6 +28,7 @@
 #import "WXComponentManager.h"
 #import "WXLog.h"
 #import "WXDarkSchemeProtocol.h"
+#import "WXAssert.h"
 #include <pthread/pthread.h>
 
 @interface WXRichNode : NSObject
@@ -80,7 +81,6 @@
         self.accessibilityTraits |= UIAccessibilityTraitStaticText;
         self.opaque = NO;
         self.editable = NO;
-        self.selectable = YES;
         self.contentMode = UIViewContentModeRedraw;
         self.textContainerInset = UIEdgeInsetsZero;
         self.textContainer.lineFragmentPadding = 0.0f;
@@ -126,6 +126,7 @@ do {\
     pthread_mutex_t _attributedStringMutex;
     pthread_mutexattr_t _propertMutexAttr;
     CGFloat _lineHeight;
+    BOOL _selectable;
 }
 
 - (void)dealloc
@@ -140,6 +141,7 @@ do {\
         textView = [[WXRichTextView alloc]init];
         textView.delegate = self;
         textView.scrollEnabled = NO;
+        textView.selectable = _selectable;
     }
     return textView;
 }
@@ -162,6 +164,10 @@ do {\
         pthread_mutexattr_init(&(_propertMutexAttr));
         pthread_mutexattr_settype(&(_propertMutexAttr), PTHREAD_MUTEX_RECURSIVE);
         pthread_mutex_init(&(_attributedStringMutex), &(_propertMutexAttr));
+        _selectable = YES;
+        if (_attributes[@"selectable"]) {
+            _selectable = [WXConvert BOOL:_attributes[@"selectable"]];
+        }
     }
     return self;
 }
@@ -595,10 +601,24 @@ do {\
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes {
+    WXAssertMainThread();
+
+    if (attributes[@"selectable"]) {
+        _selectable = [WXConvert BOOL:attributes[@"selectable"]];
+    }
+    [self textView].selectable = _selectable;
+
+    __weak WXRichText* weakSelf = self;
     WXPerformBlockOnComponentThread(^{
-        _attributes = [NSMutableDictionary dictionaryWithDictionary:attributes];
-        [self syncTextStorageForView];
+        __strong WXRichText* strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
+        }
+        strongSelf->_attributes = [NSMutableDictionary dictionaryWithDictionary:attributes];
+        [strongSelf syncTextStorageForView];
     });
+
+
 }
 
 - (void)updateChildNodeAttributes:(NSDictionary *)attributes ref:(NSString*)ref parentRef:(NSString*)parentRef {

@@ -540,6 +540,8 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
 
 + (long) getUnixFixTimeMillis;
 
++ (long)getIntervalTime;
+
 + (NSArray<NSString *> *_Nullable)extractPropertyNamesOfJSValueObject:(JSValue *_Nullable)jsvalue;
 
 @end

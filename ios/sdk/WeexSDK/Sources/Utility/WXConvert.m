@@ -389,13 +389,22 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
               unichar t =   [rgba characterAtIndex:3];
               rgba = [NSString stringWithFormat:@"#%C%C%C%C%C%C", f, f, s, s, t, t];
             }
-            
-            // 3. #rrggbb
-            uint32_t colorValue = 0;
-            sscanf(rgba.UTF8String, "#%x", &colorValue);
-            red     = ((colorValue & 0xFF0000) >> 16) / 255.0;
-            green   = ((colorValue & 0x00FF00) >> 8) / 255.0;
-            blue    = (colorValue & 0x0000FF) / 255.0;
+            // 2. #aarrggbb
+            if ([rgba length] == 9) {
+                uint32_t colorValue = 0;
+                sscanf(rgba.UTF8String, "#%x", &colorValue);
+                alpha = ((colorValue & 0xFF000000) >> 24) / 255.0;
+                red = ((colorValue & 0x00FF0000) >> 16) / 255.0;
+                green = ((colorValue & 0x0000FF00) >> 8) / 255.0;
+                blue = (colorValue & 0x000000FF) / 255.0;
+            } else {
+                // 3. #rrggbb
+                uint32_t colorValue = 0;
+                sscanf(rgba.UTF8String, "#%x", &colorValue);
+                red     = ((colorValue & 0xFF0000) >> 16) / 255.0;
+                green   = ((colorValue & 0x00FF00) >> 8) / 255.0;
+                blue    = (colorValue & 0x0000FF) / 255.0;
+            }
         } else if ([rgba hasPrefix:@"rgb("]) {
             // 4. rgb(r,g,b)
             int r,g,b;
