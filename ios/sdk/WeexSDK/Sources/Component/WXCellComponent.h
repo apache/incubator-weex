@@ -46,4 +46,6 @@
 @property (nonatomic, weak) id<WXCellRenderDelegate> delegate;
 @property (nonatomic, strong) NSString *zIndex;
 
+@property (nonatomic, assign) BOOL ignoreScrollSnap;
+
 @end
