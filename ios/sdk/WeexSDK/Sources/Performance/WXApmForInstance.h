@@ -46,6 +46,7 @@ extern NSString* const KEY_PAGE_PROPERTIES_UIKIT_TYPE;
 
 ///************** stages *****************/
 extern NSString* const KEY_PAGE_STAGES_START;
+extern NSString* const KEY_PAGE_STAGES_CONTAINER_READY;
 extern NSString* const KEY_PAGE_STAGES_DOWN_BUNDLE_START;
 extern NSString* const KEY_PAGE_STAGES_DOWN_BUNDLE_END;
 extern NSString* const KEY_PAGE_STAGES_DOWN_JS_START;
@@ -63,6 +64,10 @@ extern NSString* const KEY_PAGE_STAGES_FSRENDER;
 extern NSString* const KEY_PAGE_STAGES_NEW_FSRENDER;
 extern NSString* const KEY_PAGE_STAGES_INTERACTION;
 extern NSString* const KEY_PAGE_STAGES_DESTROY;
+extern NSString* const KEY_PAGE_STAGES_CREATE_INSTANCE_START;
+extern NSString* const KEY_PAGE_STAGES_CREATE_INSTANCE_END;
+extern NSString* const KEY_PAGE_UNICORN_ENGINE_INIT_START;
+extern NSString* const KEY_PAGE_UNICORN_ENGINE_INIT_END;
 
 ///************** stats *****************/
 extern NSString* const KEY_PAGE_STATS_BUNDLE_SIZE;

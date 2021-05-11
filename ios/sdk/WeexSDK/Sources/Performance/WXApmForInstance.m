@@ -30,6 +30,7 @@
 #import "WXExceptionUtils.h"
 #import "WXSDKInstance_performance.h"
 #import "WXAnalyzerCenter+Transfer.h"
+#import "WXSDKInstance_private.h"
 
 
 #pragma mark - const static string
@@ -57,6 +58,7 @@ NSString* const KEY_PAGE_PROPERTIES_UIKIT_TYPE = @"wxUIKitType";
 
 ///************** stages *****************/
 NSString* const KEY_PAGE_STAGES_START = @"wxRecordStart";
+NSString* const KEY_PAGE_STAGES_CONTAINER_READY = @"wxContainerReady";
 NSString* const KEY_PAGE_STAGES_DOWN_BUNDLE_START  = @"wxStartDownLoadBundle";
 NSString* const KEY_PAGE_STAGES_DOWN_BUNDLE_END  = @"wxEndDownLoadBundle";
 NSString* const KEY_PAGE_STAGES_DOWN_JS_START  = @"wxStartDownLoadJS";
@@ -73,7 +75,12 @@ NSString* const KEY_PAGE_STAGES_CREATE_FINISH = @"wxJSBundleCreateFinish";
 NSString* const KEY_PAGE_STAGES_FSRENDER  = @"wxFsRender";
 NSString* const KEY_PAGE_STAGES_NEW_FSRENDER = @"wxNewFsRender";
 NSString* const KEY_PAGE_STAGES_INTERACTION  = @"wxInteraction";
+NSString* const KEY_PAGE_STAGES_INTERACTION_TM  = @"wxInteractionTimeStamp";
 NSString* const KEY_PAGE_STAGES_DESTROY  = @"wxDestroy";
+NSString* const KEY_PAGE_STAGES_CREATE_INSTANCE_START  = @"wxCreateInstanceStart";
+NSString* const KEY_PAGE_STAGES_CREATE_INSTANCE_END  = @"wxCreateInstanceEnd";
+NSString* const KEY_PAGE_UNICORN_ENGINE_INIT_START  = @"wxUnicornEngineInitStart";
+NSString* const KEY_PAGE_UNICORN_ENGINE_INIT_END  = @"wxUnicornEngineInitEnd";
 
 ///************** stats *****************/
 NSString* const KEY_PAGE_STATS_BUNDLE_SIZE  = @"wxBundleSize";
@@ -346,6 +353,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     if (nil != _apmProtocolInstance) {
         [self.apmProtocolInstance onStart:instanceId topic:WEEX_PAGE_TOPIC];
     }
+    [self onStage:KEY_PAGE_STAGES_CONTAINER_READY];
     [self onStage:KEY_PAGE_STAGES_START];
     WXSDKInstance* instance = [WXSDKManager instanceForID:instanceId];
     if (nil == instance) {
@@ -379,11 +387,23 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     if (_isEnd) {
         return;
     }
-    _isEnd = YES;
+    WXSDKInstance* instance = [WXSDKManager instanceForID:self.instanceId];
     [self onStage:KEY_PAGE_STAGES_DESTROY];
+    if (instance.unicornRender) {
+        [self onStageWithTime:KEY_PAGE_STAGES_INTERACTION_TM time:[instance.unicornRender getFirstScreenTimeStamp]];
+        [self onStageWithTime:KEY_PAGE_STAGES_INTERACTION time:[instance.unicornRender getFirstScreenTimeInterval] + [WXUtility getIntervalTime]];
+
+        NSString* timeLine = [instance.unicornRender getEngineTimeline];
+        NSDictionary* timeLineDic = [WXUtility objectFromJSON:timeLine];
+        for (NSString* key in timeLineDic) {
+            long time = [[timeLineDic objectForKey:key] longLongValue] + [WXUtility getIntervalTime];
+            [self onStageWithTime:[@"wxUni" stringByAppendingString:key] time:time];
+        }
+    }
     if (nil != _apmProtocolInstance) {
          [self.apmProtocolInstance onEnd];
     }
+    _isEnd = YES;
     
     WXPerformBlockOnComponentThread(^{
         WXLogInfo(@"APM data of instance: %@, %@", self.instanceId, self.recordStageMap);

@@ -73,6 +73,7 @@ public:
                              const std::string& options,
                              int options_length);
 
+    void ReportJSException(const std::string& message);
 private:
     RenderObject* CreateRenderObject(const std::string& ref, const std::string& type, unsigned index, const std::map<std::string, std::string>& styles, const std::map<std::string, std::string>& attrs, const std::vector<std::string>& events, bool reserve_styles, WeexCore::RenderObject* parent);
 

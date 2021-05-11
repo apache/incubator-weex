@@ -769,8 +769,7 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
     });
 }
 
-- (void)callJSMethod:(NSString *)method args:(NSArray *)args
-{
+- (void)callJSMethod:(NSString *)method args:(NSArray *)args completion:(void (^)(JSValue *))completion {
     if (!method) return;
 
     __weak typeof(self) weakSelf = self;
@@ -778,8 +777,12 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
     WXPerformBlockOnBridgeThreadForInstance(^(){
         WXSDKInstance* sdkInstance = [WXSDKManager instanceForID:instanceId];
         WXBridgeContext* context = sdkInstance && sdkInstance.useBackupJsThread ? weakSelf.backupBridgeCtx :  weakSelf.bridgeCtx;
-        [context callJSMethod:method args:args onContext:nil completion:nil];
+        [context callJSMethod:method args:args onContext:nil completion:completion];
     }, instanceId);
+}
+
+- (void)callJSMethod:(NSString *)method args:(NSArray *)args {
+    [self callJSMethod:method args:args completion:nil];
 }
 
 #pragma mark JS Thread Check

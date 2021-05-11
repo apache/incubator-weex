@@ -190,6 +190,11 @@ void ReactorPage::CallNativeComponent(const std::string& ref,
                                            options_length);
 }
 
+void ReactorPage::ReportJSException(const std::string& message){
+    WeexCoreManager::Instance()->getPlatformBridge()
+            ->platform_side()->ReportException(page_id_.c_str(), "ReactorException", message.c_str());
+}
+
 RenderObject* ReactorPage::CreateRenderObject(const std::string& ref,
                                               const std::string& type,
                                               unsigned index,
@@ -223,6 +228,8 @@ RenderObject* ReactorPage::CreateRenderObject(const std::string& ref,
     render_object->ApplyDefaultAttr();
     return render_object;
 }
+
+
 
 }  // namespace WeexCore
 

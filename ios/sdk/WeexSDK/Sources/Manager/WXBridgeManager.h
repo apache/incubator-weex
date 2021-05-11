@@ -248,6 +248,8 @@ extern "C" {
 
 - (void)callJSMethod:(NSString *)method args:(NSArray *)args;
 
+- (void)callJSMethod:(NSString *)method args:(NSArray *)args completion:(void (^ _Nullable)(JSValue * _Nullable))completion;
+
 - (void)executeJSTaskQueue;
 
 - (void)checkJSThread;
