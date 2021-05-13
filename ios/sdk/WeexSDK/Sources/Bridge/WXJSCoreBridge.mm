@@ -24,6 +24,7 @@
 #import "WXDefine.h"
 #import "WXUtility.h"
 #import "WXSDKEngine.h"
+#import "WXSDKInstance_private.h"
 #import "WXSDKError.h"
 #import <sys/utsname.h>
 #import <JavaScriptCore/JavaScriptCore.h>
@@ -38,6 +39,7 @@
 #import "JSContext+Weex.h"
 #import "WXCoreBridge.h"
 #import "WXAnalyzerCenter.h"
+#import "WXSDKInstance_performance.h"
 
 
 #import <dlfcn.h>
@@ -148,7 +150,7 @@
         [[WXBridgeManager sharedManager].lastMethodInfo setObject:method ?: @"" forKey:@"method"];
         [[WXBridgeManager sharedManager].lastMethodInfo setObject:args ?: @[] forKey:@"args"];
     });
-    return [[_jsContext globalObject] invokeMethod:method withArguments:args];
+    return [[_jsContext globalObject] invokeMethod:method withArguments:[args copy]];
 }
 
 - (void)registerCallNative:(WXJSCallNative)callNative
@@ -199,8 +201,19 @@
 - (void)registerCallAddElement:(WXJSCallAddElement)callAddElement
 {
     id callAddElementBlock = ^(JSValue *instanceId, JSValue *ref, JSValue *element, JSValue *index, JSValue *ifCallback) {
-        
         NSString *instanceIdString = [instanceId toString];
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceIdString];
+        if (instance.unicornRender) {
+            JSValueRef args[] = {instanceId.JSValueRef, ref.JSValueRef, element.JSValueRef, index.JSValueRef};
+            [WXCoreBridge callUnicornRenderAction:instanceIdString
+                                           module:"dom"
+                                           method:"addElement"
+                                          context:[JSContext currentContext]
+                                             args:args
+                                         argCount:4];
+            return [JSValue valueWithInt32:0 inContext:[JSContext currentContext]];
+        }
+
         NSDictionary *componentData = [element toDictionary];
         NSString *parentRef = [ref toString];
         NSInteger insertIndex = [[index toNumber] integerValue];
@@ -216,8 +229,19 @@
 - (void)registerCallCreateBody:(WXJSCallCreateBody)callCreateBody
 {
     id WXJSCallCreateBodyBlock = ^(JSValue *instanceId, JSValue *body,JSValue *ifCallback) {
-        
         NSString *instanceIdString = [instanceId toString];
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceIdString];
+        if (instance.unicornRender) {
+            JSValueRef args[] = {instanceId.JSValueRef, body.JSValueRef};
+            [WXCoreBridge callUnicornRenderAction:instanceIdString
+                                           module:"dom"
+                                           method:"createBody"
+                                          context:[JSContext currentContext]
+                                             args:args
+                                         argCount:2];
+            return [JSValue valueWithInt32:0 inContext:[JSContext currentContext]];
+        }
+
         NSDictionary *bodyData = [body toDictionary];
         
         WXLogDebug(@"callCreateBody...%@, %@,", instanceIdString, bodyData);
@@ -232,6 +256,17 @@
     id WXJSCallCreateBodyBlock = ^(JSValue *instanceId, JSValue *ref,JSValue *ifCallback) {
         
         NSString *instanceIdString = [instanceId toString];
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceIdString];
+        if (instance.unicornRender) {
+            JSValueRef args[] = {instanceId.JSValueRef, ref.JSValueRef};
+            [WXCoreBridge callUnicornRenderAction:instanceIdString
+                                           module:"dom"
+                                           method:"removeElement"
+                                          context:[JSContext currentContext]
+                                             args:args
+                                         argCount:2];
+            return [JSValue valueWithInt32:0 inContext:[JSContext currentContext]];
+        }
         NSString *refString = [ref toString];
         
         WXLogDebug(@"callRemoveElement...%@, %@,", instanceIdString, refString);
@@ -246,6 +281,18 @@
     id WXJSCallMoveElementBlock = ^(JSValue *instanceId, JSValue *ref,JSValue *parentRef,JSValue *index, JSValue *ifCallback) {
         
         NSString *instanceIdString = [instanceId toString];
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceIdString];
+        if (instance.unicornRender) {
+            JSValueRef args[] = {instanceId.JSValueRef, ref.JSValueRef, parentRef.JSValueRef, index.JSValueRef};
+            [WXCoreBridge callUnicornRenderAction:instanceIdString
+                                           module:"dom"
+                                           method:"moveElement"
+                                          context:[JSContext currentContext]
+                                             args:args
+                                         argCount:4];
+            return [JSValue valueWithInt32:0 inContext:[JSContext currentContext]];
+        }
+
         NSString *refString = [ref toString];
         NSString *parentRefString = [parentRef toString];
         NSInteger moveIndex = [[index toNumber] integerValue];
@@ -262,6 +309,17 @@
     id WXJSCallUpdateAttrsBlock = ^(JSValue *instanceId, JSValue *ref,JSValue *attrs, JSValue *ifCallback) {
         
         NSString *instanceIdString = [instanceId toString];
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceIdString];
+        if (instance.unicornRender) {
+            JSValueRef args[] = {instanceId.JSValueRef, ref.JSValueRef, attrs.JSValueRef};
+            [WXCoreBridge callUnicornRenderAction:instanceIdString
+                                           module:"dom"
+                                           method:"updateAttributes"
+                                          context:[JSContext currentContext]
+                                             args:args
+                                         argCount:3];
+            return [JSValue valueWithInt32:0 inContext:[JSContext currentContext]];
+        }
         NSString *refString = [ref toString];
         NSDictionary *attrsData = [attrs toDictionary];
         
@@ -277,6 +335,17 @@
     id WXJSCallUpdateStyleBlock = ^(JSValue *instanceId, JSValue *ref,JSValue *styles, JSValue *ifCallback) {
         
         NSString *instanceIdString = [instanceId toString];
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceIdString];
+        if (instance.unicornRender) {
+            JSValueRef args[] = {instanceId.JSValueRef, ref.JSValueRef, styles.JSValueRef};
+            [WXCoreBridge callUnicornRenderAction:instanceIdString
+                                           module:"dom"
+                                           method:"updateStyle"
+                                          context:[JSContext currentContext]
+                                             args:args
+                                         argCount:3];
+            return [JSValue valueWithInt32:0 inContext:[JSContext currentContext]];
+        }
         NSString *refString = [ref toString];
         NSDictionary *stylessData = [styles toDictionary];
         
@@ -292,6 +361,17 @@
     id WXJSCallAddEventBlock = ^(JSValue *instanceId, JSValue *ref,JSValue *event, JSValue *ifCallback) {
         
         NSString *instanceIdString = [instanceId toString];
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceIdString];
+        if (instance.unicornRender) {
+            JSValueRef args[] = {instanceId.JSValueRef, ref.JSValueRef, event.JSValueRef};
+            [WXCoreBridge callUnicornRenderAction:instanceIdString
+                                           module:"dom"
+                                           method:"addEvent"
+                                          context:[JSContext currentContext]
+                                             args:args
+                                         argCount:3];
+            return [JSValue valueWithInt32:0 inContext:[JSContext currentContext]];
+        }
         NSString *refString = [ref toString];
         NSString *eventString = [event toString];
         
@@ -307,6 +387,17 @@
     id WXJSCallRemoveEventBlock = ^(JSValue *instanceId, JSValue *ref,JSValue *event, JSValue *ifCallback) {
         
         NSString *instanceIdString = [instanceId toString];
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceIdString];
+        if (instance.unicornRender) {
+            JSValueRef args[] = {instanceId.JSValueRef, ref.JSValueRef, event.JSValueRef};
+            [WXCoreBridge callUnicornRenderAction:instanceIdString
+                                           module:"dom"
+                                           method:"removeEvent"
+                                          context:[JSContext currentContext]
+                                             args:args
+                                         argCount:3];
+            return [JSValue valueWithInt32:0 inContext:[JSContext currentContext]];
+        }
         NSString *refString = [ref toString];
         NSString *eventString = [event toString];
         
@@ -321,6 +412,31 @@
 {
     id WXJSCallCreateFinishBlock = ^(JSValue *instanceId, JSValue *ifCallback) {
         NSString *instanceIdString = [instanceId toString];
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceIdString];
+        if (instance.unicornRender) {
+            JSValueRef args[] = {instanceId.JSValueRef};
+            [WXCoreBridge callUnicornRenderAction:instanceIdString
+                                           module:"dom"
+                                           method:"createFinish"
+                                          context:[JSContext currentContext]
+                                             args:args
+                                         argCount:1];
+
+            WXPerformBlockOnMainThread(^{
+                WX_MONITOR_INSTANCE_PERF_END(WXPTFirstScreenRender, instance);
+                WX_MONITOR_INSTANCE_PERF_END(WXPTAllRender, instance);
+                WX_MONITOR_SUCCESS(WXMTJSBridge);
+                WX_MONITOR_SUCCESS(WXMTNativeRender);
+                [instance updatePerDicAfterCreateFinish];
+
+                UIView *rootView = instance.rootView;
+                [instance.performance onInstanceRenderSuccess:instance];
+                if (instance.renderFinish) {
+                    instance.renderFinish(rootView);
+                }
+            });
+            return [JSValue valueWithInt32:0 inContext:[JSContext currentContext]];
+        }
         WXLogDebug(@"callCreateFinish...%@", instanceIdString);
         return [JSValue valueWithInt32:(int32_t)callCreateFinish(instanceIdString) inContext:[JSContext currentContext]];
     };
@@ -378,6 +494,18 @@
 {
     _jsContext[@"callNativeComponent"] = ^void(JSValue *instanceId, JSValue *componentName, JSValue *methodName, JSValue *args, JSValue *options) {
         NSString *instanceIdString = [instanceId toString];
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceIdString];
+        if (instance.unicornRender) {
+            JSValueRef arguments[] = {instanceId.JSValueRef, componentName.JSValueRef, methodName.JSValueRef, args.JSValueRef};
+            [WXCoreBridge callUnicornRenderAction:instanceIdString
+                                           module:"dom"
+                                           method:"callNativeComponent"
+                                          context:[JSContext currentContext]
+                                             args:arguments
+                                         argCount:4];
+            return;
+        }
+
         NSString *componentNameString = [componentName toString];
         NSString *methodNameString = [methodName toString];
         NSArray *argsArray = [args toArray];

@@ -21,6 +21,7 @@
 #import "WXSDKInstance.h"
 #import "WXModuleMethod.h"
 #import "WXThreadSafeMutableDictionary.h"
+#import "WXUnicornRenderProtocol.h"
 #import <JavaScriptCore/JavaScriptCore.h>
 #import <WeexSDK/WXEaglePlugin.h>
 
@@ -37,6 +38,8 @@
 @property (nonatomic, weak) id <WXEaglePlugin> renderPlugin;
 
 @property (nonatomic, assign) BOOL useReactor;
+
+@property (nonatomic, strong) id<WXUnicornRenderProtocol> unicornRender;
 
 // add monitor information
 @property (nonatomic, strong) NSString *callCreateInstanceContext;

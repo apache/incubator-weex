@@ -545,6 +545,7 @@ _Pragma("clang diagnostic pop") \
                                                                 };
             __weak typeof(self) weakSelf = self;
             [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
+            [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_CREATE_INSTANCE_START];
             [self callJSMethod:@"createInstanceContext" args:@[instanceIdString, immutableOptions, data?:@[]] onContext:nil completion:^(JSValue *instanceContextEnvironment) {
                 if (sdkInstance.pageName) {
                     [sdkInstance.instanceJavaScriptContext.javaScriptContext setName:sdkInstance.pageName];
@@ -596,6 +597,7 @@ _Pragma("clang diagnostic pop") \
                 }
                 sdkInstance.instanceJavaScriptContext.javaScriptContext[@"wxExtFuncInfo"] = nil;
                 [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_EXECUTE_BUNDLE_END];
+                [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_CREATE_INSTANCE_END];
                 WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
             }];
         }
@@ -603,6 +605,7 @@ _Pragma("clang diagnostic pop") \
     } else {
         [sdkInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_BUNDLE_TYPE withValue:@"other"];
         [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
+        [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_CREATE_INSTANCE_START];
         if (data){
             args = @[instanceIdString, jsBundleString, options ?: @{}, data];
         } else {
@@ -617,6 +620,7 @@ _Pragma("clang diagnostic pop") \
         [self callJSMethod:@"createInstance" args:args];
         sdkInstance.instanceJavaScriptContext.javaScriptContext[@"wxExtFuncInfo"] = nil;
         [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_EXECUTE_BUNDLE_END];
+        [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_CREATE_INSTANCE_END];
         WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
     }
 }

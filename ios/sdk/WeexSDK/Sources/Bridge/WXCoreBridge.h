@@ -20,6 +20,8 @@
 #ifndef WXCORE_BRIDGE_PLATFORM_H
 #define WXCORE_BRIDGE_PLATFORM_H
 
+#import <JavaScriptCore/JavaScriptCore.h>
+
 #if defined __cplusplus
 
 #include "core/bridge/platform_bridge.h"
@@ -277,6 +279,13 @@ namespace WeexCore
 + (void)setPageArgument:(NSString*)pageId key:(NSString*)key value:(NSString*)value;
 
 + (BOOL)isKeepingRawCssStyles:(NSString*)pageId;
+
++ (void)callUnicornRenderAction:(NSString*)instanceId
+                         module:(const char*)module
+                         method:(const char*)method
+                        context:(JSContext*)context
+                           args:(JSValueRef[])args
+                       argCount:(int)argCount;
 
 @end
 

@@ -947,7 +947,7 @@ do {\
         attrs = attrs ? attrs.mutableCopy : [NSMutableDictionary new];
         CTFontRef font = (__bridge CTFontRef)(attrs[(id)kCTFontAttributeName]);
         CGFloat fontSize = font ? CTFontGetSize(font):32 * self.weexInstance.pixelScaleFactor;
-        UIFont * uiFont = [UIFont systemFontOfSize:fontSize];
+        UIFont *uiFont = [WXUtility fontWithSize:fontSize textWeight:_fontWeight textStyle:WXTextStyleNormal fontFamily:self.fontFamily scaleFactor:self.weexInstance.pixelScaleFactor useCoreText:[self useCoreText]];
         if (uiFont) {
             font = CTFontCreateWithFontDescriptor((__bridge CTFontDescriptorRef)uiFont.fontDescriptor, uiFont.pointSize, NULL);
         }
@@ -1079,6 +1079,8 @@ do {\
     CGFloat ascent = 0;
     CGFloat descent = 0;
     CGFloat leading = 0;
+    CGPoint lineOrigins[lineCount];
+    CTFrameGetLineOrigins(frameRef, CFRangeMake(0, 0), lineOrigins);
     
     // height = ascent + descent + lineCount*leading
     // ignore linespaing
@@ -1091,7 +1093,6 @@ do {\
         totalHeight += ascent + descent;
         actualLineCount ++;
     }
-    
     totalHeight = totalHeight + actualLineCount * leading;
     CFRelease(frameRef);
     
@@ -1101,6 +1102,18 @@ do {\
             suggestSize.height = suggestSize.height * actualLineCount / lineCount;
         }
         return CGSizeMake(aWidth, suggestSize.height);
+    }
+    if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"14.0")) {
+        if (lineCount <= 1) {
+            return CGSizeMake(aWidth, totalHeight);
+        }
+        if (_lines && lineCount > _lines) {
+            actualLineCount = _lines;
+        } else {
+            actualLineCount = lineCount;
+        }
+        CGFloat actualLineHeight = lineOrigins[0].y - lineOrigins[1].y;
+        return CGSizeMake(aWidth, actualLineCount * actualLineHeight);
     }
     return CGSizeMake(aWidth, totalHeight);
 }

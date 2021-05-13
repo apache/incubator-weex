@@ -31,6 +31,8 @@
 #import "WXRecycleListComponent.h"
 #import "WXCoreBridge.h"
 #import <objc/message.h>
+#import "WXSDKInstance_performance.h"
+#import "WXMonitor.h"
 
 @interface WXDomModule ()
 
@@ -155,7 +157,27 @@ WX_EXPORT_METHOD(@selector(endBatchMark))
 - (void)createFinish
 {
     NSString* instanceId = self.weexInstance.instanceId;
-    if ([WXCustomPageBridge isCustomPage:instanceId]) {
+    if (self.weexInstance.unicornRender) {
+        __weak typeof(self) weakSelf = self;
+        WXPerformBlockOnMainThread(^{
+            __strong WXDomModule* strongSelf = weakSelf;
+            if (strongSelf == nil) {
+                return;
+            }
+
+            WX_MONITOR_INSTANCE_PERF_END(WXPTFirstScreenRender, strongSelf.weexInstance);
+            WX_MONITOR_INSTANCE_PERF_END(WXPTAllRender, strongSelf.weexInstance);
+            WX_MONITOR_SUCCESS(WXMTJSBridge);
+            WX_MONITOR_SUCCESS(WXMTNativeRender);
+            [strongSelf.weexInstance updatePerDicAfterCreateFinish];
+
+            UIView *rootView = strongSelf.weexInstance.rootView;
+            [strongSelf.weexInstance.performance onInstanceRenderSuccess:strongSelf.weexInstance];
+            if (strongSelf.weexInstance.renderFinish) {
+                strongSelf.weexInstance.renderFinish(rootView);
+            }
+        });
+    } else if ([WXCustomPageBridge isCustomPage:instanceId]) {
         [[WXCustomPageBridge sharedInstance] callCreateFinish:instanceId];
     }
     else {

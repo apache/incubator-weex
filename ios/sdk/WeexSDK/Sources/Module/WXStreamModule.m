@@ -27,6 +27,7 @@
 #import "WXSDKEngine.h"
 #import "WXSDKInstance_performance.h"
 #import "WXMonitor.h"
+#import "WXConvert.h"
 
 @implementation WXStreamModule
 
@@ -141,9 +142,17 @@ WX_EXPORT_METHOD(@selector(fetchWithArrayBuffer:options:callback:progressCallbac
     if (self.weexInstance && !weexInstance.isJSCreateFinish) {
         self.weexInstance.performance.fsReqNetNum++;
     }
-    
-    WXResourceRequest *request = [WXResourceRequest requestWithURL:[NSURL URLWithString:urlStr] resourceType:WXResourceTypeOthers referrer:nil cachePolicy:NSURLRequestUseProtocolCachePolicy];
-    
+    BOOL shouldSetReferer = NO;
+    if ([options objectForKey:@"referer"] ) {
+        shouldSetReferer = [WXConvert BOOL:[options objectForKey:@"referer"]];
+    }
+    NSRange range = [weexInstance.scriptURL.absoluteString rangeOfString:@"?"];
+    NSString *referer = nil;
+    if (range.length > 0 && shouldSetReferer) {
+        referer = [weexInstance.scriptURL.absoluteString substringToIndex:range.location];
+    }
+    WXResourceRequest *request = [WXResourceRequest requestWithURL:[NSURL URLWithString:urlStr] resourceType:WXResourceTypeOthers referrer:referer cachePolicy:NSURLRequestUseProtocolCachePolicy];
+
     // parse http method
     NSString *method = [options objectForKey:@"method"];
     if ([WXUtility isBlankString:method]) {

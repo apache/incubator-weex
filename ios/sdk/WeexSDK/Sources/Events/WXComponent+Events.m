@@ -33,6 +33,8 @@
 #import <UIKit/UIGestureRecognizerSubclass.h>
 #import "WXComponent+PseudoClassManagement.h"
 #import "WXCoreBridge.h"
+#import "WXSDKEngine.h"
+#import "WXConfigCenterProtocol.h"
 
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
 
@@ -575,9 +577,16 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
 - (void)addPanGesture
 {
     if (!_panGesture) {
+        _enableScreenEdgePanGesture = YES;
         _panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(onPan:)];
+
         _panGesture.delegate = self;
         [self.view addGestureRecognizer:_panGesture];
+
+        id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+        if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+            _enableScreenEdgePanGesture = [[configCenter configForKey:@"iOS_weex_ext_config.enableScreenEdgePanGesture" defaultValue:@(YES) isDefault:NULL] boolValue];
+        }
     }
 }
 
@@ -840,6 +849,12 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
     if ([gestureRecognizer isKindOfClass:[WXTouchGestureRecognizer class]]) {
         return YES;
     }
+
+    if (_enableScreenEdgePanGesture && gestureRecognizer == _panGesture && [otherGestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]] && ![otherGestureRecognizer isKindOfClass:NSClassFromString(panGestureRecog)]) {
+        [gestureRecognizer requireGestureRecognizerToFail:otherGestureRecognizer];
+        return YES;
+    }
+
     // swipe and scroll
     if ([gestureRecognizer isKindOfClass:[UISwipeGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass:NSClassFromString(panGestureRecog)]) {
         return YES;
