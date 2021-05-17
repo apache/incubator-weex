@@ -1565,6 +1565,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       }
       mHostClickListeners.remove(mClickEventListener);
       //click event only remove from listener array
+      if (mHostClickListeners.isEmpty()) {
+        getRealView().setClickable(false);
+      }
     }
     Scrollable scroller = getParentScroller();
     if (type.equals(Constants.Event.APPEAR) && scroller != null) {
