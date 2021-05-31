@@ -452,6 +452,30 @@ _Pragma("clang diagnostic pop") \
     return 1;
 }
 
+- (JSValueRef)getFunctionPrototype:(JSContextRef)ctx{
+    WXAssertParam(ctx);
+    
+    JSStringRef funcstr = JSStringCreateWithUTF8CString("Function");
+    JSObjectRef global = JSContextGetGlobalObject(ctx);
+    JSValueRef exc = NULL;
+    
+    JSValueRef value = JSObjectGetProperty(ctx, global, funcstr, &exc);
+    if (!value) {
+        WXLogError(@"%@",exc);
+    	JSStringRelease(funcstr);
+        return NULL;
+    }
+    JSObjectRef funcCtor = JSValueToObject(ctx, value, &exc);
+    if (!funcCtor) {
+        WXLogError(@"%@",exc);
+    	JSStringRelease(funcstr);
+        return NULL;
+    }
+    JSValueRef funcProto = JSObjectGetPrototype(ctx, funcCtor);
+    JSStringRelease(funcstr);
+    return funcProto;
+}
+
 - (void)createInstance:(NSString *)instanceIdString
               template:(NSString *)jsBundleString
                options:(NSDictionary *)options
@@ -560,7 +584,9 @@ _Pragma("clang diagnostic pop") \
                 for (NSString * key in allKeys) {
                     JSStringRef propertyName = JSStringCreateWithUTF8CString([key cStringUsingEncoding:NSUTF8StringEncoding]);
                     if ([key isEqualToString:@"Vue"]) {
-                        JSObjectSetPrototype(instanceContextRef, JSValueToObject(instanceContextRef, [instanceContextEnvironment valueForProperty:key].JSValueRef, NULL), JSObjectGetPrototype(instanceContextRef, instanceGlobalObject));
+                        JSValueRef funcProto = [self getFunctionPrototype:instanceContextRef];
+                        WXAssert(funcProto,@"failed to get function prototype! ");
+                        JSObjectSetPrototype(instanceContextRef, JSValueToObject(instanceContextRef, [instanceContextEnvironment valueForProperty:key].JSValueRef, NULL), funcProto);
                     }
                     JSObjectSetProperty(instanceContextRef, instanceGlobalObject, propertyName, [instanceContextEnvironment valueForProperty:key].JSValueRef, 0, NULL);
                     JSStringRelease(propertyName);
