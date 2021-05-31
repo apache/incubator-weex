@@ -1232,6 +1232,12 @@ _Pragma("clang diagnostic pop") \
                     if ([appMonitorHandler respondsToSelector:@selector(commitAppMonitorAlarm:monitorPoint:success:errorCode:errorMsg:arg:)]) {
                         [appMonitorHandler commitAppMonitorAlarm:@"weex" monitorPoint:@"jswarning" success:NO errorCode:@"99999" errorMsg:string arg:[WXSDKEngine topInstance].pageName];
                     }
+                } else if(WXLogFlagError == logLevel) {
+                    [WXExceptionUtils commitCriticalExceptionRT:[WXSDKEngine topInstance].instanceId
+                                                        errCode:[NSString stringWithFormat:@"%d", WX_ERR_JS_EXECUTE]
+                                                       function:@""
+                                                      exception:string
+                                                      extParams:nil];
                 }
                 WX_LOG(logLevel, @"%@", string);
             } else {
