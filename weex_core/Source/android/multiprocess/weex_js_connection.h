@@ -36,13 +36,17 @@ class WeexConnInfo {
     this->handler = std::move(handler);
     ipcFd = -1;
     is_client = isClient;
+    base_mem_ = mmap_for_ipc();
   }
 
   ~WeexConnInfo() {
     closeFd();
   }
 
-  void *mmap_for_ipc();
+
+  static int memfd_create_below_androidR(const char *name, size_t size);
+  static int memfd_create_androidR(const char *name, size_t size);
+  static int memfd_create(const char *name, size_t size);
 
   void closeFd() {
     if(ipcFd == -1) {
@@ -54,6 +58,11 @@ class WeexConnInfo {
     hasBeenClosed = true;
     close(ipcFd);
   }
+
+  void* base_mem_;
+
+ private:
+  void *mmap_for_ipc();
 
  private:
   bool hasBeenClosed = false;

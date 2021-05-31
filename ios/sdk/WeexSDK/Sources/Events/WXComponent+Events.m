@@ -33,6 +33,8 @@
 #import <UIKit/UIGestureRecognizerSubclass.h>
 #import "WXComponent+PseudoClassManagement.h"
 #import "WXCoreBridge.h"
+#import "WXSDKEngine.h"
+#import "WXConfigCenterProtocol.h"
 
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
 
@@ -93,6 +95,7 @@
 @property (nonatomic, assign) BOOL listenTouchEnd;
 @property (nonatomic, assign) BOOL listenTouchCancel;
 @property (nonatomic, assign) BOOL listenPseudoTouch;
+@property (nonatomic, assign) NSInteger activeTouches;
 
 - (instancetype)initWithComponent:(WXComponent *)component NS_DESIGNATED_INITIALIZER;
 
@@ -574,9 +577,16 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
 - (void)addPanGesture
 {
     if (!_panGesture) {
+        _enableScreenEdgePanGesture = YES;
         _panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(onPan:)];
+
         _panGesture.delegate = self;
         [self.view addGestureRecognizer:_panGesture];
+
+        id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+        if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+            _enableScreenEdgePanGesture = [[configCenter configForKey:@"iOS_weex_ext_config.enableScreenEdgePanGesture" defaultValue:@(YES) isDefault:NULL] boolValue];
+        }
     }
 }
 
@@ -839,6 +849,12 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
     if ([gestureRecognizer isKindOfClass:[WXTouchGestureRecognizer class]]) {
         return YES;
     }
+
+    if (_enableScreenEdgePanGesture && gestureRecognizer == _panGesture && [otherGestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]] && ![otherGestureRecognizer isKindOfClass:NSClassFromString(panGestureRecog)]) {
+        [gestureRecognizer requireGestureRecognizerToFail:otherGestureRecognizer];
+        return YES;
+    }
+
     // swipe and scroll
     if ([gestureRecognizer isKindOfClass:[UISwipeGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass:NSClassFromString(panGestureRecog)]) {
         return YES;
@@ -914,6 +930,7 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
         _listenTouchEnd = NO;
         _listenTouchMove = NO;
         _listenTouchCancel = NO;
+        _activeTouches = 0;
         
         self.cancelsTouchesInView = NO;
     }
@@ -933,6 +950,10 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
         [_component updatePseudoClassStyles:styles];
     }
 
+    _activeTouches += [touches count];
+    if (_activeTouches > (NSInteger)[event.allTouches count]) {
+        _activeTouches = [event.allTouches count];
+    }
 }
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
@@ -956,6 +977,11 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
         [self recoveryPseudoStyles:_component.styles];
     }
 
+    _activeTouches -= [touches count];
+    if (_activeTouches <= 0) {
+        self.state = UIGestureRecognizerStateEnded;
+        _activeTouches = 0;
+    }
 }
 
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
@@ -967,6 +993,12 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
     }
     if(_listenPseudoTouch) {
         [self recoveryPseudoStyles:_component.styles];
+    }
+
+    _activeTouches -= [touches count];
+    if (_activeTouches <= 0) {
+        self.state = UIGestureRecognizerStateEnded;
+        _activeTouches = 0;
     }
 }
 

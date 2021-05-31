@@ -69,6 +69,7 @@ Pod::Spec.new do |s|
                           'ios/sdk/WeexSDK/Sources/Controller/WXBaseViewController.h',
                           'ios/sdk/WeexSDK/Sources/Controller/WXRootViewController.h',
                           'ios/sdk/WeexSDK/Sources/Handler/WXNavigationDefaultImpl.h',
+                          'ios/sdk/WeexSDK/Sources/Handler/WXUnicornEventListenerHandler.h',
                           'ios/sdk/WeexSDK/Sources/View/WXView.h',
                           'ios/sdk/WeexSDK/Sources/View/WXErrorView.h',
                           'ios/sdk/WeexSDK/Sources/Protocol/*.h',

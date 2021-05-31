@@ -61,6 +61,10 @@
             //in Android, cellReuse is not equal cellDataRecycle
             [weexInstance.apmInstance updateDiffStats:KEY_PAGE_STATS_CELL_DATA_UN_RECYCLE_NUM withDiffValue:1];
         }
+        if (attributes[@"scrollSnapIgnore"]) {
+            _ignoreScrollSnap = [WXConvert BOOL:attributes[@"scrollSnapIgnore"]];
+        }
+        
     }
     
     return self;
@@ -105,6 +109,10 @@
     
     if (attributes[@"keepScrollPosition"]) {
         _keepScrollPosition = [WXConvert BOOL:attributes[@"keepScrollPosition"]];
+    }
+    
+    if (attributes[@"scrollSnapIgnore"]) {
+        _ignoreScrollSnap = [WXConvert BOOL:attributes[@"scrollSnapIgnore"]];
     }
 }
 

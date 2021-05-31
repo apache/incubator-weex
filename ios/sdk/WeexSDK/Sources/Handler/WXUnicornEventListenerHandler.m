@@ -16,28 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import chai from 'chai'
-const { expect } = chai
 
-import * as modules from '../../../../../runtime/frameworks/legacy/api/modules'
-import { initModules, requireModule, clearModules } from '../../../../../runtime/frameworks/legacy/app/register'
+#import "WXUnicornEventListenerHandler.h"
 
-describe('built-in modules', () => {
-  before(() => {
-    clearModules()
-  })
+#import "WXSDKManager.h"
 
-  after(() => {
-    clearModules()
-  })
+@implementation WXUnicornEventListenerHandler
 
-  it('have keys', () => {
-    const app = {}
-    initModules(modules)
-    expect(requireModule(app, 'dom')).to.have.all.keys('scrollToElement')
-    expect(requireModule(app, 'stream')).to.have.all.keys('sendHttp')
-    expect(requireModule(app, 'event')).to.have.all.keys('openURL')
-    expect(requireModule(app, 'pageInfo')).to.have.all.keys('setTitle')
-    expect(requireModule(app, 'animation')).to.have.all.keys('transition')
-  })
-})
++ (void)fireEvent:(NSDictionary *)args {
+    NSMutableDictionary* eventParams = [args[@"params"] mutableCopy];
+    NSTimeInterval timeSp = [[NSDate date] timeIntervalSince1970] * 1000;
+    [eventParams setObject:@(timeSp) forKey:@"timestamp"];
+    NSDictionary* domChanges = [args[@"domChanges"] copy];
+    [[WXSDKManager bridgeMgr] fireEvent:args[@"pageId"] ref:args[@"ref"] type:args[@"type"] params:eventParams domChanges:domChanges?:@{}];
+}
+
+@end
+
+

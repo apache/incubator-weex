@@ -1,5 +1,3 @@
-// { "framework": "Vanilla" }
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -19,24 +17,17 @@
  * under the License.
  */
 
-var body = document.createElement('div', {
-  classStyle: { alignItems: 'center', marginTop: 120 }
-})
+#ifndef WXLegacyAdapter_h
+#define WXLegacyAdapter_h
 
-var image = document.createElement('image', {
-  attr: { src: 'https://alibaba.github.io/weex/img/weex_logo_blue@3x.png' },
-  classStyle: { width: 360, height: 82 }
-})
+API_AVAILABLE(ios(13.4))
+@interface UIDatePicker (LegacyXcode)
 
-var text = document.createElement('text', {
-  attr: { value: 'Hello World' },
-  classStyle: { fontSize: 48 }
-})
+#if (defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130400)
+@property (nonatomic, readwrite, assign) UIDatePickerStyle preferredDatePickerStyle;
+#endif
 
-body.appendChild(image)
-body.appendChild(text)
-document.documentElement.appendChild(body)
+@end
 
-body.addEvent('click', function () {
-  text.setAttr('value', 'Hello Weex')
-})
+
+#endif /* WXLegacyAdapter_h */

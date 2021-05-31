@@ -84,6 +84,285 @@
 @end
 
 
+
+@interface WXScrollSnapData ()
+
+@property (nonatomic, assign) CGPoint triggerOffset;
+
+@end
+
+/// Default snap trigger velocity and offset
+CGFloat kDefaultScrollSnapVelocity = 1.2;
+CGFloat kDefaultScrollSnapTriggerOffset = 60;
+
+@implementation WXScrollSnapData
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.triggerOffset = CGPointMake(kDefaultScrollSnapTriggerOffset, kDefaultScrollSnapTriggerOffset);
+        self.useSnap = false;
+        self.padding = UIEdgeInsetsZero;
+        self.scrollAnimateDuration = 0.25;
+        self.timingFunction = WXScrollAnimateNone;
+    }
+    return self;
+}
+
+- (void)bindingScrollView:(UIScrollView *)scrollView {
+    _scrollView = scrollView;
+    _scrollView.pagingEnabled = NO;
+    _scrollView.decelerationRate = UIScrollViewDecelerationRateFast;
+}
+
+- (WXScrollSnapStatus)shouldTriggerSnap:(CGPoint)offset velocity:(CGPoint)velocity {
+    BOOL shouldScrollToNextCell = false;
+    BOOL shouldScrollToPrevCell = false;
+    
+    if (self.axis == WXScrollDirectionVertical) {
+        if (velocity.y > kDefaultScrollSnapVelocity) {
+            shouldScrollToNextCell = true;
+        } else if (velocity.y < -kDefaultScrollSnapVelocity) {
+            shouldScrollToPrevCell = true;
+        } else if (offset.y > self.triggerOffset.y) {
+            shouldScrollToNextCell = true;
+        } else if (offset.y < -(self.triggerOffset.y * 2)) {
+            shouldScrollToPrevCell = true;
+        }
+    } else {
+        if (velocity.x > kDefaultScrollSnapVelocity) {
+            shouldScrollToNextCell = true;
+        } else if (velocity.x < -kDefaultScrollSnapVelocity) {
+            shouldScrollToPrevCell = true;
+        } else if (offset.x > self.triggerOffset.x) {
+            shouldScrollToNextCell = true;
+        } else if (offset.x < -(self.triggerOffset.x * 2)) {
+            shouldScrollToPrevCell = true;
+        }
+    }
+    if (shouldScrollToPrevCell == false && shouldScrollToNextCell == false) {
+        return WXScrollSnapStay;
+    }
+    if (shouldScrollToNextCell == true && shouldScrollToPrevCell == true) {
+        return WXScrollSnapNone;
+    }
+    return shouldScrollToNextCell ? WXScrollSnapToNext : WXScrollSnapToPrev;
+}
+
+- (CGFloat)calcScrollSnapPositionOffset {
+    CGFloat targetOffset = 0;
+    if (!self.scrollView) {
+        return targetOffset;
+    }
+    CGSize containerSize = self.scrollView.frame.size;
+    if (self.axis == WXScrollDirectionHorizontal) {
+        switch (self.alignment) {
+            case WXScrollSnapAlignStart:
+                targetOffset = self.padding.left;
+                break;
+            case WXScrollSnapAlignCenter:
+                targetOffset = (containerSize.width + self.padding.left - self.padding.right)/2;
+                break;
+            case WXScrollSnapAlignEnd:
+                targetOffset = containerSize.width - self.padding.right;
+                break;
+            default:
+                targetOffset = self.padding.left;
+                break;
+        }
+        if (targetOffset < 0) {
+            targetOffset = 0;
+        }
+        if (targetOffset > self.scrollView.contentSize.width - containerSize.width) {
+            targetOffset = self.scrollView.contentSize.width - containerSize.width;
+        }
+    } else {
+        switch (self.alignment) {
+            case WXScrollSnapAlignStart:
+                targetOffset = self.padding.top;
+                break;
+            case WXScrollSnapAlignCenter:
+                targetOffset = (containerSize.height + self.padding.top - self.padding.bottom)/2;
+                break;
+            case WXScrollSnapAlignEnd:
+                targetOffset = containerSize.height - self.padding.bottom;
+                break;
+            default:
+                targetOffset = self.padding.top;
+                break;
+        }
+        if (targetOffset < 0) {
+            targetOffset = 0;
+        }
+        if (targetOffset > self.scrollView.contentSize.height - containerSize.height) {
+            targetOffset = self.scrollView.contentSize.height - containerSize.height;
+        }
+    }
+    return targetOffset;
+}
+
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"[ScrollSnap] {\n\tuseSnap:%d \n\tpadding:(top:%.2f, right:%.2f, bottom:%.2f, left:%.2f)\n\tstartPosition:(%.2f, %.2f)\n\ttargetIndexPath:%@\n\ttargetPosition(%.2f, %.2f)}", _useSnap, _padding.top, _padding.right, _padding.bottom, _padding.left ,_startPosition.x, _startPosition.y, _targetIndexPath, _targetPosition.x, _targetPosition.y];
+}
+
+@end
+
+@interface WXScrollAnimator()
+
+@end
+
+@implementation WXScrollAnimator
+
+- (instancetype)initWithScrollView:(WXScrollerComponentView *)scrollView timingFunction:(WXScrollAnimateFunction)timingFunction {
+    if (self = [super init]) {
+        _scrollView = scrollView;
+        _timingFunction = timingFunction;
+    }
+    return self;
+}
+
+- (CGFloat)computeAnimateWithTime:(CGFloat)time begin:(CGFloat)begin change:(CGFloat)change duration:(CGFloat)duration {
+    switch (self.timingFunction) {
+        case WXScrollAnimateNone:
+            return 0;
+        case WXScrollAnimateLinear:
+            return change * time / duration + begin;
+        case WXScrollAnimateQuadOut:
+            time /= duration;
+            return -change * time * (time - 2) + begin;
+        case WXScrollAnimateQuadInOut:
+            time /= (duration / 2);
+            if (time < 1) {
+                return change / 2 * time * time + begin;
+            }
+            time -= 1;
+            return -change / 2 * (time * (time - 2) - 1) + begin;
+        case WXScrollAnimateQuadIn:
+            time /= duration;
+            return change * time * time + begin;
+        case WXScrollAnimateCubicIn:
+            time /= duration;
+            return change * time * time * time + begin;
+        case WXScrollAnimateCubicOut:
+            time = time / duration - 1;
+            return change * (time * time * time + 1) + begin;
+        case WXScrollAnimateCubicInOut:
+            time /= duration / 2;
+            if (time < 1) {
+                return change / 2 * time * time * time + begin;
+            }
+            time -= 2;
+            return change / 2 * ( time * time * time + 2) + begin;
+        case WXScrollAnimateQuartIn:
+            time /= duration;
+            return change * time * time * time * time + begin;
+        case WXScrollAnimateQuartOut:
+            time = time / duration - 1;
+            return -change * (time * time * time * time - 1) + begin;
+        case WXScrollAnimateQuartInOut:
+            time /= duration / 2;
+            if (time < 1) {
+                return change / 2 * time * time * time * time + begin;
+            }
+            time -= 2;
+            return -change / 2 * (time * time * time * time - 2) + begin;
+        case WXScrollAnimateSineIn:
+            return -change * cos(time / duration * M_PI_2) + change + begin;
+        case WXScrollAnimateSineOut:
+            return change * sin(time / duration * M_PI_2) + begin;
+        case WXScrollAnimateSineInOut:
+            return -change / 2 * (cos(M_PI * time / duration) - 1) + begin;
+        case WXScrollAnimateQuintIn:
+            time /= duration;
+            return change * time * time * time * time * time + begin;
+        case WXScrollAnimateQuintOut:
+            time = time / duration - 1;
+            return change * (time * time * time * time * time + 1) + begin;
+        case WXScrollAnimateQuintInOut:
+            time /= duration / 2;
+            if (time < 1) {
+                return change / 2 * time * time * time * time * time + begin;
+            }
+            time -= 2;
+            return change / 2 * (time * time * time * time * time + 2) + begin;
+        case WXScrollAnimateExpoIn:
+            return (time == 0) ? begin : change * pow(2, 10*(time / duration - 1)) + begin;
+        case WXScrollAnimateExpoOut:
+            return (time == duration) ? begin + change : change * (-pow(2, -10 * time / duration) + 1) + begin;
+        case WXScrollAnimateExpoInOut:
+            if (time == 0) {
+                return begin;
+            }
+            if (time == duration) {
+                return begin + change;
+            }
+            time /= duration / 2;
+            if (time < 1) {
+                return change / 2 * pow(2, 10 * (time - 1)) + begin;
+            }
+            time -= 1;
+            return change / 2 * (-pow(2, -10 * time) + 2) + begin;
+        case WXScrollAnimateCircleIn:
+            time /= duration;
+            return -change * (sqrt(1 - time * time) - 1) + begin;
+        case WXScrollAnimateCircleOut:
+            time = time / duration - 1;
+            return change * sqrt(1 - time * time) + begin;
+        case WXScrollAnimateCircleInOut:
+            time /= duration / 2;
+            if (time < 1) {
+                return -change / 2 * (sqrt(1 - time * time) - 1) + begin;
+            }
+            time -= 2;
+            return change / 2 * (sqrt(1 - time * time) + 1) + begin;
+    }
+}
+
+- (void)setContentOffset:(CGPoint)offset duration:(NSTimeInterval)duration {
+    if (!_scrollView) {
+        return;
+    }
+    _startTime = [[NSDate date] timeIntervalSince1970];
+    _startOffset = _scrollView.contentOffset;
+    _destinationOffset = offset;
+    _duration = duration;
+    _runTime = 0;
+    if (_duration < 0) {
+        [_scrollView setContentOffset:offset animated:false];
+        return;
+    }
+    if (_timer == nil) {
+        _timer = [CADisplayLink displayLinkWithTarget:self selector:@selector(animatedScroll)];
+        [_timer addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+    }
+}
+
+- (void)animatedScroll {
+    if (!_timer || !_scrollView) {
+        return;
+    }
+    _runTime += _timer.duration;
+    if (_runTime >= _duration) {
+        [_scrollView setContentOffset:_destinationOffset animated:false];
+        [_timer invalidate];
+        _timer = nil;
+        if (self.completion) {
+            self.completion();
+        }
+        return;
+    }
+    CGPoint offset = _scrollView.contentOffset;
+    offset.x = [self computeAnimateWithTime:_runTime begin:_startOffset.x change:(_destinationOffset.x - _startOffset.x) duration:_duration];
+    offset.y = [self computeAnimateWithTime:_runTime begin:_startOffset.y change:(_destinationOffset.y - _startOffset.y) duration:_duration];
+    [_scrollView setContentOffset:offset animated:false];
+}
+
+@end
+
+
 @interface WXScrollerComponent()
 
 @property (nonatomic, strong) NSMutableArray *  stickyArray;
@@ -176,6 +455,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         
         _stickyArray = [NSMutableArray array];
         _listenerArray = [NSMutableArray array];
+        _snapData = [[WXScrollSnapData alloc] init];
         _scrollEvent = NO;
         _scrollStartEvent = NO;
         _scrollEndEvent = NO;
@@ -231,9 +511,81 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         if (weexInstance.instanceCallback) {
             weexInstance.instanceCallback(weexInstance, WXScrollerComponentCreatedCallback, self);
         }
+        
+        [self handleScrollSnapAttributes:attributes];
     }
     
     return self;
+}
+
+- (void)handleScrollSnapAttributes:(NSDictionary *)attrs {
+    if (attrs[@"scrollSnap"]) {
+        _snapData.useSnap = attrs[@"scrollSnap"] ? [WXConvert BOOL:attrs[@"scrollSnap"]] : NO;
+        _snapData.axis = _scrollDirection;
+    }
+    CGFloat top=0, right=0, bottom=0, left=0;
+    if (attrs[@"scrollPaddingTop"]) {
+        top = attrs[@"scrollPaddingTop"] ? [WXConvert WXPixelType:attrs[@"scrollPaddingTop"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0.f;
+    }
+    if (attrs[@"scrollPaddingRight"]) {
+        right = attrs[@"scrollPaddingRight"] ? [WXConvert WXPixelType:attrs[@"scrollPaddingRight"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0.f;
+    }
+    if (attrs[@"scrollPaddingBottom"]) {
+        bottom = attrs[@"scrollPaddingBottom"] ? [WXConvert WXPixelType:attrs[@"scrollPaddingBottom"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0.f;
+    }
+    if (attrs[@"scrollPaddingLeft"]) {
+        left = attrs[@"scrollPaddingLeft"] ? [WXConvert WXPixelType:attrs[@"scrollPaddingLeft"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0.f;
+    }
+    _snapData.padding = UIEdgeInsetsMake(top, left, bottom, right);
+    if (attrs[@"scrollSnapAlign"]) {
+        NSString *alignment = attrs[@"scrollSnapAlign"];
+        if ([alignment isEqualToString:@"start"]) {
+            _snapData.alignment = WXScrollSnapAlignStart;
+        } else if ([alignment isEqualToString:@"center"]) {
+            _snapData.alignment = WXScrollSnapAlignCenter;
+        } else if ([alignment isEqualToString:@"end"]) {
+            _snapData.alignment = WXScrollSnapAlignEnd;
+        } else {
+            _snapData.alignment = WXScrollSnapAlignNone;
+        }
+    }
+    if (attrs[@"scrollAnimateFunc"]) {
+        _snapData.timingFunction = [self translateScrollAnimateFunction:attrs[@"scrollAnimateFunc"]];
+    }
+    if (attrs[@"scrollAnimateDuration"]) {
+        _snapData.scrollAnimateDuration = [WXConvert CGFloat:attrs[@"scrollAnimateDuration"]];
+    }
+}
+
+- (WXScrollAnimateFunction)translateScrollAnimateFunction:(NSString *)name {
+    NSDictionary *dic = @{
+        @"linear" : @(WXScrollAnimateLinear),
+        @"quadIn" : @(WXScrollAnimateQuadIn),
+        @"quadOut" : @(WXScrollAnimateQuadOut),
+        @"quadInOut" : @(WXScrollAnimateQuadInOut),
+        @"cubicIn" : @(WXScrollAnimateCubicIn),
+        @"cubicOut" : @(WXScrollAnimateCubicOut),
+        @"cubicInOut" : @(WXScrollAnimateCubicInOut),
+        @"quartIn" : @(WXScrollAnimateQuartIn),
+        @"quartOut" : @(WXScrollAnimateQuartOut),
+        @"quartInOut" : @(WXScrollAnimateQuartInOut),
+        @"quintIn" : @(WXScrollAnimateQuintIn),
+        @"quintOut" : @(WXScrollAnimateQuintOut),
+        @"quintInOut" : @(WXScrollAnimateQuintInOut),
+        @"sineIn" : @(WXScrollAnimateSineIn),
+        @"sineOut" : @(WXScrollAnimateSineOut),
+        @"sineInOut" : @(WXScrollAnimateSineInOut),
+        @"expoIn" : @(WXScrollAnimateExpoIn),
+        @"expoOut" : @(WXScrollAnimateExpoOut),
+        @"expoInOut" : @(WXScrollAnimateExpoInOut),
+        @"circleIn" : @(WXScrollAnimateCircleIn),
+        @"circleOut" : @(WXScrollAnimateCircleOut),
+        @"circleInOut" : @(WXScrollAnimateCircleInOut),
+    };
+    if (dic[name]) {
+        return (WXScrollAnimateFunction)[dic[name] integerValue];
+    }
+    return WXScrollAnimateNone;
 }
 
 - (UIView *)loadView
@@ -278,9 +630,10 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         scrollView.scrollsToTop = YES;
     }
     
-    if (_pagingEnabled && _pageSize > 0) {
+    if ((_pagingEnabled && _pageSize > 0) || _snapData.useSnap) {
         scrollView.pagingEnabled = NO; // turn off system default paging
         scrollView.decelerationRate = UIScrollViewDecelerationRateFast;
+        [_snapData bindingScrollView:scrollView];
     }
     else {
         scrollView.decelerationRate = UIScrollViewDecelerationRateNormal;
@@ -337,10 +690,13 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         }
     }
     
+    [self handleScrollSnapAttributes:attributes];
+    
     if ([self isViewLoaded]) {
-        if (_pagingEnabled && _pageSize > 0) {
+        if ((_pagingEnabled && _pageSize > 0) || _snapData.useSnap) {
             ((UIScrollView *)self.view).pagingEnabled = NO; // turn off system default paging
             ((UIScrollView *)self.view).decelerationRate = UIScrollViewDecelerationRateFast;
+            [_snapData bindingScrollView:(UIScrollView *)self.view];
         }
         else {
             ((UIScrollView *)self.view).decelerationRate = UIScrollViewDecelerationRateNormal;
@@ -859,6 +1215,9 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     if (!_isScrolling) {
         [self dispatchScrollEndEvent:scrollView];
         _scrollEndPoint = scrollView.contentOffset;
+        if (_snapData.useSnap && _snapData.snapping == true) {
+            _snapData.snapping = false;
+        }
         id<WXPageEventNotifyEventProtocol> eventNotify = [WXSDKEngine handlerForProtocol:@protocol(WXPageEventNotifyEventProtocol)];
         if ([eventNotify respondsToSelector:@selector(notifyScrollEvent:from:to:)]) {
             [eventNotify notifyScrollEvent:self.weexInstance.instanceId from:_scrollStartPoint to:_scrollEndPoint];
@@ -873,8 +1232,49 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
 }
 
+- (CGPoint)calculateSnapPosition:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity startPosition:(CGPoint)startPosition targetPosition:(CGPoint)targetPosition{
+    return CGPointMake(-1, -1);
+}
+
+- (void)setContentOffset:(CGPoint)contentOffset duration:(NSTimeInterval)duration timingFunction:(WXScrollAnimateFunction)timingFunction completion:(void(^)(void))completion {
+    if (!_scrollAnimator) {
+        _scrollAnimator = [[WXScrollAnimator alloc] initWithScrollView:(UIScrollView *)self.view timingFunction:timingFunction];
+    }
+    __weak typeof(self) weakSelf = self;
+    _scrollAnimator.completion = ^{
+        __strong typeof(self) strongSelf = weakSelf;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            strongSelf.scrollAnimator = nil;
+        });
+        if (completion) {
+            completion();
+        }
+    };
+    [_scrollAnimator setContentOffset:contentOffset duration:duration];
+}
+
 - (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset
 {
+    if (_snapData.useSnap) {
+        CGPoint offset = [self calculateSnapPosition:scrollView withVelocity:velocity startPosition:_scrollStartPoint targetPosition:CGPointMake(targetContentOffset->x, targetContentOffset->y)];
+        // offset beyond bounary use default animation, make sure bounce effect
+        if (offset.x + scrollView.frame.size.width > scrollView.contentSize.width ||
+            offset.y + scrollView.frame.size.height > scrollView.contentSize.height ||
+            (self.scrollDirection == WXScrollDirectionVertical && offset.y <= 0) ||
+            (self.scrollDirection == WXScrollDirectionHorizontal && offset.x <= 0)) {
+            targetContentOffset->x = offset.x;
+            targetContentOffset->y = offset.y;
+        }
+        else if (self.snapData.timingFunction != WXScrollAnimateNone) {
+            [self setContentOffset:offset duration:self.snapData.scrollAnimateDuration timingFunction:self.snapData.timingFunction completion:^{
+                WXLogInfo(@"snap scroll animate over");
+            }];
+        } else {
+            targetContentOffset->x = offset.x;
+            targetContentOffset->y = offset.y;
+        }
+        self.snapData.targetPosition = offset;
+    }
     // Page stop effect
     if (_pagingEnabled && _pageSize > 0) {
         if (_scrollDirection == WXScrollDirectionVertical) {
@@ -1036,6 +1436,9 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         if (_scrollEventListener) {
             _scrollEventListener(self, @"scrollend", @{@"contentSize":contentSizeData, @"contentOffset":contentOffsetData});
         }
+    }
+    if (_snapData.useSnap) {
+        [self fireEvent:@"snapend" params:@{@"section" : @(self.snapData.targetIndexPath.section), @"row" : @(self.snapData.targetIndexPath.row)} domChanges:nil];
     }
 }
 
