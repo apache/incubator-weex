@@ -53,9 +53,9 @@ subprojects {
     }
 }
 ext {
-    compileSdkVersion=28
+    compileSdkVersion=29
     minSdkVersion=14
-    targetSdkVersion=28
+    targetSdkVersion=29
     supportLibVersion="28.0.0"
     fastjsonLibVersion="1.1.70.android"
     //Default value for disableCov is false
